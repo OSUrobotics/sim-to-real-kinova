@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+  <rosparam command="load" file="$(find grasp_classifier_individual_sim_2_real)/config/params.yaml"/>
+  
+  <include file="$(find kinova_bringup)/launch/kinova_robot.launch">
+    <arg name="kinova_robotType" value="j2s7s300"/>
+  </include>
+  
+  <include file="$(find j2s7s300_moveit_config)/launch/j2s7s300_demo.launch"/>
+  
+  <include file="$(find kinova_controller_sim_2_real)/launch/sim_2_real_connector.launch">
+  
+  <node pkg="grasp_classifier_individual_sim_2_real" name="" type=".py" output="screen"/>
+  
+</launch>

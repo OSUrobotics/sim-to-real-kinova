@@ -1,0 +1,16 @@
+
+# Kinova Param
+kinova_robotType: 'j2s7s300'
+
+
+### Run Pararmetrs ###
+
+close_percent: 80
+
+
+### Output Parameters ###
+lift: 'false'
+Goal: 'false'
+exec_done: 'false'
+
+Object_size: {'x': 0, 'y': 0, 'z': 0}
