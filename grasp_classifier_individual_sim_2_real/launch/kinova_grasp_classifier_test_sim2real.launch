@@ -11,6 +11,6 @@
   
   <include file="$(find kinova_controller_sim_2_real)/launch/sim_2_real_connector.launch">
   
-  <node pkg="grasp_classifier_individual_sim_2_real" name="" type=".py" output="screen"/>
+  <node pkg="grasp_classifier_individual_sim_2_real" name="grasp_classifier_test" type="grasp_classifier_test.py" output="screen"/>
   
 </launch>
