@@ -8,7 +8,7 @@ Simulation to Real Implementation on Kinova Arm
 
 - Install OpenCV and cv_bridge using the following commands:
 
-      sudo apt-get install ros-your-distro-vision-opencv
+      $ sudo apt-get install ros-your-distro-vision-opencv
   
       $ sudo apt-get install ros-your-distro-cv-bridge
 
