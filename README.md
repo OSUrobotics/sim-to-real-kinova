@@ -8,13 +8,13 @@ Simulation to Real Implementation on Kinova Arm
 
 - Install OpenCV and cv_bridge using the following commands:
 
-  $ sudo apt-get install ros-<your-distro>-vision-opencv
+  $ sudo apt-get install ros-your-distro-vision-opencv
   
-  $ sudo apt-get install ros-<your-distro>-cv-bridge
+  $ sudo apt-get install ros-your-distro-cv-bridge
 
 - Create a package in your workspace with the required dependencies by running the following command:
   
-  $ catkin_create_pkg <package-name> rospy roscpp opencv2 cv_bridge std_msgs sensor_msgs
+  $ catkin_create_pkg package-name rospy roscpp opencv2 cv_bridge std_msgs sensor_msgs
 
 - Put pose_estimation.py and camera_cal.py in the src folder
 
