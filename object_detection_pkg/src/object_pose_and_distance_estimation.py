@@ -117,7 +117,7 @@ class ImageProcessor():
 				# Get the distance between object and finger 
 				for x, y in zip(obj_marker, finger1_dist):
 				    delta_pose += (x - y)*(x - y)
-				dist = sqrt(delta_pose)
+				dist = sqrt(delta_pose)*10.0
 				finger_object_dist.append(dist)
 				print("Finger1 Dist to object: " +str(dist))
 				count += 1
@@ -127,7 +127,7 @@ class ImageProcessor():
 				# Get the distance between object and finger 
 				for x, y in zip(obj_marker, finger1_tip):
 				    delta_pose += (x - y)*(x - y)
-				dist = sqrt(delta_pose)
+				dist = sqrt(delta_pose)*10.0
 				finger_object_dist.append(dist)
 				print("Finger1 tip to object: " +str(dist))
 				count += 1
@@ -137,7 +137,7 @@ class ImageProcessor():
 				# Get the distance between object and finger 
 				for x, y in zip(obj_marker, finger2_dist):
 				    delta_pose += (x - y)*(x - y)
-				dist = sqrt(delta_pose)
+				dist = sqrt(delta_pose)*10.0
 				finger_object_dist.append(dist)
 				print("Finger2 Dist to object: " +str(dist))
 				count += 1
@@ -147,7 +147,7 @@ class ImageProcessor():
 				# Get the distance between object and finger 
 				for x, y in zip(obj_marker, finger2_tip):
 				    delta_pose += (x - y)*(x - y)
-				dist = sqrt(delta_pose)
+				dist = sqrt(delta_pose)*10.0
 				finger_object_dist.append(dist)
 				print("Finger2 tip to object: " +str(dist))
 				count += 1
