@@ -40,7 +40,8 @@ class KinovaGripper_Env:
         self.object_id = String()
         self.Grasp_Reward = False
         self.wrist_pose=np.zeros(3)  # The wrist position in world coordinates. Since we using local co-ordinate it is 0
-        self.finger_dist_list = Float32() 
+        self.finger_dist_list = Float32()
+        self.finger_pose_list = Float32()
         
         ###Grasp Classifier###
         self.Grasp_net = LinearNetwork().to(device)
@@ -55,7 +56,7 @@ class KinovaGripper_Env:
         self.object_pose_sub = rospy.Subscriber('/object_pose', Float32, object_pose_callback, queue_size=1)
         self.marker_id_sub = rospy.Subscriber('/marker_id', String, marker_id_callback, queue_size=1)
         self.finger_dist_sub = rospy.Subscriber('/finger_dist', Float32, finger_dist_callback, queue_size=1)
-        
+        self.finger_pose_sub = rospy.Subscriber('/finger_pose', Float32, finger_pose_callback, queue_size=1)        
         
         ###Publisher###
         self.finger_command_pub = rospy.Publisher('/sim2real/finger_command', FingerPosition, queue_size=1)
@@ -139,7 +140,7 @@ class KinovaGripper_Env:
 
 
     # Function to get the distance between the digits on the fingers and the object center
-    def get_finger_obj_dist(self): #TODO:Center of finger to Object center distance 
+    def get_finger_obj_dist(self): 
         return self.finger_dist_list
    
     
@@ -160,15 +161,8 @@ class KinovaGripper_Env:
     
     
     ####Gives x,y,z position of fingers#####
-    ##TODO: Get accurate values w.r.t Wrist
     def get_finger_pos(self):
-        num_fing = 3
-        cordinate_axis = 3
-        finger_pos = []
-        for i in range(num_fing):
-            for j in range(cordinate_axis):
-                finger_pos.append(0)
-        return finger_pos
+        return self.finger_pose_list
     
     
         #Function to step the hardware forward in time
@@ -217,6 +211,10 @@ class KinovaGripper_Env:
     def finger_dist_callback(self, msg):
         self.finger_dist_list = msg          
               
+
+    def finger_pose_callback(self, msg):
+        self.finger_pose_list = msg 
+
                 
 class GraspValid_net(nn.Module):
     def __init__(self, state_dim):

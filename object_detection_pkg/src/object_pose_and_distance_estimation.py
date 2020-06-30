@@ -18,6 +18,7 @@ class ImageProcessor():
 		self.marker_pub = rospy.Publisher('/marker_id', String, queue_size=10)
 		# Finger object distance publisher
 		self.finger_dist_pub = rospy.Publisher("/finger_dist", Float32, queue_size=10)
+		self.finger_pose_pub = rospy.Publisher("/finger_pose", Float32, queue_size=10)
 
 		#cv bridge class
 		self.bridge = CvBridge()
@@ -54,6 +55,7 @@ class ImageProcessor():
 		finger2_dist = []
 		finger2_tip = []
 		finger_object_dist = []
+		finger_object_pose = []
 
 	
 		#Convert ros image message to opencv image
@@ -113,6 +115,10 @@ class ImageProcessor():
 				count += 1
 				
 			if len(finger1_dist) > 0 and len(obj_marker) > 0 :
+			    
+			    finger_object_pose_local = [(x - y)*10.0 for x, y in zip(obj_marker, finger1_dist)]
+                finger_object_pose.append(finger_object_pose_local)			
+			
 			    delta_pose = 0
 				# Get the distance between object and finger 
 				for x, y in zip(obj_marker, finger1_dist):
@@ -123,6 +129,10 @@ class ImageProcessor():
 				count += 1
 			
 			if len(finger1_tip) > 0 and len(obj_marker) > 0 :
+			
+			    finger_object_pose_local = [(x - y)*10.0 for x, y in zip(obj_marker, finger1_tip)]
+                finger_object_pose.append(finger_object_pose_local)
+			
 			    delta_pose = 0
 				# Get the distance between object and finger 
 				for x, y in zip(obj_marker, finger1_tip):
@@ -133,6 +143,10 @@ class ImageProcessor():
 				count += 1
 				
 			if len(finger2_dist) > 0 and len(obj_marker) > 0 :
+			
+			    finger_object_pose_local = [(x - y)*10.0 for x, y in zip(obj_marker, finger2_dist)]
+                finger_object_pose.append(finger_object_pose_local)
+			
 			    delta_pose = 0
 				# Get the distance between object and finger 
 				for x, y in zip(obj_marker, finger2_dist):
@@ -143,6 +157,10 @@ class ImageProcessor():
 				count += 1
 			
 			if len(finger2_tip) > 0 and len(obj_marker) > 0 :
+			
+			    finger_object_pose_local = [(x - y)*10.0 for x, y in zip(obj_marker, finger2_tip)]
+                finger_object_pose.append(finger_object_pose_local)
+			
 			    delta_pose = 0
 				# Get the distance between object and finger 
 				for x, y in zip(obj_marker, finger2_tip):
@@ -155,6 +173,7 @@ class ImageProcessor():
 			if count > 4:
 			    count = 0	
                 self.finger_dist_pub.publish(finger_object_dist)
+                self.finger_pose_pub.publish(finger_object_pose)
 				self.pose_pub.publish(object_pose)
 				self.marker_pub.publish(str(obj_marker_id))
 			else: 
