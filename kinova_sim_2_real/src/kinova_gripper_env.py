@@ -91,7 +91,7 @@ class KinovaGripper_Env:
     def get_reward_DataCollection(self):
         obj_target = 0.2
         obs = self.get_obs() 
-        # TODO: change obs[23] and obs[5] to the simulator height object
+        lift = rospy.get_param('Goal')
         if lift:
             lift_reward = 1
             done = True
@@ -131,8 +131,8 @@ class KinovaGripper_Env:
             lift_reward = 0.0
             done = False
             
-        finger_reward = -np.sum((np.array(obs[41:47])) + (np.array(obs[35:41]))) #Talk to Anjali
-        reward = 0.2*finger_reward + lift_reward + grasp_reward
+        finger_reward = -np.sum((np.array(obs[41:47])) + (np.array(obs[35:41]))) #Distance between finger and object 
+        reward = 0.2*finger_reward + lift_reward + grasp_reward 
         
         return reward, {}, done    
     
@@ -159,9 +159,6 @@ class KinovaGripper_Env:
             temp = np.linalg.norm(dist)
             dists.append(temp)
         return dists
-    
-    
-
     
     
     # Function to return global or local transformation matrix

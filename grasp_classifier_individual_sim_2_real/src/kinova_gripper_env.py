@@ -27,6 +27,7 @@ import rospy
 from sensor_msgs.msg import JointState
 from kinova_msgs.msg import FingerPosition, KinovaPose
 from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import String, Float32
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -35,9 +36,11 @@ class KinovaGripper_Env:
         self.joint_states = JointState()
         self.finger_pos = FingerPosition()
         self.reward = 0
-        self.object_pose = KinovaPose()
+        self.object_pose = Float32()
+        self.object_id = String()
         self.Grasp_Reward = False
-        self.wrist_pose=np.zeros(3)  # The wrist position in world coordinates. Since we using local co-ordinate it is 0 
+        self.wrist_pose=np.zeros(3)  # The wrist position in world coordinates. Since we using local co-ordinate it is 0
+        self.finger_dist_list = Float32() 
         
         ###Grasp Classifier###
         self.Grasp_net = LinearNetwork().to(device)
@@ -49,7 +52,10 @@ class KinovaGripper_Env:
         ###Subscribers###
         self.joint_state_sub = rospy.Subscriber('/j2s7s300_driver/out/joint_state', JointState, joint_state_callback, queue_size=1)
         self.finger_sub = rospy.Subscriber('/j2s7s300_driver/out/finger_position', FingerPosition, finger_state_callback, queue_size=1)
-        self.object_pose_sub = rospy.Subscriber('Object pose topic', KinovaPose, object_pose_callback, queue_size=1)
+        self.object_pose_sub = rospy.Subscriber('/object_pose', Float32, object_pose_callback, queue_size=1)
+        self.marker_id_sub = rospy.Subscriber('/marker_id', String, marker_id_callback, queue_size=1)
+        self.finger_dist_sub = rospy.Subscriber('/finger_dist', Float32, finger_dist_callback, queue_size=1)
+        
         
         ###Publisher###
         self.finger_command_pub = rospy.Publisher('/sim2real/finger_command', FingerPosition, queue_size=1)
@@ -86,16 +92,12 @@ class KinovaGripper_Env:
     
     # Function to get rewards based only on the lift reward. This is primarily used to generate data for the grasp classifier
     def get_reward_DataCollection(self):
-        obj_target = 0.2
         obs = self.get_obs() 
 
-        lift = rospy.get_param('lift')
+        lift = rospy.get_param('Goal')
         if lift:
             lift_reward = 1
             done = True
-        elif obs[5]>obj_target+0.05:
-            lift_reward=0.0
-            done=True
         else:
             lift_reward = 0
             done = False        
@@ -104,13 +106,10 @@ class KinovaGripper_Env:
     
     # Function to get rewards for RL training
     def get_reward(self):                    
-        # object height target
-        obj_target = 0.2
-
         # Grasp reward
         grasp_reward = 0.0 
         obs = self.get_obs() 
-        lift = rospy.get_param('lift')
+        lift = rospy.get_param('Goal')
         
         network_inputs=obs
         inputs = torch.FloatTensor(np.array(network_inputs)).to(device)
@@ -128,7 +127,7 @@ class KinovaGripper_Env:
         else:
             lift_reward = 0.0
             done = False            
-        finger_reward = 1#-np.sum((np.array(obs[41:47])) + (np.array(obs[35:41]))) #Talk to Anjali
+        finger_reward = sum(self.finger_dist_list)
         reward = 0.2*finger_reward + lift_reward + grasp_reward
         
         return grasp_reward, {}, done    
@@ -136,22 +135,12 @@ class KinovaGripper_Env:
     
     # Function to get the dimensions of the object
     def get_obj_size(self):
-        return [rospy.get_param('Object_size/x'), rospy.get_param('Object_size/y'), rospy.get_param('Object_size/z')]
+        return [42, 42, 110]
 
 
     # Function to get the distance between the digits on the fingers and the object center
     def get_finger_obj_dist(self): #TODO:Center of finger to Object center distance 
-        finger_joints = ["f1_prox", "f2_prox", "f3_prox", "f1_dist", "f2_dist", "f3_dist"]
-
-        obj = self.get_obj_pose()
-        dists = []
-        ##TODO: Change this to exact fingers postion represenation 
-        for i in finger_joints:
-            pos = [0, 0, 0]#Pose Topic 
-            dist = np.absolute(pos[0:2] - obj[0:2])
-            temp = np.linalg.norm(dist)
-            dists.append(temp)
-        return dists
+        return self.finger_dist_list
    
     
     # Function to return global or local transformation matrix
@@ -219,7 +208,15 @@ class KinovaGripper_Env:
 
     def object_pose_callback(self, msg):
         self.object_pose = msg        
-            
+    
+    
+    def marker_id_callback(self, msg):
+        self.object_id = msg
+        
+        
+    def finger_dist_callback(self, msg):
+        self.finger_dist_list = msg          
+              
                 
 class GraspValid_net(nn.Module):
     def __init__(self, state_dim):

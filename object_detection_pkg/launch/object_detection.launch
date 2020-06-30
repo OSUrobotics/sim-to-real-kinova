@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="object_detection_pkg" name="object_pose_and_distance_estimation" type="object_pose_and_distance_estimation.py" output="screen"/>
+  
+  <node pkg="object_detection_pkg" name="reward_detection" type="reward_detection.py" output="screen"/>
+  
+</launch>

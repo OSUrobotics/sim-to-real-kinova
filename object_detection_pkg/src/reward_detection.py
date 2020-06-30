@@ -12,21 +12,23 @@ import sys
 
 class ImageProcessor():
 	def __init__(self):
-		# Object pose publisher
-		self.pose_pub = rospy.Publisher("object_pose", Float32, queue_size=10)
-		# Marker ID publisher 
-		self.marker_pub = rospy.Publisher('marker_id', String, queue_size=10)
 
 		#cv bridge class
 		self.bridge = CvBridge()
 
 		# This is the image message subcriber. Change the topic to your camera topic (most likely realsense)
-		self.image_sub = rospy.Subscriber('/usb_cam/image_raw', Image, self.get_object_pose)
+		self.image_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.get_object_pose)
+		
 		
 	# Callback for image processing
 	def get_object_pose(self, img_msg):
-
- 
+	
+	    ##Box Pixel values in the Image##
+	    x = 0   # Start Pixel in Height
+	    y = 0   # Start Pixel in Width
+	    h = 250	# Height in pixels    
+	    w = 250 # Width in pixels
+	    
 		# Aruko Marker Info
 		marker_size = 5 #cm 
 
@@ -45,18 +47,19 @@ class ImageProcessor():
 		#Lists for storing marker positions
 		ee_marker = []
 		obj_marker = []
-
 	
 		#Convert ros image message to opencv image
-
 		try:
 			cv_image = self.bridge.imgmsg_to_cv2(img_msg, "bgr8")
 		except CvBridgeError as e:
 			print(e)
-
+        
+        #Cropping Image
+        cv_image = cv_image[y:y+h, x:x+w]
+        
 		#Convert in gray scale
 		gray = cv2.cvtColor(cv_image,cv2.COLOR_BGR2GRAY)
-
+        
 		#Find markers in the image 
 		corners, ids, rejected = aruco.detectMarkers(image=gray, dictionary=aruco_dict, parameters=parameters, cameraMatrix=mtx, distCoeff=dist)
 
@@ -80,21 +83,12 @@ class ImageProcessor():
 			#Draw Markers
 			aruco.drawDetectedMarkers(cv_image, corners, ids)
 
-			# print('obj: ', obj_marker)
-			# print('ee: ', ee_marker)
-
-			if len(ee_marker) > 0 and len(obj_marker) > 0 :
-				# Get the pose of object with respect to end-effector 
-				delta_pose = [(x - y)*10.0 for x, y in zip(obj_marker, ee_marker)] # Prints in milimeters. Default is cm.
-				print(delta_pose)
-
-				self.pose_pub.publish(delta_pose)
-				self.marker_pub.publish(str(obj_marker_id))
-			else: 
+			if len(obj_marker) > 0 :
+			    rospy.set_param('Goal', "true")
+				print("Lift Detected")
+			else:
+			    rospy.set_param('Goal', "false") 
 				print("No Marker Found")
-
-			
-			
 
 		#Display
 		cv2.imshow('Window', cv_image)
@@ -103,7 +97,7 @@ class ImageProcessor():
 	
 def main(args):
 	f = ImageProcessor()
-	rospy.init_node('pose_estimation', anonymous=True)
+	rospy.init_node('reward_detection', anonymous=True)
 
 	try:
 		rospy.spin()
