@@ -85,6 +85,7 @@ class ImageProcessor():
                 # Save object marker pose
                 if ids[i] == obj_marker_id:
                     obj_marker = tvec[i]
+                    obj_marker[2] = obj_marker[2] - 5.5  ###Since Object height in z is 110 mm. Subtracting 55 mm brings center to object center 
                     
                 # Save finger1 Dist marker pose
                 if ids[i] == finger1_dist_id:
