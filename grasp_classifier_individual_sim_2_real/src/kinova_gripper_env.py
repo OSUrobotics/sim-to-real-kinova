@@ -66,10 +66,13 @@ class KinovaGripper_Env:
     ### Finger Position in Radians ###
     def get_joint_states(self): 
         temp = list(self.joint_states.position)     
-        finger_joint_state_value = [0, 0, 0]
+        finger_joint_state_value = [0, 0, 0, 0, 0, 0]
         finger_joint_state_value[0] = temp[7]
         finger_joint_state_value[1] = temp[8]
         finger_joint_state_value[2] = temp[9]
+        finger_joint_state_value[3] = temp[7]
+        finger_joint_state_value[4] = temp[8]
+        finger_joint_state_value[5] = temp[9]
         return  finger_joint_state_value
             
     
@@ -140,7 +143,7 @@ class KinovaGripper_Env:
 
 
     # Function to get the distance between the digits on the fingers and the object center
-    def get_finger_obj_dist(self): 
+    def get_finger_obj_dist(self):
         return self.finger_dist_list
    
     
