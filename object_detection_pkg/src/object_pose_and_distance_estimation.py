@@ -145,29 +145,33 @@ class ImageProcessor():
                 
             if len(finger2_dist) > 0 and len(obj_marker) > 0 :
             
-                finger_object_pose_local = [(x - y)*10.0 for x, y in zip(obj_marker, finger2_dist)]
-                finger_object_pose.append(finger_object_pose_local)
+                finger_object_pose_local1 = [(x - y)*10.0 for x, y in zip(obj_marker, finger2_dist)]
+                finger_object_pose.append(finger_object_pose_local1)
             
                 delta_pose = 0
                 # Get the distance between object and finger 
                 for x, y in zip(obj_marker, finger2_dist):
                     delta_pose += (x - y)*(x - y)
-                dist = sqrt(delta_pose)*10.0
-                finger_object_dist.append(dist)
-                print("Finger2 Dist to object: " +str(dist))
+                dist1 = sqrt(delta_pose)*10.0
+                finger_object_dist.append(dist1)
+                print("Finger2 Dist to object: " +str(dist1))
                 count += 1
             
             if len(finger2_tip) > 0 and len(obj_marker) > 0 :
             
-                finger_object_pose_local = [(x - y)*10.0 for x, y in zip(obj_marker, finger2_tip)]
-                finger_object_pose.append(finger_object_pose_local)
+                finger_object_pose_local2 = [(x - y)*10.0 for x, y in zip(obj_marker, finger2_tip)]
+                finger_object_pose.append(finger_object_pose_local2)
+                finger_object_pose.append(finger_object_pose_local1)
+                finger_object_pose.append(finger_object_pose_local2)
             
                 delta_pose = 0
                 # Get the distance between object and finger 
                 for x, y in zip(obj_marker, finger2_tip):
                     delta_pose += (x - y)*(x - y)
-                dist = sqrt(delta_pose)*10.0
-                finger_object_dist.append(dist)
+                dist2 = sqrt(delta_pose)*10.0
+                finger_object_dist.append(dist2)
+                finger_object_dist.append(dist1)
+                finger_object_dist.append(dist2)
                 print("Finger2 tip to object: " +str(dist))
                 count += 1
             
