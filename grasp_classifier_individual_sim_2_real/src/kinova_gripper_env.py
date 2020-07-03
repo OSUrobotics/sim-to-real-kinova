@@ -47,7 +47,7 @@ class KinovaGripper_Env:
         
         ###Grasp Classifier###
         self.Grasp_net = LinearNetwork().to(device)
-        trained_model = "path to model"
+        trained_model = "path to model"  ###Path Requiered 
         model = torch.load(trained_model)
         self.Grasp_net.load_state_dict(model)
         self.Grasp_net.eval()
@@ -243,7 +243,6 @@ class GraspValid_net(nn.Module):
         self.l3 = nn.Linear(256, 1)
 
     def forward(self, state):
-        # pdb.set_trace()
         a = F.relu(self.l1(state))
         a = F.relu(self.l2(a))
         a =    torch.sigmoid(self.l3(a))
