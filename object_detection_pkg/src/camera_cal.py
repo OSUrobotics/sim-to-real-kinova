@@ -24,23 +24,23 @@ img_points = [] # 2D points in image plane
 images = glob.glob('/home/nuha/kinova_ws/src/traj-control/images/*.jpg')
 
 for fname in images:
-	img = cv2.imread(fname)
-	gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.imread(fname)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-	# Find chess board corners
-	ret, corners = cv2.findChessboardCorners(gray, (7,6), None)
+    # Find chess board corners
+    ret, corners = cv2.findChessboardCorners(gray, (7,6), None)
 
-	# If found, add object points, image points (after refining them)
-	if ret == True:
-		object_points.append(object_p)
+    # If found, add object points, image points (after refining them)
+    if ret == True:
+        object_points.append(object_p)
 
-		corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
-		img_points.append(corners2)
+        corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
+        img_points.append(corners2)
 
-		#Draw and display the corners
-		img = cv2.drawChessboardCorners(img, (7,6), corners2, ret)
-		cv2.imshow('img',img)
-		cv2.waitKey(500)
+        #Draw and display the corners
+        img = cv2.drawChessboardCorners(img, (7,6), corners2, ret)
+        cv2.imshow('img',img)
+        cv2.waitKey(500)
 
 
 # Get all the relevant matrices
