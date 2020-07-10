@@ -27,7 +27,7 @@ import rospy
 from sensor_msgs.msg import JointState
 from kinova_msgs.msg import FingerPosition, KinovaPose
 from geometry_msgs.msg import PoseStamped
-from std_msgs.msg import String, Float32
+from std_msgs.msg import String, Float32, Float32MultiArray
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -62,8 +62,8 @@ class KinovaGripper_Env:
         
         ###Publisher###
         self.finger_command_pub = rospy.Publisher('/sim2real/finger_command', FingerPosition, queue_size=1)
-        self.joint_angle_command_pub = rospy.Publisher('/sim2real/joint_angle_command', JointState, joint_angle_client, queue_size=1)
-        
+        self.joint_angle_command_pub = rospy.Publisher('/sim2real/joint_angle_command', JointState, queue_size=1)
+        self.obs_pub = rospy.Publisher('/sim2real/obs', Float32MultiArray, queue_size=1)
         
     ### Finger Position in Radians ###
     def get_joint_states(self): 
@@ -183,7 +183,10 @@ class KinovaGripper_Env:
             rospy.sleep(0.1)
         
         obs = self.get_obs()
-        
+        obs_pub_msg = Float32MultiArray()
+        obs_pub_msg.data.append(obs)
+        self.obs_pub.publish(obs_pub_msg)
+
         ### Get this reward for RL training ###
         total_reward, info, done = self.get_reward()
 
