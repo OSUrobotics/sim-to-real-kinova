@@ -47,10 +47,10 @@ class KinovaGripper_Env:
         
         ###Grasp Classifier###
         self.Grasp_net = LinearNetwork().to(device)
-        trained_model = "path to model"  ###Path Requiered 
-        model = torch.load(trained_model)
-        self.Grasp_net.load_state_dict(model)
-        self.Grasp_net.eval()
+        #trained_model = "path to model"  ###Path Requiered 
+        #model = torch.load(trained_model)
+        #self.Grasp_net.load_state_dict(model)
+        #self.Grasp_net.eval()
         
         ###Subscribers###
         self.joint_state_sub = rospy.Subscriber('/j2s7s300_driver/out/joint_state', JointState, joint_state_callback, queue_size=1)
