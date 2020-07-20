@@ -15,11 +15,11 @@ from scipy.spatial.transform import Rotation as R
 import random
 import pickle
 import pdb
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+#mport torch
+#import torch.nn as nn
+#import torch.nn.functional as F
 import xml.etree.ElementTree as ET
-from classifier_network import LinearNetwork, ReducedLinearNetwork
+#from classifier_network import LinearNetwork, ReducedLinearNetwork
 import re
 from scipy.stats import triang
 
@@ -29,7 +29,7 @@ from kinova_msgs.msg import FingerPosition, KinovaPose
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import String, Float32, Float32MultiArray
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class KinovaGripper_Env:
     def init():
@@ -46,7 +46,7 @@ class KinovaGripper_Env:
         self.finger2_dist_ang = 0
         
         ###Grasp Classifier###
-        self.Grasp_net = LinearNetwork().to(device)
+        #self.Grasp_net = LinearNetwork().to(device)
         #trained_model = "path to model"  ###Path Requiered 
         #model = torch.load(trained_model)
         #self.Grasp_net.load_state_dict(model)
@@ -114,12 +114,12 @@ class KinovaGripper_Env:
     def get_reward(self):                    
         # Grasp reward
         grasp_reward = 0.0 
-        obs = self.get_obs() 
+        #obs = self.get_obs() 
         lift = rospy.get_param('Goal')
         
-        network_inputs=obs
-        inputs = torch.FloatTensor(np.array(network_inputs)).to(device)
-        outputs = self.Grasp_net(inputs).cpu().data.numpy().flatten()
+        #network_inputs=obs
+        #inputs = torch.FloatTensor(np.array(network_inputs)).to(device)
+        outputs = 0#self.Grasp_net(inputs).cpu().data.numpy().flatten()
         if (outputs >=0.3) & (not self.Grasp_Reward):
             grasp_reward = 5.0
             self.Grasp_Reward=True
@@ -136,7 +136,7 @@ class KinovaGripper_Env:
         finger_reward = sum(self.finger_dist_list)
         reward = 0.2*finger_reward + lift_reward + grasp_reward
         
-        return grasp_reward, {}, done    
+        return reward, {}, done    
     
     
     # Function to get the dimensions of the object
@@ -181,7 +181,8 @@ class KinovaGripper_Env:
         
         while not rospy.get_param('exec_done'):
             rospy.sleep(0.1)
-        
+
+        rospy.set_param('exec_done', "false")
         obs = self.get_obs()
         obs_pub_msg = Float32MultiArray()
         obs_pub_msg.data.append(obs)
@@ -238,15 +239,15 @@ class KinovaGripper_Env:
          
 
                 
-class GraspValid_net(nn.Module):
-    def __init__(self, state_dim):
-        super(GraspValid_net, self).__init__()
-        self.l1 = nn.Linear(state_dim, 256)
-        self.l2 = nn.Linear(256, 256)
-        self.l3 = nn.Linear(256, 1)
+# class GraspValid_net(nn.Module):
+#     def __init__(self, state_dim):
+#         super(GraspValid_net, self).__init__()
+#         self.l1 = nn.Linear(state_dim, 256)
+#         self.l2 = nn.Linear(256, 256)
+#         self.l3 = nn.Linear(256, 1)
 
-    def forward(self, state):
-        a = F.relu(self.l1(state))
-        a = F.relu(self.l2(a))
-        a =    torch.sigmoid(self.l3(a))
-        return a
+#     def forward(self, state):
+#         a = F.relu(self.l1(state))
+#         a = F.relu(self.l2(a))
+#         a =    torch.sigmoid(self.l3(a))
+#         return a
