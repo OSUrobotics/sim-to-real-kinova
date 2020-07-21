@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Test_Control_Behavior_GR">
+
+	<executable package_path="grasp_reset_flexbe_behaviors.test_control_behavior_gr_sm" class="Test_Control_Behavior_GRSM" />
+	<tagstring></tagstring>
+	<author>Keegan</author>
+	<date>Thu Jun 11 2020</date>
+	<description>
+		This Behavior contains the Monitor_State and the Test_Control state. This is where the initial test information will be passed in and Test_control will store it as userdata.
+
+TODO:
+In the future an additional state might be useful for further processsing test information from a file or another source before storing it as userdata.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+	<params>
+
+		<param type="numeric" name="direction" default="1" label="direction" hint="Sets the direction">
+			<min value="0" />
+			<max value="3" />
+		</param>
+
+		<param type="numeric" name="num_trials" default="1" label="num_trials" hint="Sets the num_trials">
+			<min value="1" />
+			<max value="20" />
+		</param>
+
+		<param type="numeric" name="num_tests" default="1" label="num_tests" hint="Sets the num_tests">
+			<min value="1" />
+			<max value="20" />
+		</param>
+
+	</params>
+
+
+</behavior>

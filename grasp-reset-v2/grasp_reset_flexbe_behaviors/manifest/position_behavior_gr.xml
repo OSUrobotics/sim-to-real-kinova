@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Position_Behavior_GR">
+
+	<executable package_path="grasp_reset_flexbe_behaviors.position_behavior_gr_sm" class="Position_Behavior_GRSM" />
+	<tagstring></tagstring>
+	<author>Keegan</author>
+	<date>Wed Jun 24 2020</date>
+	<description>
+		Holds the necessary states for the Position stage of the arm.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+
+</behavior>

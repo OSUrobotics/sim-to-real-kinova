@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Trial_Control_Behavior_GR">
+
+	<executable package_path="grasp_reset_flexbe_behaviors.trial_control_behavior_gr_sm" class="Trial_Control_Behavior_GRSM" />
+	<tagstring></tagstring>
+	<author>Keegan</author>
+	<date>Mon Jun 15 2020</date>
+	<description>
+		Contains Trial_Control which keeps track of the number of trials and if trials remains continues to Data_Control where the data recording begins before moving to next behavior.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+	<params>
+
+		<param type="numeric" name="rotation" default="0" label="rotation" hint="Sets the rotation">
+			<min value="0" />
+			<max value="360" />
+		</param>
+
+	</params>
+
+
+</behavior>

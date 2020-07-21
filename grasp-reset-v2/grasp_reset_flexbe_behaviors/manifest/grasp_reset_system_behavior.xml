@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="Grasp_Reset_System_Behavior">
+
+	<executable package_path="grasp_reset_flexbe_behaviors.grasp_reset_system_behavior_sm" class="Grasp_Reset_System_BehaviorSM" />
+	<tagstring></tagstring>
+	<author>Keegan</author>
+	<date>Sat Jun 13 2020</date>
+	<description>
+		Behavior that contains all necessary behaviors and states for the grasp reset to complete a full operation of tests.
+	</description>
+
+
+	<!-- Contained Behaviors -->
+	<contains name="Test_Control_Behavior_GR" />
+	<contains name="Trial_Control_Behavior_GR" />
+	<contains name="Reset_Control_Behavior_GR" />
+	<contains name="Position_Behavior_GR" />
+
+	<!-- Available Parameters -->
+
+</behavior>
