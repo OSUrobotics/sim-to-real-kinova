@@ -52,6 +52,17 @@ class KinovaGripper_Env:
         #self.Grasp_net.load_state_dict(model)
         #self.Grasp_net.eval()
         
+
+        ###Define Intermidiate Positions###
+        self.joint_angle1 = [0,0,0,0,0,0,0]
+        self.joint_angle2 = [0,0,0,0,0,0,0]
+        self.joint_angle3 = [0,0,0,0,0,0,0]
+        self.joint_angle4 = [0,0,0,0,0,0,0]
+        self.joint_angle5 = [0,0,0,0,0,0,0]
+        self.joint_angle6 = [0,0,0,0,0,0,0]
+        self.joint_angle7 = [0,0,0,0,0,0,0]
+
+
         ###Subscribers###
         self.joint_state_sub = rospy.Subscriber('/j2s7s300_driver/out/joint_state', JointState, joint_state_callback, queue_size=1)
         self.finger_sub = rospy.Subscriber('/j2s7s300_driver/out/finger_position', FingerPosition, finger_state_callback, queue_size=1)
@@ -196,6 +207,39 @@ class KinovaGripper_Env:
         return obs, total_reward, done, info 
     
     
+    def go_to_goal(self):
+
+        joint_state_goal = self.joint_angle1
+        self.move_arm_joint_angle(joint_state_goal)
+        joint_state_goal = self.joint_angle2
+        self.move_arm_joint_angle(joint_state_goal)
+        joint_state_goal = self.joint_angle3
+        self.move_arm_joint_angle(joint_state_goal)
+        joint_state_goal = self.joint_angle4
+        self.move_arm_joint_angle(joint_state_goal)
+        joint_state_goal = self.joint_angle5
+        self.move_arm_joint_angle(joint_state_goal)
+        joint_state_goal = self.joint_angle6
+        self.move_arm_joint_angle(joint_state_goal)
+        joint_state_goal = self.joint_angle7
+        self.move_arm_joint_angle(joint_state_goal)
+        
+
+
+    def move_arm_joint_angle(self, joint_angle):
+        self.joint_pos_goal = JointState()
+        self.joint_pos_goal.position.append(joint_angle)
+        
+        self.joint_angle_command_pub.publish(self.joint_pos_goal)
+        
+        while not rospy.get_param('exec_done'):
+            rospy.sleep(0.1)
+
+        rospy.set_param('exec_done', "false")
+
+
+
+
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed] 
