@@ -9,6 +9,8 @@
   
   <include file="$(find j2s7s300_moveit_config)/launch/j2s7s300_demo.launch"/>
   
+  <include file="$(find grasp_reset_flexbe_behaviors)/launch/grasp_reset.launch"/>
+  
   <include file="$(find kinova_controller_sim_2_real)/launch/sim_2_real_connector.launch"/>
   
   <include file="$(find object_detection_pkg)/launch/object_detection.launch"/>
