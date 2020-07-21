@@ -26,14 +26,17 @@ if __name__ == '__main__':
         finger_pos.finger1 = 0
         finger_pos.finger2 = 0
         finger_pos.finger3 = 0
-        
+        count = 0
         while not rospy.is_shutdown():
+            
             if finger_pos.finger1 < (64*finger_close_percent)-10:
                 finger_pos.finger1 = finger_pos.finger1 + 10
                 finger_pos.finger2 = finger_pos.finger2 + 10
                 finger_pos.finger3 = finger_pos.finger3 + 10               
                 _, reward, _, _ = env.step(finger_pos)                
-                
+            elif count == 0:
+                count = 1
+                env.go_to_goal()
             else:
                 print("Goal Reached Terminate execution")        
 
