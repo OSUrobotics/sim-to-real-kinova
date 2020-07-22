@@ -8,7 +8,7 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from door_flexbe_states.test_control_state import Test_Control_State
+from grasp_reset_flexbe_states.test_control_state_GR import Test_Control_State_GR
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -60,9 +60,9 @@ In the future an additional state might be useful for further processsing test i
 
 
 		with _state_machine:
-			# x:393 y:88
-			OperatableStateMachine.add('Test_Control',
-										Test_Control_State(direction=self.direction, num_trials=self.num_trials, num_tests=self.num_tests),
+			# x:262 y:106
+			OperatableStateMachine.add('Test_control_GR',
+										Test_Control_State_GR(direction=self.direction, num_trials=self.num_trials, num_tests=self.num_tests),
 										transitions={'continue': 'continue', 'failed': 'failed', 'completed': 'tests_completed'},
 										autonomy={'continue': Autonomy.Off, 'failed': Autonomy.Off, 'completed': Autonomy.Off},
 										remapping={'number_of_trials': 'number_of_trials'})

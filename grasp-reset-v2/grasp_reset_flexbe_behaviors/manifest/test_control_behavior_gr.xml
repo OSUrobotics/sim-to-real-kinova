@@ -30,8 +30,8 @@ In the future an additional state might be useful for further processsing test i
 		</param>
 
 		<param type="numeric" name="num_tests" default="1" label="num_tests" hint="Sets the num_tests">
-			<min value="1" />
-			<max value="20" />
+			<min value="0" />
+			<max value="360" />
 		</param>
 
 	</params>
