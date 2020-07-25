@@ -29,7 +29,7 @@ if __name__ == '__main__':
         count = 0
         while not rospy.is_shutdown():
             
-            if finger_pos.finger1 < (64*finger_close_percent)-10:
+            if finger_pos.finger1 < (finger_close_percent)-10:
                 finger_pos.finger1 = finger_pos.finger1 + 10
                 finger_pos.finger2 = finger_pos.finger2 + 10
                 finger_pos.finger3 = finger_pos.finger3 + 10               
