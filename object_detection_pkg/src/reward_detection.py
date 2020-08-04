@@ -17,20 +17,20 @@ class ImageProcessor():
         self.bridge = CvBridge()
 
         # This is the image message subcriber. Change the topic to your camera topic (most likely realsense)
-        self.image_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.get_object_pose)
+        self.image_sub = rospy.Subscriber('/usb_cam/image_raw', Image, self.get_object_pose)
         
         
     # Callback for image processing
     def get_object_pose(self, img_msg):
     
         ##Box Pixel values in the Image##
-        x = 0   # Start Pixel in Height
-        y = 0   # Start Pixel in Width
-        h = 250 # Height in pixels    
-        w = 250 # Width in pixels
+        x = 100 # Start Pixel in Height
+        y = 350 # Start Pixel in Width
+        h = 600 # Height in pixels    
+        w = 550 # Width in pixels
         
         # Aruko Marker Info
-        marker_size = 5 #cm 
+        marker_size = 2 #cm 
 
         # Marker IDs
         ee_marker_id = 0  # end-effector
