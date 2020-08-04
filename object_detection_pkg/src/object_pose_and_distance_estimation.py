@@ -4,10 +4,11 @@ import rospy
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
-from std_msgs.msg import String, Float32
+from std_msgs.msg import String, Float32, Float32MultiArray
 import numpy as np
 import cv2.aruco as aruco
 import sys
+import math
 
 
 class ImageProcessor():
@@ -24,20 +25,27 @@ class ImageProcessor():
         self.bridge = CvBridge()
 
         # This is the image message subcriber. Change the topic to your camera topic (most likely realsense)
-        self.image_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.get_object_pose)
+        self.image_sub = rospy.Subscriber('/usb_cam/image_raw', Image, self.get_object_pose)
         
     # Callback for image processing
     def get_object_pose(self, img_msg):
         # Aruko Marker Info
-        marker_size = 5 #cm 
+
+        ##Box Pixel values in the Image##
+        x = 600 # Start Pixel in Height
+        y = 250 # Start Pixel in Width
+        h = 500 # Height in pixels    
+        w = 700 # Width in pixels
+        
+        marker_size = 2 #cm 
 
         # Marker IDs
-        ee_marker_id = 0    # end-effector
-        obj_marker_id = 1   # object
+        ee_marker_id = 5  # end-effector
+        obj_marker_id = 0  # object
         finger1_dist_id = 3 # Finger 1 Dist
-        finger1_tip_id = 4  # Finger 1 Tip
-        finger2_dist_id = 5 # Finger 2 Dist  
-        finger2_tip_id = 6  # Finger 1 Tip
+        finger1_tip_id = 2  # Finger 1 Tip
+        finger2_dist_id = 4 # Finger 2 Dist  
+        finger2_tip_id = 1  # Finger 1 Tip
 
         # Get the saved camera and distortion matrices from calibration
         mtx = np.load('/home/nuha/kinova_ws/src/traj-control/src/camera_mtx.npy') # camera matrix
@@ -65,6 +73,9 @@ class ImageProcessor():
         except CvBridgeError as e:
             print(e)
 
+        #Cropping Image
+        cv_image = cv_image[y:y+h, x:x+w]
+
         #Convert in gray scale
         gray = cv2.cvtColor(cv_image,cv2.COLOR_BGR2GRAY)
 
@@ -85,7 +96,7 @@ class ImageProcessor():
                 # Save object marker pose
                 if ids[i] == obj_marker_id:
                     obj_marker = tvec[i]
-                    obj_marker[2] = obj_marker[2] - 5.5  ###Since Object height in z is 110 mm. Subtracting 55 mm brings center to object center 
+                    # obj_marker[2] = obj_marker[2] - 5.5  ###Since Object height in z is 110 mm. Subtracting 55 mm brings center to object center 
                     
                 # Save finger1 Dist marker pose
                 if ids[i] == finger1_dist_id:
@@ -103,84 +114,117 @@ class ImageProcessor():
                 if ids[i] == finger2_tip_id:
                     finger2_tip = tvec[i]
 
-                aruco.drawAxis(cv_image, mtx, dist, rvec[i], tvec[i], 10)
+                aruco.drawAxis(cv_image, mtx, dist, rvec[i], tvec[i], 2)
 
             #Draw Markers
             aruco.drawDetectedMarkers(cv_image, corners, ids)
             count = 0
 
+            # For indexing
+            n = len(finger_object_pose) - 3
+            n_next = len(finger_object_pose)
+
             if len(ee_marker) > 0 and len(obj_marker) > 0 :
                 # Get the pose of object with respect to end-effector 
                 object_pose = [(x - y)*10.0 for x, y in zip(obj_marker, ee_marker)] # Prints in milimeters. Default is cm.
+
+                # object_pose: [x,y,z]
+
                 print("Object Distance: " +str(object_pose))
                 count += 1
-                
+            
             if len(finger1_dist) > 0 and len(obj_marker) > 0 :
                 
                 finger_object_pose_local = [(x - y)*10.0 for x, y in zip(obj_marker, finger1_dist)]
-                finger_object_pose.append(finger_object_pose_local)         
+                finger_object_pose.append(finger_object_pose_local[0][0])  
+                finger_object_pose.append(finger_object_pose_local[0][1])
+                finger_object_pose.append(finger_object_pose_local[0][2])
+                print("Finger1_Proximal to Object relative pose: ", finger_object_pose[0:3])
+                # print("Finger1_Proximal to Object relative pose: ", finger_object_pose[n:n_next])
+
+                # finger1_dist to obj pose: finger_object_pose[0:3]
             
-                delta_pose = 0
-                # Get the distance between object and finger 
-                for x, y in zip(obj_marker, finger1_dist):
-                    delta_pose += (x - y)*(x - y)
-                dist = sqrt(delta_pose)*10.0
+            
+                # Get the distance between object and finger 1
+
+                dist = math.sqrt(sum([x**2 for x in finger_object_pose[0:3]]))
+                #dist = [math.sqrt(x)*10.0 for x in delta_pose]
                 finger_object_dist.append(dist)
                 print("Finger1 Dist to object: " +str(dist))
                 count += 1
+
+                # finger1_dist to object distance: finger_object_dist[0]
             
             if len(finger1_tip) > 0 and len(obj_marker) > 0 :
             
                 finger_object_pose_local = [(x - y)*10.0 for x, y in zip(obj_marker, finger1_tip)]
-                finger_object_pose.append(finger_object_pose_local)
+                finger_object_pose.append(finger_object_pose_local[0][0])
+                finger_object_pose.append(finger_object_pose_local[0][1])
+                finger_object_pose.append(finger_object_pose_local[0][2])
+                print("Finger1 tip to Object relative pose: ", finger_object_pose[3:6])
+
+                # finger1_tip to obj pose: finger_object_pose[3:6]
             
                 delta_pose = 0
                 # Get the distance between object and finger 
-                for x, y in zip(obj_marker, finger1_tip):
-                    delta_pose += (x - y)*(x - y)
-                dist = sqrt(delta_pose)*10.0
-                finger_object_dist.append(dist)
-                print("Finger1 tip to object: " +str(dist))
+                dist1 = math.sqrt(sum([x**2 for x in finger_object_pose[3:6]]))
+                finger_object_dist.append(dist1)
+                print("Finger1 tip to object: " +str(dist1))
                 count += 1
+
+                # finger1_tip to object distance: finger_object_dist[1]
                 
             if len(finger2_dist) > 0 and len(obj_marker) > 0 :
             
                 finger_object_pose_local1 = [(x - y)*10.0 for x, y in zip(obj_marker, finger2_dist)]
-                finger_object_pose.append(finger_object_pose_local1)
+                finger_object_pose.append(finger_object_pose_local1[0][0])
+                finger_object_pose.append(finger_object_pose_local1[0][1])
+                finger_object_pose.append(finger_object_pose_local1[0][2])
+                print("Finger2 Proximal to Object relative pose: ", finger_object_pose[6:9])
+
+                # finger2_dist to object pose: finger_object_pose[6:9]
             
-                delta_pose = 0
-                # Get the distance between object and finger 
-                for x, y in zip(obj_marker, finger2_dist):
-                    delta_pose += (x - y)*(x - y)
-                dist1 = sqrt(delta_pose)*10.0
-                finger_object_dist.append(dist1)
-                print("Finger2 Dist to object: " +str(dist1))
+                dist2 = math.sqrt(sum([x**2 for x in finger_object_pose[6:9]]))
+               
+                # finger2_dist to object distance: finger_object_dist[2] 
+
+                finger_object_dist.append(dist2)
+                print("Finger2 Dist to object: " +str(dist2))
                 count += 1
             
             if len(finger2_tip) > 0 and len(obj_marker) > 0 :
             
                 finger_object_pose_local2 = [(x - y)*10.0 for x, y in zip(obj_marker, finger2_tip)]
-                finger_object_pose.append(finger_object_pose_local2)
-                finger_object_pose.append(finger_object_pose_local1)
-                finger_object_pose.append(finger_object_pose_local2)
+                finger_object_pose.append(finger_object_pose_local2[0][0])
+                finger_object_pose.append(finger_object_pose_local2[0][1])
+                finger_object_pose.append(finger_object_pose_local2[0][2])
+                print("Finger2 tip to Object relative pose: ", finger_object_pose[9:12])
             
-                delta_pose = 0
+            
+                # finger2_tip to object pose: finger_object_pose[6], finger_object_pose[7]
+                
                 # Get the distance between object and finger 
-                for x, y in zip(obj_marker, finger2_tip):
-                    delta_pose += (x - y)*(x - y)
-                dist2 = sqrt(delta_pose)*10.0
-                finger_object_dist.append(dist2)
-                finger_object_dist.append(dist1)
-                finger_object_dist.append(dist2)
-                print("Finger2 tip to object: " +str(dist))
+                dist3 = math.sqrt(sum([x**2 for x in finger_object_pose[9:12]]))
+                
+                
+                # finger2_tip to object distance: finger_object_dist[3]
+
+                finger_object_dist.append(dist3)
+                # finger_object_dist.append(dist1)
+                # finger_object_dist.append(dist2)
+
+                print("Finger2 tip to object: " +str(dist3))
                 count += 1
             
             if count > 4:
-                count = 0   
-                self.finger_dist_pub.publish(finger_object_dist)
-                self.finger_pose_pub.publish(finger_object_pose)
-                self.pose_pub.publish(object_pose)
-                self.marker_pub.publish(str(obj_marker_id))
+                count = 0 
+                if len(finger_object_dist) == 8:
+                    self.finger_dist_pub.publish(finger_object_dist)
+                if len(finger_object_pose) == 4:
+                    self.finger_pose_pub.publish(finger_object_pose)
+                if len(object_pose) == 3:
+                    self.pose_pub.publish(object_pose)
+                    self.marker_pub.publish(str(obj_marker_id))
             else: 
                 print("Not all Markers Found")      
 
