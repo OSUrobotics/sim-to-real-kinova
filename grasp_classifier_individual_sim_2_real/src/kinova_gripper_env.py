@@ -32,16 +32,16 @@ from std_msgs.msg import String, Float32, Float32MultiArray, Int32
 #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class KinovaGripper_Env:
-    def init():
+    def __init__(self):
         self.joint_states = JointState()
         self.finger_pos = FingerPosition()
         self.reward = 0
         self.object_pose = Float32()
         self.object_id = String()
         self.Grasp_Reward = False
-        self.wrist_pose=np.zeros(3)  # The wrist position in world coordinates. Since we using local co-ordinate it is 0
-        self.finger_dist_list = Float32()
-        self.finger_pose_list = Float32()
+        self.wrist_pose= np.zeros(3)  # The wrist position in world coordinates. Since we using local co-ordinate it is 0
+        self.finger_dist_list = Float32MultiArray()
+        self.finger_pose_list = Float32MultiArray()
         self.finger1_dist_ang = 0
         self.finger2_dist_ang = 0
         
@@ -54,29 +54,36 @@ class KinovaGripper_Env:
         
 
         ###Define Intermidiate Positions###
-        self.joint_angle1 = [0,0,0,0,0,0,0]
-        self.joint_angle2 = [0,0,0,0,0,0,0]
-        self.joint_angle3 = [0,0,0,0,0,0,0]
-        self.joint_angle4 = [0,0,0,0,0,0,0]
-        self.joint_angle5 = [0,0,0,0,0,0,0]
-        self.joint_angle6 = [0,0,0,0,0,0,0]
-        self.joint_angle7 = [0,0,0,0,0,0,0]
+        # Starting position at the center of the table
+        self.joint_angle1 = [4.76, 4.52, -0.015, 1.43, 3.21, 4.53, 6.22]
+        # Pick Up 
+        self.joint_angle2 = [4.78, 4.13, -0.04, 1.24, 3.21, 4.33, 6.23]
+        # Move slightly to the right
+        self.joint_angle3 = [4.99, 4.16, 0.05, 1.36, 3.21, 4.25, 6.15]
+        # Move more to the right
+        self.joint_angle4 = [4.99, 4.16, 0.05, 1.36, 3.21, 4.25, 6.15]
+        # Move slightly forward
+        self.joint_angle5 = [4.98, 4.20, 0.05, 1.52, 3.21, 4.13, 6.14]
+        # Move more to the right
+        self.joint_angle6 = [5.10, 4.20, 0.09, 1.51, 3.21, 4.13, 6.10]
+        # Move down
+        self.joint_angle7 = [5.11, 4.49, 0.08, 1.65, 3.18, 4.28, 6.12]
 
 
         ###Subscribers###
-        self.joint_state_sub = rospy.Subscriber('/j2s7s300_driver/out/joint_state', JointState, joint_state_callback, queue_size=1)
-        self.finger_sub = rospy.Subscriber('/j2s7s300_driver/out/finger_position', FingerPosition, finger_state_callback, queue_size=1)
-        self.object_pose_sub = rospy.Subscriber('/object_pose', Float32, object_pose_callback, queue_size=1)
-        self.marker_id_sub = rospy.Subscriber('/marker_id', String, marker_id_callback, queue_size=1)
-        self.finger_dist_sub = rospy.Subscriber('/finger_dist', Float32, finger_dist_callback, queue_size=1)
-        self.finger_pose_sub = rospy.Subscriber('/finger_pose', Float32, finger_pose_callback, queue_size=1)
-        self.reset_check_sub = rospy.Subscriber('/sim2real/reset_status', Int32, reset_check_callback, queue_size=1)        
+        self.joint_state_sub = rospy.Subscriber('/j2s7s300_driver/out/joint_state', JointState, self.joint_state_callback, queue_size=10)
+        self.finger_sub = rospy.Subscriber('/j2s7s300_driver/out/finger_position', FingerPosition, self.finger_state_callback, queue_size=10)
+        self.object_pose_sub = rospy.Subscriber('/object_pose', Float32, self.object_pose_callback, queue_size=10)
+        self.marker_id_sub = rospy.Subscriber('/marker_id', String, self.marker_id_callback, queue_size=10)
+        self.finger_dist_sub = rospy.Subscriber('/finger_dist', Float32, self.finger_dist_callback, queue_size=10)
+        self.finger_pose_sub = rospy.Subscriber('/finger_pose', Float32, self.finger_pose_callback, queue_size=10)
+        self.reset_check_sub = rospy.Subscriber('/sim2real/reset_status', Int32, self.reset_check_callback, queue_size=10)        
         
         ###Publisher###
-        self.finger_command_pub = rospy.Publisher('/sim2real/finger_command', FingerPosition, queue_size=1)
-        self.joint_angle_command_pub = rospy.Publisher('/sim2real/joint_angle_command', JointState, queue_size=1)
-        self.obs_pub = rospy.Publisher('/sim2real/obs', Float32MultiArray, queue_size=1)
-        self.reset = rospy.Publisher('/sim2real/reset', Int32, queue_size=1)
+        self.finger_command_pub = rospy.Publisher('/sim2real/finger_command', FingerPosition, queue_size=10)
+        self.joint_angle_command_pub = rospy.Publisher('/sim2real/joint_angle_command', JointState, queue_size=10)
+        self.obs_pub = rospy.Publisher('/sim2real/obs', Float32MultiArray, queue_size=10)
+        self.reset = rospy.Publisher('/sim2real/reset', Int32, queue_size=10)
         
     ### Finger Position in Radians ###
     def get_joint_states(self): 
@@ -89,7 +96,7 @@ class KinovaGripper_Env:
         finger_joint_state_value[4] = self.finger2_dist_ang
         finger_joint_state_value[5] = self.finger2_dist_ang
         return  finger_joint_state_value
-            
+
     
     def get_obj_pose(self):
         return self.object_pose    
@@ -187,9 +194,9 @@ class KinovaGripper_Env:
     def step(self, action):
         total_reward = 0
         self.finger_pos_goal = FingerPosition()
-        self.finger_pos_goal.finger1 = action[0]
-        self.finger_pos_goal.finger2 = action[1]
-        self.finger_pos_goal.finger3 = action[2]
+        self.finger_pos_goal.finger1 = action.finger1
+        self.finger_pos_goal.finger2 = action.finger2
+        self.finger_pos_goal.finger3 = action.finger3
         self.finger_command_pub.publish(self.finger_pos_goal)
         
         while not rospy.get_param('exec_done'):
@@ -291,6 +298,9 @@ class KinovaGripper_Env:
               
     def reset_check_callback(self, msg):
         self.reset_done = msg
+
+     
+    # Look at this function again 
 
     def finger_pose_callback(self, msg):
         self.finger_pose_list = msg
