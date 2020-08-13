@@ -20,7 +20,10 @@ class ImageProcessor():
         # Finger object distance publisher
         self.finger_dist_pub = rospy.Publisher("/finger_dist", Float32, queue_size=10)
         self.finger_pose_pub = rospy.Publisher("/finger_pose", Float32, queue_size=10)
-
+        
+        self.finger1_dist_angle_pub = rospy.Publisher("/finger1_dist_angle", Float32, queue_size=10)
+        self.finger2_dist_angle_pub = rospy.Publisher("/finger2_dist_angle", Float32, queue_size=10)
+        
         #cv bridge class
         self.bridge = CvBridge()
 
@@ -64,6 +67,10 @@ class ImageProcessor():
         finger2_tip = []
         finger_object_dist = []
         finger_object_pose = []
+        finger1_tip1 = []
+        finger1_dist1 = []
+        finger2_tip1 = []
+        finger2_dist1 = []
 
     
         #Convert ros image message to opencv image
@@ -92,27 +99,41 @@ class ImageProcessor():
                 # Save end-effector marker pose
                 if ids[i] == ee_marker_id:
                     ee_marker = tvec[i]
+                    ee_marker[1] = ee_marker[1] + 5.241 #52.41 mm offset in Y
+                    ee_marker[2] = ee_marker[2] - 3.556 #35.56 mm offset in z
 
                 # Save object marker pose
                 if ids[i] == obj_marker_id:
                     obj_marker = tvec[i]
-                    # obj_marker[2] = obj_marker[2] - 5.5  ###Since Object height in z is 110 mm. Subtracting 55 mm brings center to object center 
+                    obj_marker[2] = obj_marker[2] - 5.5  ###Since Object height in z is 110 mm. Subtracting 55 mm brings center to object center 
                     
                 # Save finger1 Dist marker pose
                 if ids[i] == finger1_dist_id:
                     finger1_dist = tvec[i]
+                    finger1_dist1[0] = finger1_dist[0] 
+                    finger1_dist1[1] = finger1_dist[1] + 35.38
+                    finger1_dist1[2] = finger1_dist[2]
 
                 # Save finger1 tip pose
                 if ids[i] == finger1_tip_id:
                     finger1_tip = tvec[i]
+                    finger1_tip1[0] = finger1_tip[0] 
+                    finger1_tip1[1] = finger1_tip[1] - 4.27
+                    finger1_tip1[2] = finger1_tip[2]
                     
                 # Save finger2 Dist marker pose
                 if ids[i] == finger2_dist_id:
                     finger2_dist = tvec[i]
+                    finger2_dist1[0] = finger2_dist[0] 
+                    finger2_dist1[1] = finger2_dist[1] + 35.38
+                    finger2_dist1[2] = finger2_dist[2]
 
                 # Save finger2 tip pose
                 if ids[i] == finger2_tip_id:
                     finger2_tip = tvec[i]
+                    finger2_tip1[0] = finger2_tip[0] 
+                    finger2_tip1[1] = finger2_tip[1] - 4.27
+                    finger2_tip1[2] = finger2_tip[2]
 
                 aruco.drawAxis(cv_image, mtx, dist, rvec[i], tvec[i], 2)
 
@@ -215,6 +236,30 @@ class ImageProcessor():
 
                 print("Finger2 tip to object: " +str(dist3))
                 count += 1
+            
+            m1 = (finger2_dist1[1] - finger2_dist[1])/(finger2_dist1[0] - finger2_dist[0]) 
+            m2 = (finger2_tip1[1] - finger2_tip[1])/(finger2_tip1[0] - finger2_tip[0]) 
+            
+            if m1 > m2:
+                #finger2_dist_angle = np.atan((m2- m1)/(1+ m1*m2))  ###  <  <-  this side angle of finger
+                finger2_dist_angle = np.pi*2 - np.atan((m2 - m1)/(1+ m1*m2))  ###  ->   <  this side angle of finger
+            else:
+                  #finger2_dist_angle = np.atan((m1 - m2)/(1+ m1*m2))  ###  <  <-  this side angle of finger
+                finger2_dist_angle = np.pi*2 - np.atan((m1 - m2)/(1+ m1*m2))  ###  ->   <  this side angle of finger
+                             
+            m3 = (finger1_dist1[1] - finger1_dist[1])/(finger1_dist1[0] - finger1_dist[0]) 
+            m4 = (finger1_tip1[1] - finger1_tip[1])/(finger1_tip1[0] - finger1_tip[0]) 
+            
+            if m3 > m4:
+                #finger1_dist_angle = np.atan((m3 - m4)/(1+ m3*m4))  ###  <  <-  this side angle of finger
+                finger1_dist_angle = np.pi*2 - np.atan((m3 - m4)/(1+ m3*m4))  ###  ->   <  this side angle of finger
+            else:
+                  #finger1_dist_angle = np.atan((m4 - m3)/(1+ m3*m4))  ###  <  <-  this side angle of finger
+                finger1_dist_angle = np.pi*2 - np.atan((m4 - m3)/(1+ m3*m4))  ###  ->   <  this side angle of finger  
+            
+            
+            self.finger1_dist_angle_pub.publish(finger1_dist_angle)
+            self.finger2_dist_angle_pub.publish(finger2_dist_angle)
             
             if count > 4:
                 count = 0 

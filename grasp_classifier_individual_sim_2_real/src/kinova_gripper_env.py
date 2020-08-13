@@ -42,8 +42,8 @@ class KinovaGripper_Env:
         self.wrist_pose= np.zeros(3)  # The wrist position in world coordinates. Since we using local co-ordinate it is 0
         self.finger_dist_list = Float32MultiArray()
         self.finger_pose_list = Float32MultiArray()
-        self.finger1_dist_ang = 0
-        self.finger2_dist_ang = 0
+        self.finger1_dist_ang = Float32()
+        self.finger2_dist_ang = Float32()
         
         ###Grasp Classifier###
         #self.Grasp_net = LinearNetwork().to(device)
@@ -77,7 +77,9 @@ class KinovaGripper_Env:
         self.marker_id_sub = rospy.Subscriber('/marker_id', String, self.marker_id_callback, queue_size=10)
         self.finger_dist_sub = rospy.Subscriber('/finger_dist', Float32, self.finger_dist_callback, queue_size=10)
         self.finger_pose_sub = rospy.Subscriber('/finger_pose', Float32, self.finger_pose_callback, queue_size=10)
-        self.reset_check_sub = rospy.Subscriber('/sim2real/reset_status', Int32, self.reset_check_callback, queue_size=10)        
+        self.reset_check_sub = rospy.Subscriber('/sim2real/reset_status', Int32, self.reset_check_callback, queue_size=10)
+        self.finger1_dist_angle_sub = rospy.Subscriber('/finger1_dist_angle', Float32, self.finger1_dist_angle_callback, queue_size=10)
+        self.finger2_dist_angle_sub = rospy.Subscriber('/finger2_dist_angle', Float32, self.finger2_dist_angle_callback, queue_size=10)        
         
         ###Publisher###
         self.finger_command_pub = rospy.Publisher('/sim2real/finger_command', FingerPosition, queue_size=10)
@@ -299,25 +301,17 @@ class KinovaGripper_Env:
     def reset_check_callback(self, msg):
         self.reset_done = msg
 
-     
+    def finger1_dist_angle_callback(self, msg):
+    	self.finger1_dist_ang = msg
+
+    def finger2_dist_angle_callback(self, msg):
+    	self.finger2_dist_ang = msg
+
+
     # Look at this function again 
 
     def finger_pose_callback(self, msg):
         self.finger_pose_list = msg
-        a = list(self.finger_pose_list[0])
-        b = list(self.finger_pose_list[1])
-        c = [0,0,0]
-        A = a - c
-        B = a - b
-        self.finger1_dist_ang = np.pi - np.acos((A[0]*B[0] + A[1]*B[1] + A[2]*B[2]) / (sqrt(A[0]*A[0] + A[1]*A[1] + A[2]*A[2]) * sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]) ) )
-        
-        a = list(self.finger_pose_list[2])
-        b = list(self.finger_pose_list[3])
-        c = [0,0,0]
-        A = a - c
-        B = a - b
-        self.finger2_dist_ang = np.pi - np.acos((A[0]*B[0] + A[1]*B[1] + A[2]*B[2]) / (sqrt(A[0]*A[0] + A[1]*A[1] + A[2]*A[2]) * sqrt(B[0]*B[0] + B[1]*B[1] + B[2]*B[2]) ) )
-         
 
                 
 # class GraspValid_net(nn.Module):
