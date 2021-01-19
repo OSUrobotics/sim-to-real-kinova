@@ -7,9 +7,11 @@ project(object_detection_pkg)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+SET(opencv_DIR "/home/nigel/opencv/build")
+
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
-  opencv2
+  opencv
   roscpp
   rospy
   sensor_msgs

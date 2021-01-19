@@ -28,6 +28,7 @@ from sensor_msgs.msg import JointState
 from kinova_msgs.msg import FingerPosition, KinovaPose
 from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import String, Float32, Float32MultiArray, Int32
+from rospy_tutorials.msg import Floats
 
 #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -37,13 +38,15 @@ class KinovaGripper_Env:
         self.finger_pos = FingerPosition()
         self.reward = 0
         self.object_pose = Float32()
+        self.object_pose = [0,0,0]
         self.object_id = String()
         self.Grasp_Reward = False
         self.wrist_pose= np.zeros(3)  # The wrist position in world coordinates. Since we using local co-ordinate it is 0
-        self.finger_dist_list = Float32MultiArray()
-        self.finger_pose_list = Float32MultiArray()
-        self.finger1_dist_ang = Float32()
-        self.finger2_dist_ang = Float32()
+        self.finger_dist_list = []
+        self.finger_pose_list = []
+        self.joint_pos_goal = JointState()
+        #self.finger_ang = Float32()
+        #self.finger2_dist_ang = Float32()
         
         ###Grasp Classifier###
         #self.Grasp_net = LinearNetwork().to(device)
@@ -55,6 +58,10 @@ class KinovaGripper_Env:
 
         ###Define Intermidiate Positions###
         # Starting position at the center of the table
+        self.lift_pose=[5.107055072864546, 4.182369856030427, 6.372742620948989, 0.9732052155762178, 4.334058984347489, 4.659141737549645, 6.059653946348221]
+        self.goal_pose=[5.397565467743622, 4.2931829237241885, 6.4585773681466785, 1.230296933516434, 4.216070561728727, 4.651007378316107, 5.868929534353324]
+        self.home_angle = [5.7486665058475275, 4.71978990505402, 0.06439481071681724, 0.7641883490018938, 4.545757121507304, 4.779063881435913, 6.867758753831903]
+        self.pre_grasp_angle = [5.283249810584189, 4.553736484765399, 0.00398323672719485, 0.9834487983930984, 4.252874116413077, 4.767322536821972, 6.455476916005609]
         self.joint_angle1 = [4.76, 4.52, -0.015, 1.43, 3.21, 4.53, 6.22]
         # Pick Up 
         self.joint_angle2 = [4.78, 4.13, -0.04, 1.24, 3.21, 4.33, 6.23]
@@ -68,18 +75,18 @@ class KinovaGripper_Env:
         self.joint_angle6 = [5.10, 4.20, 0.09, 1.51, 3.21, 4.13, 6.10]
         # Move down
         self.joint_angle7 = [5.11, 4.49, 0.08, 1.65, 3.18, 4.28, 6.12]
-
+        self.finger_angle =[]
 
         ###Subscribers###
         self.joint_state_sub = rospy.Subscriber('/j2s7s300_driver/out/joint_state', JointState, self.joint_state_callback, queue_size=10)
         self.finger_sub = rospy.Subscriber('/j2s7s300_driver/out/finger_position', FingerPosition, self.finger_state_callback, queue_size=10)
-        self.object_pose_sub = rospy.Subscriber('/object_pose', Float32, self.object_pose_callback, queue_size=10)
+        self.object_pose_sub = rospy.Subscriber('/object_pose', Float32MultiArray, self.object_pose_callback, queue_size=10)
         self.marker_id_sub = rospy.Subscriber('/marker_id', String, self.marker_id_callback, queue_size=10)
-        self.finger_dist_sub = rospy.Subscriber('/finger_dist', Float32, self.finger_dist_callback, queue_size=10)
-        self.finger_pose_sub = rospy.Subscriber('/finger_pose', Float32, self.finger_pose_callback, queue_size=10)
+        self.finger_dist_sub = rospy.Subscriber('/finger_dist', Float32MultiArray, self.finger_dist_callback, queue_size=10)
+        self.finger_pose_sub = rospy.Subscriber('/finger_pose', Float32MultiArray, self.finger_pose_callback, queue_size=10)
         self.reset_check_sub = rospy.Subscriber('/sim2real/reset_status', Int32, self.reset_check_callback, queue_size=10)
-        self.finger1_dist_angle_sub = rospy.Subscriber('/finger1_dist_angle', Float32, self.finger1_dist_angle_callback, queue_size=10)
-        self.finger2_dist_angle_sub = rospy.Subscriber('/finger2_dist_angle', Float32, self.finger2_dist_angle_callback, queue_size=10)        
+        self.finger_angle_sub = rospy.Subscriber('/finger_angle', Float32MultiArray, self.finger_angle_callback, queue_size=10)
+        #self.finger2_dist_angle_sub = rospy.Subscriber('/finger2_dist_angle', Float32, self.finger2_dist_angle_callback, queue_size=10)        
         
         ###Publisher###
         self.finger_command_pub = rospy.Publisher('/sim2real/finger_command', FingerPosition, queue_size=10)
@@ -89,24 +96,27 @@ class KinovaGripper_Env:
         
     ### Finger Position in Radians ###
     def get_joint_states(self): 
-        temp = list(self.joint_states.position)     
+        temp = list(self.joint_states.position)
+        print(temp)     
         finger_joint_state_value = [0, 0, 0, 0, 0, 0]
-        finger_joint_state_value[0] = temp[7]
-        finger_joint_state_value[1] = temp[8]
-        finger_joint_state_value[2] = temp[9]
-        finger_joint_state_value[3] = self.finger1_dist_ang
-        finger_joint_state_value[4] = self.finger2_dist_ang
-        finger_joint_state_value[5] = self.finger2_dist_ang
+        if self.finger_angle!=[]:
+            finger_joint_state_value[0] = self.finger_angle[0]
+            finger_joint_state_value[1] = self.finger_angle[1]
+            finger_joint_state_value[2] = self.finger_angle[2]
+            finger_joint_state_value[3] = self.finger_angle[3]
+            finger_joint_state_value[4] = self.finger_angle[2]
+            finger_joint_state_value[5] = self.finger_angle[3]
         return  finger_joint_state_value
 
     
     def get_obj_pose(self):
-        return self.object_pose    
+        return self.object_pose
     
     
     # Function to return the angles between the palm normal and the object location
     def get_angles(self):
         obj_pose = self.get_obj_pose() #x, y, z
+        #print(obj_pose)
         local_obj_pos=np.copy(obj_pose)
         local_obj_pos=np.append(local_obj_pos,1)
         obj_wrist = local_obj_pos[0:3]/np.linalg.norm(local_obj_pos[0:3])
@@ -160,7 +170,6 @@ class KinovaGripper_Env:
         
         return reward, {}, done    
     
-    
     # Function to get the dimensions of the object
     def get_obj_size(self):
         return [42, 42, 110]
@@ -181,9 +190,9 @@ class KinovaGripper_Env:
         finger_obj_dist = self.get_finger_obj_dist()          
         fingers_6D_pose = []
 
-        fingers_6D_pose.append(self.get_finger_pos())
+        fingers_6D_pose=self.get_finger_pos()
         fingers_6D_pose = fingers_6D_pose + list(self.wrist_pose) + list(obj_pose) + joint_states + [obj_size[0], obj_size[1], obj_size[2]*2] + finger_obj_dist + [x_angle, z_angle] 
-        
+        print('this is the obs data',fingers_6D_pose)
         return fingers_6D_pose     
     
     
@@ -220,6 +229,11 @@ class KinovaGripper_Env:
     
     def go_to_goal(self):
 
+        joint_state_goal = self.lift_pose
+        self.move_arm_joint_angle(joint_state_goal)
+        joint_state_goal = self.goal_pose
+        self.move_arm_joint_angle(joint_state_goal)
+        '''
         joint_state_goal = self.joint_angle1
         self.move_arm_joint_angle(joint_state_goal)
         joint_state_goal = self.joint_angle2
@@ -234,9 +248,11 @@ class KinovaGripper_Env:
         self.move_arm_joint_angle(joint_state_goal)
         joint_state_goal = self.joint_angle7
         self.move_arm_joint_angle(joint_state_goal)
-        
-    def go_to_home(self):
-
+        '''
+    def go_to_home(self,joint_state=None):
+        if joint_state==None:
+            joint_state=self.pre_grasp_angle
+        '''
         joint_state_goal = self.joint_angle7
         self.move_arm_joint_angle(joint_state_goal)
         joint_state_goal = self.joint_angle6
@@ -250,12 +266,18 @@ class KinovaGripper_Env:
         joint_state_goal = self.joint_angle2
         self.move_arm_joint_angle(joint_state_goal)
         joint_state_goal = self.joint_angle1
+        '''
+        joint_state_goal=self.home_angle
+        self.move_arm_joint_angle(joint_state_goal)
+        joint_state_goal=joint_state
         self.move_arm_joint_angle(joint_state_goal)
 
     def move_arm_joint_angle(self, joint_angle):
+        #print('this is called')
+        #print(joint_angle)
         self.joint_pos_goal = JointState()
-        self.joint_pos_goal.position.append(joint_angle)
-        
+        self.joint_pos_goal.name=['j1','j2','j3','j4','j5','j6','j7']
+        self.joint_pos_goal.position=joint_angle
         self.joint_angle_command_pub.publish(self.joint_pos_goal)
         
         while not rospy.get_param('exec_done'):
@@ -281,6 +303,8 @@ class KinovaGripper_Env:
     
     def joint_state_callback(self, msg):
         self.joint_states = msg
+        #if np.random.rand()>0.95:
+        #    print('joint states',self.joint_states.position)
      
 
     def finger_state_callback(self, msg):
@@ -288,30 +312,31 @@ class KinovaGripper_Env:
      
 
     def object_pose_callback(self, msg):
-        self.object_pose = msg        
+        self.object_pose = list(msg.data) 
+        #print('object pose',self.object_pose)
     
     
     def marker_id_callback(self, msg):
         self.object_id = msg
-        
+        joint_angle_client
         
     def finger_dist_callback(self, msg):
-        self.finger_dist_list = msg          
+        self.finger_dist_list = list(msg.data)  
               
     def reset_check_callback(self, msg):
-        self.reset_done = msg
+        self.reset_done = list(msg.data)
 
-    def finger1_dist_angle_callback(self, msg):
-    	self.finger1_dist_ang = msg
+    def finger_angle_callback(self, msg):
+        self.finger_angle = list(msg.data)
 
-    def finger2_dist_angle_callback(self, msg):
-    	self.finger2_dist_ang = msg
+    #def finger2_dist_angle_callback(self, msg):
+    #    self.finger2_dist_ang = msg
 
 
     # Look at this function again 
 
     def finger_pose_callback(self, msg):
-        self.finger_pose_list = msg
+        self.finger_pose_list = list(msg.data)
 
                 
 # class GraspValid_net(nn.Module):

@@ -5,6 +5,7 @@ import cv2
 from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 from std_msgs.msg import String, Float32
+from std_msgs.msg import Bool
 import numpy as np
 import cv2.aruco as aruco
 import sys
@@ -18,7 +19,7 @@ class ImageProcessor():
 
         # This is the image message subcriber. Change the topic to your camera topic (most likely realsense)
         self.image_sub = rospy.Subscriber('/usb_cam/image_raw', Image, self.get_object_pose)
-        
+        self.test_done=rospy.Publisher("/test_finish",Bool,queue_size=1)
         
     # Callback for image processing
     def get_object_pose(self, img_msg):
@@ -30,18 +31,23 @@ class ImageProcessor():
         w = 550 # Width in pixels
         
         # Aruko Marker Info
-        marker_size = 2 #cm 
-
+        marker_size = 3.6 #cm 
+        
         # Marker IDs
-        ee_marker_id = 0  # end-effector
-        obj_marker_id = 1 # object 
+        ee_marker_id = 1  # end-effector
+        obj_marker_id = 0  # object
+        finger1_dist_id = 5 # Finger 1 Dist
+        finger1_tip_id = 3  # Finger 1 Tip
+        finger2_dist_id = 4 # Finger 2 Dist  
+        finger2_tip_id = 2  # Finger 1 Tip
 
         # Get the saved camera and distortion matrices from calibration
-        mtx = np.load('/home/nuha/kinova_ws/src/traj-control/src/camera_mtx.npy') # camera matrix
-        dist = np.load('/home/nuha/kinova_ws/src/traj-control/src/dist_mtx.npy')  # distortion matrix
+        mtx = np.load('/home/nigel/camera_mtx2.npy') # camera matrix
+        dist = np.load('/home/nigel/dist_mtx2.npy')  # distortion matrix
+
 
         # Define Aruco Dictionary 
-        aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_1000)
+        aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_5X5_1000)
         parameters = aruco.DetectorParameters_create()
 
         #Lists for storing marker positions
@@ -59,10 +65,9 @@ class ImageProcessor():
         
         #Convert in gray scale
         gray = cv2.cvtColor(cv_image,cv2.COLOR_BGR2GRAY)
-        
+        marker_count=0
         #Find markers in the image 
         corners, ids, rejected = aruco.detectMarkers(image=gray, dictionary=aruco_dict, parameters=parameters, cameraMatrix=mtx, distCoeff=dist)
-
         if np.all(ids != None):
 
             rvec, tvec, __ = aruco.estimatePoseSingleMarkers(corners,marker_size, mtx, dist)
@@ -73,11 +78,19 @@ class ImageProcessor():
                 # Save end-effector marker pose
                 if ids[i] == ee_marker_id:
                     ee_marker = tvec[i]
-
+                    marker_count+=1
                 # Save object marker pose
                 if ids[i] == obj_marker_id:
                     obj_marker = tvec[i]
 
+                if ids[i] == finger1_dist_id:
+                    marker_count+=1
+                if ids[i]==finger1_tip_id:
+                    marker_count+=1
+                if ids[i] == finger2_dist_id:
+                    marker_count+=1
+                if ids[i]==finger2_tip_id:
+                    marker_count+=1
                 aruco.drawAxis(cv_image, mtx, dist, rvec[i], tvec[i], 10)
 
             #Draw Markers
@@ -85,10 +98,16 @@ class ImageProcessor():
 
             if len(obj_marker) > 0 :
                 rospy.set_param('Goal', "true")
-                print("Lift Detected")
+                #print("Lift Detected")
+                self.test_done.publish(True)
+            elif marker_count > 3:
+                self.test_done.publish(True)
+                #print('hand without object detected')
             else:
                 rospy.set_param('Goal', "false") 
-                print("No Marker Found")
+                #print("No Marker Found")
+                self.test_done.publish(False)
+                #self.test_done.publish(False)
 
         #Display
         cv2.imshow('Window', cv_image)
