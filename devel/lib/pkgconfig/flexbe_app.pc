@@ -1,0 +1,8 @@
+prefix=/home/nigel/kinova_ws/devel
+
+Name: flexbe_app
+Description: Description of flexbe_app
+Version: 2.2.4
+Cflags: -I/home/nigel/kinova_ws/src/flexbe_app/src
+Libs: -L${prefix}/lib -lflexbe_app
+Requires: 

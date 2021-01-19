@@ -1,0 +1,8 @@
+prefix=/home/nigel/kinova_ws/install
+
+Name: grasp_reset_flexbe_behaviors
+Description: Description of grasp_reset_flexbe_behaviors
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib -lgrasp_reset_flexbe_behaviors
+Requires: 

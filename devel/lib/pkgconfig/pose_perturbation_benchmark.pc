@@ -1,0 +1,8 @@
+prefix=/home/nigel/kinova_ws/devel
+
+Name: pose_perturbation_benchmark
+Description: Description of pose_perturbation_benchmark
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

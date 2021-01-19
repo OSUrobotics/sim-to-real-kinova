@@ -1,0 +1,8 @@
+prefix=/home/nigel/kinova_ws/devel
+
+Name: kinova_control
+Description: Description of kinova_control
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

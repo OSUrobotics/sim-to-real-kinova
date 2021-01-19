@@ -1,0 +1,7 @@
+set(grasp_reset_flexbe_behaviors_SETUP_PY_SETUP_MODULE "distutils.core")
+set(grasp_reset_flexbe_behaviors_SETUP_PY_VERSION "1.0.0")
+set(grasp_reset_flexbe_behaviors_SETUP_PY_SCRIPTS "")
+set(grasp_reset_flexbe_behaviors_SETUP_PY_PACKAGES "grasp_reset_flexbe_behaviors")
+set(grasp_reset_flexbe_behaviors_SETUP_PY_PACKAGE_DIRS "src/grasp_reset_flexbe_behaviors")
+set(grasp_reset_flexbe_behaviors_SETUP_PY_MODULES "")
+set(grasp_reset_flexbe_behaviors_SETUP_PY_MODULE_DIRS "")

@@ -1,0 +1,123 @@
+;; Auto-generated. Do not edit!
+
+
+(when (boundp 'kinova_msgs::PoseVelocity)
+  (if (not (find-package "KINOVA_MSGS"))
+    (make-package "KINOVA_MSGS"))
+  (shadow 'PoseVelocity (find-package "KINOVA_MSGS")))
+(unless (find-package "KINOVA_MSGS::POSEVELOCITY")
+  (make-package "KINOVA_MSGS::POSEVELOCITY"))
+
+(in-package "ROS")
+;;//! \htmlinclude PoseVelocity.msg.html
+
+
+(defclass kinova_msgs::PoseVelocity
+  :super ros::object
+  :slots (_twist_linear_x _twist_linear_y _twist_linear_z _twist_angular_x _twist_angular_y _twist_angular_z ))
+
+(defmethod kinova_msgs::PoseVelocity
+  (:init
+   (&key
+    ((:twist_linear_x __twist_linear_x) 0.0)
+    ((:twist_linear_y __twist_linear_y) 0.0)
+    ((:twist_linear_z __twist_linear_z) 0.0)
+    ((:twist_angular_x __twist_angular_x) 0.0)
+    ((:twist_angular_y __twist_angular_y) 0.0)
+    ((:twist_angular_z __twist_angular_z) 0.0)
+    )
+   (send-super :init)
+   (setq _twist_linear_x (float __twist_linear_x))
+   (setq _twist_linear_y (float __twist_linear_y))
+   (setq _twist_linear_z (float __twist_linear_z))
+   (setq _twist_angular_x (float __twist_angular_x))
+   (setq _twist_angular_y (float __twist_angular_y))
+   (setq _twist_angular_z (float __twist_angular_z))
+   self)
+  (:twist_linear_x
+   (&optional __twist_linear_x)
+   (if __twist_linear_x (setq _twist_linear_x __twist_linear_x)) _twist_linear_x)
+  (:twist_linear_y
+   (&optional __twist_linear_y)
+   (if __twist_linear_y (setq _twist_linear_y __twist_linear_y)) _twist_linear_y)
+  (:twist_linear_z
+   (&optional __twist_linear_z)
+   (if __twist_linear_z (setq _twist_linear_z __twist_linear_z)) _twist_linear_z)
+  (:twist_angular_x
+   (&optional __twist_angular_x)
+   (if __twist_angular_x (setq _twist_angular_x __twist_angular_x)) _twist_angular_x)
+  (:twist_angular_y
+   (&optional __twist_angular_y)
+   (if __twist_angular_y (setq _twist_angular_y __twist_angular_y)) _twist_angular_y)
+  (:twist_angular_z
+   (&optional __twist_angular_z)
+   (if __twist_angular_z (setq _twist_angular_z __twist_angular_z)) _twist_angular_z)
+  (:serialization-length
+   ()
+   (+
+    ;; float32 _twist_linear_x
+    4
+    ;; float32 _twist_linear_y
+    4
+    ;; float32 _twist_linear_z
+    4
+    ;; float32 _twist_angular_x
+    4
+    ;; float32 _twist_angular_y
+    4
+    ;; float32 _twist_angular_z
+    4
+    ))
+  (:serialize
+   (&optional strm)
+   (let ((s (if strm strm
+              (make-string-output-stream (send self :serialization-length)))))
+     ;; float32 _twist_linear_x
+       (sys::poke _twist_linear_x (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
+     ;; float32 _twist_linear_y
+       (sys::poke _twist_linear_y (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
+     ;; float32 _twist_linear_z
+       (sys::poke _twist_linear_z (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
+     ;; float32 _twist_angular_x
+       (sys::poke _twist_angular_x (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
+     ;; float32 _twist_angular_y
+       (sys::poke _twist_angular_y (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
+     ;; float32 _twist_angular_z
+       (sys::poke _twist_angular_z (send s :buffer) (send s :count) :float) (incf (stream-count s) 4)
+     ;;
+     (if (null strm) (get-output-stream-string s))))
+  (:deserialize
+   (buf &optional (ptr- 0))
+   ;; float32 _twist_linear_x
+     (setq _twist_linear_x (sys::peek buf ptr- :float)) (incf ptr- 4)
+   ;; float32 _twist_linear_y
+     (setq _twist_linear_y (sys::peek buf ptr- :float)) (incf ptr- 4)
+   ;; float32 _twist_linear_z
+     (setq _twist_linear_z (sys::peek buf ptr- :float)) (incf ptr- 4)
+   ;; float32 _twist_angular_x
+     (setq _twist_angular_x (sys::peek buf ptr- :float)) (incf ptr- 4)
+   ;; float32 _twist_angular_y
+     (setq _twist_angular_y (sys::peek buf ptr- :float)) (incf ptr- 4)
+   ;; float32 _twist_angular_z
+     (setq _twist_angular_z (sys::peek buf ptr- :float)) (incf ptr- 4)
+   ;;
+   self)
+  )
+
+(setf (get kinova_msgs::PoseVelocity :md5sum-) "37cb696ff239fbcc6aa4a04f7318d9da")
+(setf (get kinova_msgs::PoseVelocity :datatype-) "kinova_msgs/PoseVelocity")
+(setf (get kinova_msgs::PoseVelocity :definition-)
+      "float32 twist_linear_x
+float32 twist_linear_y
+float32 twist_linear_z
+float32 twist_angular_x
+float32 twist_angular_y
+float32 twist_angular_z
+
+")
+
+
+
+(provide :kinova_msgs/PoseVelocity "37cb696ff239fbcc6aa4a04f7318d9da")
+
+

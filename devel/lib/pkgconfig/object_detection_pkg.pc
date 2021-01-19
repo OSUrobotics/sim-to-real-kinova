@@ -1,0 +1,8 @@
+prefix=/home/nigel/kinova_ws/devel
+
+Name: object_detection_pkg
+Description: Description of object_detection_pkg
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

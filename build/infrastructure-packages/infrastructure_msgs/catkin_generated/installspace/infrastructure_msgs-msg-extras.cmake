@@ -1,0 +1,2 @@
+set(infrastructure_msgs_MESSAGE_FILES "msg/DoorSensors.msg;msg/DataTimestamps.msg;msg/StageAction.msg;msg/StageActionGoal.msg;msg/StageActionResult.msg;msg/StageActionFeedback.msg;msg/StageGoal.msg;msg/StageResult.msg;msg/StageFeedback.msg;msg/DataCollectionAction.msg;msg/DataCollectionActionGoal.msg;msg/DataCollectionActionResult.msg;msg/DataCollectionActionFeedback.msg;msg/DataCollectionGoal.msg;msg/DataCollectionResult.msg;msg/DataCollectionFeedback.msg")
+set(infrastructure_msgs_SERVICE_FILES "")

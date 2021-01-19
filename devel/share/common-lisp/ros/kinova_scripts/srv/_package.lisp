@@ -1,0 +1,15 @@
+(cl:defpackage kinova_scripts-srv
+  (:use )
+  (:export
+   "JOINT_ANGLES"
+   "<JOINT_ANGLES-REQUEST>"
+   "JOINT_ANGLES-REQUEST"
+   "<JOINT_ANGLES-RESPONSE>"
+   "JOINT_ANGLES-RESPONSE"
+   "NEW_POSE"
+   "<NEW_POSE-REQUEST>"
+   "NEW_POSE-REQUEST"
+   "<NEW_POSE-RESPONSE>"
+   "NEW_POSE-RESPONSE"
+  ))
+

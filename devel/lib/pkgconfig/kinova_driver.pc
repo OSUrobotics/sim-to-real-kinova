@@ -1,0 +1,8 @@
+prefix=/home/nigel/kinova_ws/devel
+
+Name: kinova_driver
+Description: Description of kinova_driver
+Version: 0.0.1
+Cflags: -I/home/nigel/kinova_ws/devel/include -I/home/nigel/kinova_ws/src/kinova-ros/kinova_driver/include
+Libs: -L${prefix}/lib -lkinova_driver
+Requires: actionlib actionlib_msgs geometry_msgs kinova_msgs roscpp rospy sensor_msgs std_msgs tf interactive_markers visualization_msgs

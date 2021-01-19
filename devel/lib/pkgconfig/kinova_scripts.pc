@@ -1,0 +1,8 @@
+prefix=/home/nigel/kinova_ws/devel
+
+Name: kinova_scripts
+Description: Description of kinova_scripts
+Version: 0.0.0
+Cflags: -I/home/nigel/kinova_ws/devel/include
+Libs: -L${prefix}/lib 
+Requires: 
