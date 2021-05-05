@@ -1,7 +1,7 @@
 # generated from genmsg/cmake/pkg-genmsg.context.in
 
 messages_str = ""
-services_str = "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv;/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
+services_str = "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv;/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
 pkg_name = "kinova_scripts"
 dependencies_str = "std_msgs"
 langs = "gencpp;geneus;genlisp;gennodejs;genpy"

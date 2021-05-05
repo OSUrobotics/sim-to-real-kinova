@@ -12,11 +12,13 @@ from kinova_gripper_env import KinovaGripper_Env
 import time
 from std_msgs.msg import String, Float32, Float32MultiArray, Int32, MultiArrayDimension
 from std_msgs.msg import Bool
+import csv
 
 class controller():
     def __init__(self):
         self.test_done=False
         self.route_done=False
+        self.errors=[]
         
     def route(self,msg):
         self.route_done=msg.data
@@ -25,20 +27,32 @@ class controller():
         #print('test_finished')
         self.test_done=msg.data
         
+    def update(self,msg):
+        self.errors=msg
 if __name__ == '__main__':
     rospy.init_node('grasp_classifier_test')
     try:
         rospy.sleep(2.0)
         print("Starting Testing of Grasp Classifier")
-        #[5.292494707992289, 4.617425449602426, 6.262907998639722, 1.1245324203011362, 10.581492152841088, 4.773212383888791, 12.698122519807571],\
-        robot_grasp_joints=[[5.194395038710349, 4.61755328133475, 6.258866918001637, 1.1237466546215082, 10.583468218369926, 4.77062485657367, 12.701494081747612],\
-                    [5.301863708707188, 4.642172075083661, 6.25642586454647, 1.0640270648102172, 10.638482734904347, 4.773731167669139, 12.787761326306331],\
+        '''
+        [5.301863708707188, 4.642172075083661, 6.25642586454647, 1.0640270648102172, 10.638482734904347, 4.773731167669139, 12.787761326306331],\
                     [5.1712862572995135, 4.612319104528309, 6.258938290718851, 1.1500339187933535, 10.562352546718905, 4.76536884184629, 12.666124106678053],\
                     [5.283578977294923, 4.655589613287698, 6.2539922679423565, 1.0363660089900546, 10.668026778773251, 4.774261669358283, 12.831719463259178],\
                     [5.291669660686583, 4.620667581913489, 6.259802220176472, 1.1244778254987895, 10.582222924244205, 4.775655035240613, 12.699355030760062],\
                     [5.31152459187756, 4.6414903058445995, 6.256269270674373, 1.0651639017005448, 10.636814530797523, 4.775946917696085, 12.78615064647905],\
                     [5.231036406884313, 4.623028207903735, 6.256276194893207, 1.1181681310861193, 10.588668839346633, 4.7726222273912295, 12.710124854208342],\
                     [5.190161145209341, 4.60857097161013, 6.263025710359904, 1.1623586288440768, 10.551653030723402, 4.765531827305003, 12.649429282436563],\
+        '''
+        #[5.31152459187756, 4.6414903058445995, 6.256269270674373, 1.0651639017005448, 10.636814530797523, 4.775946917696085, 12.78615064647905],\
+        robot_grasp_joints=[[5.301863708707188, 4.642172075083661, 6.25642586454647, 1.0640270648102172, 10.638482734904347, 4.773731167669139, 12.787761326306331],\
+                    [5.1712862572995135, 4.612319104528309, 6.258938290718851, 1.1500339187933535, 10.562352546718905, 4.76536884184629, 12.666124106678053],\
+                    [5.283578977294923, 4.655589613287698, 6.2539922679423565, 1.0363660089900546, 10.668026778773251, 4.774261669358283, 12.831719463259178],\
+                    [5.291669660686583, 4.620667581913489, 6.259802220176472, 1.1244778254987895, 10.582222924244205, 4.775655035240613, 12.699355030760062],\
+                    [5.31152459187756, 4.6414903058445995, 6.256269270674373, 1.0651639017005448, 10.636814530797523, 4.775946917696085, 12.78615064647905],\
+                    [5.231036406884313, 4.623028207903735, 6.256276194893207, 1.1181681310861193, 10.588668839346633, 4.7726222273912295, 12.710124854208342],\
+                    [5.190161145209341, 4.60857097161013, 6.263025710359904, 1.1623586288440768, 10.551653030723402, 4.765531827305003, 12.649429282436563],\
+                    [5.292494707992289, 4.617425449602426, 6.262907998639722, 1.1245324203011362, 10.581492152841088, 4.773212383888791, 12.698122519807571],\
+                    [5.194395038710349, 4.61755328133475, 6.258866918001637, 1.1237466546215082, 10.583468218369926, 4.77062485657367, 12.701494081747612],\
                     [5.180549796835245, 4.616609457044426, 6.257989140106346, 1.1261925017666372, 10.581176834568023, 4.765731031754541, 12.69837072642117]]
         env = KinovaGripper_Env()
         rospy.set_param('exec_done', "false")
@@ -48,6 +62,7 @@ if __name__ == '__main__':
         done=rospy.Subscriber('/test_finish',Bool,cont.test)
         hand=rospy.Publisher('/hand_control',String,queue_size=1)
         collector=rospy.Publisher('/data_to_save',Float32MultiArray, queue_size=10)
+        err_checker=rospy.Subscriber('/total_errors',Float32MultiArray,cont.update)
         finger_pos = FingerPosition()
         finger_pos.finger1 = 0
         finger_pos.finger2 = 0
@@ -55,9 +70,13 @@ if __name__ == '__main__':
         count = 0
         reset_mechanism=rospy.Publisher('reset_start',Int32,queue_size=1)
         #reset_mechanism.publish(1)
+        time.sleep(5)
+        Flag=True
+        #11.550346961618606, 4.113509564988685, 6.578729076518911, 0.5496185585281591, 4.53057230960389, 4.964140261390971, 6.412245289398134
         i=0
         abba=[5.31152459187756, 4.6414903058445995, 6.256269270674373, 1.0651639017005448, 10.636814530797523, 4.775946917696085, 12.78615064647905]
         for i in range(10):
+            print('moving on to iteration', i)
             a=True
             b=True
             c=True
@@ -72,7 +91,7 @@ if __name__ == '__main__':
                     print('moving to start position')
                     env.go_to_home(robot_grasp_joints[i])
                     a=False
-                if cont.route_done:
+                if cont.route_done&(b):
                     rospy.sleep(4)
                     data2=env.get_obs()
                     print('route done, closing the hand')
@@ -86,6 +105,7 @@ if __name__ == '__main__':
                     env.go_to_goal()
                     b=False
                 if (cont.test_done) & (not(a)) & (not(b)):
+                    print('we have gotten into this part of the program')
                     c=False
                     result=rospy.get_param('Goal')
                     if result=='true':
@@ -94,6 +114,7 @@ if __name__ == '__main__':
                         data.append(0.0)
                     print('end result is ',result)
                     print('this is what data is after appending the value',data)
+            print('made it out')
             publisher=Float32MultiArray()
             publisher.layout.dim.append(MultiArrayDimension())
             publisher.layout.dim[0].label = 'pregrasp_data'
@@ -109,8 +130,8 @@ if __name__ == '__main__':
             publisher.data=data
             print('ending data',data)
             collector.publish(publisher)
-            
-            '''
+            print('thing published')
+        '''
                 if finger_pos.finger1 < (finger_close_percent)-10:
                     finger_pos.finger1 = finger_pos.finger1 + 10
                     finger_pos.finger2 = finger_pos.finger2 + 10
@@ -118,12 +139,15 @@ if __name__ == '__main__':
                     _, reward, _, _ = env.step(finger_pos)                
                 elif count == 0:
                     count = 1
-            '''
+        '''
                 #env.go_to_goal()
             #else:
-            #    print("Goal Reached Terminate execution")        
-
+            #    print("Goal Reached Terminate execution")
+        '''
+        with open('Errors_different_Z.csv','a') as fd:
+            fd.write(cont.errors)
         print('test finished')
+        '''
     except rospy.ROSInterruptException:
         print('program interrupted before completion')
 

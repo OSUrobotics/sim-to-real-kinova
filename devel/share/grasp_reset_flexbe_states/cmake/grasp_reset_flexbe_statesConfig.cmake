@@ -67,14 +67,14 @@ set(grasp_reset_flexbe_states_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("TRUE" STREQUAL "TRUE")
-  set(grasp_reset_flexbe_states_SOURCE_PREFIX /home/nigel/kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp_reset_flexbe_states)
-  set(grasp_reset_flexbe_states_DEVEL_PREFIX /home/nigel/kinova_ws/devel)
+  set(grasp_reset_flexbe_states_SOURCE_PREFIX /home/nigel/full_kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp_reset_flexbe_states)
+  set(grasp_reset_flexbe_states_DEVEL_PREFIX /home/nigel/full_kinova_ws/devel)
   set(grasp_reset_flexbe_states_INSTALL_PREFIX "")
   set(grasp_reset_flexbe_states_PREFIX ${grasp_reset_flexbe_states_DEVEL_PREFIX})
 else()
   set(grasp_reset_flexbe_states_SOURCE_PREFIX "")
   set(grasp_reset_flexbe_states_DEVEL_PREFIX "")
-  set(grasp_reset_flexbe_states_INSTALL_PREFIX /home/nigel/kinova_ws/install)
+  set(grasp_reset_flexbe_states_INSTALL_PREFIX /home/nigel/full_kinova_ws/install)
   set(grasp_reset_flexbe_states_PREFIX ${grasp_reset_flexbe_states_INSTALL_PREFIX})
 endif()
 
@@ -91,9 +91,9 @@ endif()
 # flag project as catkin-based to distinguish if a find_package()-ed project is a catkin project
 set(grasp_reset_flexbe_states_FOUND_CATKIN_PROJECT TRUE)
 
-if(NOT "/home/nigel/kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp_reset_flexbe_states/src " STREQUAL " ")
+if(NOT "/home/nigel/full_kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp_reset_flexbe_states/src " STREQUAL " ")
   set(grasp_reset_flexbe_states_INCLUDE_DIRS "")
-  set(_include_dirs "/home/nigel/kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp_reset_flexbe_states/src")
+  set(_include_dirs "/home/nigel/full_kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp_reset_flexbe_states/src")
   if(NOT " " STREQUAL " ")
     set(_report "Check the issue tracker '' and consider creating a ticket if the problem has not been reported yet.")
   elseif(NOT " " STREQUAL " ")
@@ -110,7 +110,7 @@ if(NOT "/home/nigel/kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp
         message(FATAL_ERROR "Project 'grasp_reset_flexbe_states' specifies '${idir}' as an include dir, which is not found.  It does not exist in '${include}'.  ${_report}")
       endif()
     else()
-      message(FATAL_ERROR "Project 'grasp_reset_flexbe_states' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/nigel/kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp_reset_flexbe_states/${idir}'.  ${_report}")
+      message(FATAL_ERROR "Project 'grasp_reset_flexbe_states' specifies '${idir}' as an include dir, which is not found.  It does neither exist as an absolute directory nor in '/home/nigel/full_kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp_reset_flexbe_states/${idir}'.  ${_report}")
     endif()
     _list_append_unique(grasp_reset_flexbe_states_INCLUDE_DIRS ${include})
   endforeach()
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/nigel/kinova_ws/devel/lib;/home/nigel/kinova_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/nigel/full_kinova_ws/devel/lib;/home/nigel/kinova_ws/devel/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

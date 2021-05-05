@@ -17,14 +17,14 @@ add_custom_target(kinova_scripts_generate_messages ALL)
 
 
 
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
 add_custom_target(_kinova_scripts_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "kinova_scripts" "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "kinova_scripts" "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" ""
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
 add_custom_target(_kinova_scripts_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "kinova_scripts" "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "kinova_scripts" "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" ""
 )
 
 #
@@ -36,13 +36,13 @@ add_custom_target(_kinova_scripts_generate_messages_check_deps_${_filename}
 
 ### Generating Services
 _generate_srv_cpp(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/kinova_scripts
 )
 _generate_srv_cpp(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/kinova_scripts
@@ -60,9 +60,9 @@ add_custom_target(kinova_scripts_generate_messages_cpp
 add_dependencies(kinova_scripts_generate_messages kinova_scripts_generate_messages_cpp)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_cpp _kinova_scripts_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_cpp _kinova_scripts_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -77,13 +77,13 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS kinova_scripts_generate_messages_cp
 
 ### Generating Services
 _generate_srv_eus(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/kinova_scripts
 )
 _generate_srv_eus(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/kinova_scripts
@@ -101,9 +101,9 @@ add_custom_target(kinova_scripts_generate_messages_eus
 add_dependencies(kinova_scripts_generate_messages kinova_scripts_generate_messages_eus)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_eus _kinova_scripts_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_eus _kinova_scripts_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -118,13 +118,13 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS kinova_scripts_generate_messages_eu
 
 ### Generating Services
 _generate_srv_lisp(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/kinova_scripts
 )
 _generate_srv_lisp(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/kinova_scripts
@@ -142,9 +142,9 @@ add_custom_target(kinova_scripts_generate_messages_lisp
 add_dependencies(kinova_scripts_generate_messages kinova_scripts_generate_messages_lisp)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_lisp _kinova_scripts_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_lisp _kinova_scripts_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -159,13 +159,13 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS kinova_scripts_generate_messages_li
 
 ### Generating Services
 _generate_srv_nodejs(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/kinova_scripts
 )
 _generate_srv_nodejs(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/kinova_scripts
@@ -183,9 +183,9 @@ add_custom_target(kinova_scripts_generate_messages_nodejs
 add_dependencies(kinova_scripts_generate_messages kinova_scripts_generate_messages_nodejs)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_nodejs _kinova_scripts_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_nodejs _kinova_scripts_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -200,13 +200,13 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS kinova_scripts_generate_messages_no
 
 ### Generating Services
 _generate_srv_py(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/kinova_scripts
 )
 _generate_srv_py(kinova_scripts
-  "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
+  "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/kinova_scripts
@@ -224,9 +224,9 @@ add_custom_target(kinova_scripts_generate_messages_py
 add_dependencies(kinova_scripts_generate_messages kinova_scripts_generate_messages_py)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/Joint_angles.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_py _kinova_scripts_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_scripts/srv/New_pose.srv" NAME_WE)
 add_dependencies(kinova_scripts_generate_messages_py _kinova_scripts_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility

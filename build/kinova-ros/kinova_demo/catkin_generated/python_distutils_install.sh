@@ -13,21 +13,21 @@ fi
 
 echo_and_run() { echo "+ $@" ; "$@" ; }
 
-echo_and_run cd "/home/nigel/kinova_ws/src/kinova-ros/kinova_demo"
+echo_and_run cd "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_demo"
 
 # ensure that Python install destination exists
-echo_and_run mkdir -p "$DESTDIR/home/nigel/kinova_ws/install/lib/python3/dist-packages"
+echo_and_run mkdir -p "$DESTDIR/home/nigel/full_kinova_ws/install/lib/python3/dist-packages"
 
 # Note that PYTHONPATH is pulled from the environment to support installing
 # into one location when some dependencies were installed in another
 # location, #123.
 echo_and_run /usr/bin/env \
-    PYTHONPATH="/home/nigel/kinova_ws/install/lib/python3/dist-packages:/home/nigel/kinova_ws/build/lib/python3/dist-packages:$PYTHONPATH" \
-    CATKIN_BINARY_DIR="/home/nigel/kinova_ws/build" \
+    PYTHONPATH="/home/nigel/full_kinova_ws/install/lib/python3/dist-packages:/home/nigel/full_kinova_ws/build/lib/python3/dist-packages:$PYTHONPATH" \
+    CATKIN_BINARY_DIR="/home/nigel/full_kinova_ws/build" \
     "/usr/bin/python3" \
-    "/home/nigel/kinova_ws/src/kinova-ros/kinova_demo/setup.py" \
+    "/home/nigel/full_kinova_ws/src/kinova-ros/kinova_demo/setup.py" \
      \
-    build --build-base "/home/nigel/kinova_ws/build/kinova-ros/kinova_demo" \
+    build --build-base "/home/nigel/full_kinova_ws/build/kinova-ros/kinova_demo" \
     install \
     --root="${DESTDIR-/}" \
-    --install-layout=deb --prefix="/home/nigel/kinova_ws/install" --install-scripts="/home/nigel/kinova_ws/install/bin"
+    --install-layout=deb --prefix="/home/nigel/full_kinova_ws/install" --install-scripts="/home/nigel/full_kinova_ws/install/bin"

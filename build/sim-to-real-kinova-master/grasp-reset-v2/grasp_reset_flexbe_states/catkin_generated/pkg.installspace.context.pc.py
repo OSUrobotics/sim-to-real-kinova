@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "${prefix}/include".split(';') if "${prefix}/i
 PROJECT_CATKIN_DEPENDS = "".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "-lgrasp_reset_flexbe_states".split(';') if "-lgrasp_reset_flexbe_states" != "" else []
 PROJECT_NAME = "grasp_reset_flexbe_states"
-PROJECT_SPACE_DIR = "/home/nigel/kinova_ws/install"
+PROJECT_SPACE_DIR = "/home/nigel/full_kinova_ws/install"
 PROJECT_VERSION = "1.0.0"

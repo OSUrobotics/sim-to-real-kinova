@@ -2,7 +2,7 @@
 
 message(STATUS "infrastructure_msgs: 16 messages, 0 services")
 
-set(MSG_I_FLAGS "-Iinfrastructure_msgs:/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg;-Iinfrastructure_msgs:/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg;-Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg;-Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg")
+set(MSG_I_FLAGS "-Iinfrastructure_msgs:/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg;-Iinfrastructure_msgs:/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg;-Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg;-Iactionlib_msgs:/opt/ros/noetic/share/actionlib_msgs/cmake/../msg")
 
 # Find all generators
 find_package(gencpp REQUIRED)
@@ -17,84 +17,84 @@ add_custom_target(infrastructure_msgs_generate_messages ALL)
 
 
 
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" ""
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" ""
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" "infrastructure_msgs/StageGoal:infrastructure_msgs/StageActionGoal:infrastructure_msgs/StageFeedback:infrastructure_msgs/StageActionFeedback:std_msgs/Header:infrastructure_msgs/StageResult:actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:infrastructure_msgs/StageActionResult"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" "actionlib_msgs/GoalStatus:infrastructure_msgs/StageResult:infrastructure_msgs/StageActionFeedback:infrastructure_msgs/StageActionResult:infrastructure_msgs/StageActionGoal:infrastructure_msgs/StageGoal:actionlib_msgs/GoalID:infrastructure_msgs/StageFeedback:std_msgs/Header"
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" "actionlib_msgs/GoalID:infrastructure_msgs/StageGoal:std_msgs/Header"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" "actionlib_msgs/GoalID:infrastructure_msgs/StageGoal:std_msgs/Header"
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" "actionlib_msgs/GoalID:std_msgs/Header:infrastructure_msgs/StageResult:actionlib_msgs/GoalStatus"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" "actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:infrastructure_msgs/StageResult:std_msgs/Header"
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" "actionlib_msgs/GoalID:infrastructure_msgs/StageFeedback:std_msgs/Header:actionlib_msgs/GoalStatus"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" "actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:infrastructure_msgs/StageFeedback:std_msgs/Header"
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" ""
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" ""
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" ""
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" "infrastructure_msgs/DataCollectionActionResult:infrastructure_msgs/DataCollectionFeedback:std_msgs/Header:actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:infrastructure_msgs/DataCollectionGoal:infrastructure_msgs/DataCollectionActionFeedback:infrastructure_msgs/DataCollectionActionGoal:infrastructure_msgs/DataCollectionResult"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" "actionlib_msgs/GoalStatus:infrastructure_msgs/DataCollectionActionFeedback:infrastructure_msgs/DataCollectionGoal:infrastructure_msgs/DataCollectionResult:infrastructure_msgs/DataCollectionActionGoal:actionlib_msgs/GoalID:infrastructure_msgs/DataCollectionActionResult:infrastructure_msgs/DataCollectionFeedback:std_msgs/Header"
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" "actionlib_msgs/GoalID:infrastructure_msgs/DataCollectionGoal:std_msgs/Header"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" "actionlib_msgs/GoalID:infrastructure_msgs/DataCollectionGoal:std_msgs/Header"
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" "actionlib_msgs/GoalID:std_msgs/Header:infrastructure_msgs/DataCollectionResult:actionlib_msgs/GoalStatus"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" "actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:infrastructure_msgs/DataCollectionResult:std_msgs/Header"
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" "actionlib_msgs/GoalID:std_msgs/Header:infrastructure_msgs/DataCollectionFeedback:actionlib_msgs/GoalStatus"
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" "actionlib_msgs/GoalStatus:actionlib_msgs/GoalID:infrastructure_msgs/DataCollectionFeedback:std_msgs/Header"
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" ""
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" ""
 )
 
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
 add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
-  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" ""
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "infrastructure_msgs" "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" ""
 )
 
 #
@@ -104,97 +104,97 @@ add_custom_target(_infrastructure_msgs_generate_messages_check_deps_${_filename}
 ### Section generating for lang: gencpp
 ### Generating Messages
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
-  "${MSG_I_FLAGS}"
-  ""
-  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
-  "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
-  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
-  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_cpp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_cpp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_cpp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_cpp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_cpp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_cpp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/infrastructure_msgs
@@ -214,37 +214,37 @@ add_custom_target(infrastructure_msgs_generate_messages_cpp
 add_dependencies(infrastructure_msgs_generate_messages infrastructure_msgs_generate_messages_cpp)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_cpp _infrastructure_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -257,97 +257,97 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS infrastructure_msgs_generate_messag
 ### Section generating for lang: geneus
 ### Generating Messages
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
-  "${MSG_I_FLAGS}"
-  ""
-  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
-  "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
-  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
-  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_eus(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_eus(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_eus(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_eus(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_eus(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_eus(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/infrastructure_msgs
@@ -367,37 +367,37 @@ add_custom_target(infrastructure_msgs_generate_messages_eus
 add_dependencies(infrastructure_msgs_generate_messages infrastructure_msgs_generate_messages_eus)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_eus _infrastructure_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -410,97 +410,97 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS infrastructure_msgs_generate_messag
 ### Section generating for lang: genlisp
 ### Generating Messages
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
-  "${MSG_I_FLAGS}"
-  ""
-  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
-  "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
-  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
-  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_lisp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_lisp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_lisp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_lisp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_lisp(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_lisp(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/infrastructure_msgs
@@ -520,37 +520,37 @@ add_custom_target(infrastructure_msgs_generate_messages_lisp
 add_dependencies(infrastructure_msgs_generate_messages infrastructure_msgs_generate_messages_lisp)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_lisp _infrastructure_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -563,97 +563,97 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS infrastructure_msgs_generate_messag
 ### Section generating for lang: gennodejs
 ### Generating Messages
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
-  "${MSG_I_FLAGS}"
-  ""
-  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
-  "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
-  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
-  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_nodejs(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_nodejs(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_nodejs(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_nodejs(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_nodejs(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_nodejs(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/infrastructure_msgs
@@ -673,37 +673,37 @@ add_custom_target(infrastructure_msgs_generate_messages_nodejs
 add_dependencies(infrastructure_msgs_generate_messages infrastructure_msgs_generate_messages_nodejs)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_nodejs _infrastructure_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -716,97 +716,97 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS infrastructure_msgs_generate_messag
 ### Section generating for lang: genpy
 ### Generating Messages
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
+  "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg"
   "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg"
   "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
-  "${MSG_I_FLAGS}"
-  ""
-  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
-  "${MSG_I_FLAGS}"
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
-  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
-  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
-  "${MSG_I_FLAGS}"
-  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg;/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg"
-  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
-)
-_generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_py(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_py(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_py(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalStatus.msg;/opt/ros/noetic/share/actionlib_msgs/cmake/../msg/GoalID.msg;/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg;/opt/ros/noetic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_py(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
 )
 _generate_msg_py(infrastructure_msgs
-  "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
+)
+_generate_msg_py(infrastructure_msgs
+  "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/infrastructure_msgs
@@ -826,37 +826,37 @@ add_custom_target(infrastructure_msgs_generate_messages_py
 add_dependencies(infrastructure_msgs_generate_messages infrastructure_msgs_generate_messages_py)
 
 # add dependencies to all check dependencies targets
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DoorSensors.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/src/infrastructure-packages/infrastructure_msgs/msg/DataTimestamps.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/StageFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionAction.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionActionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionGoal.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionResult.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
-get_filename_component(_filename "/home/nigel/kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
+get_filename_component(_filename "/home/nigel/full_kinova_ws/devel/share/infrastructure_msgs/msg/DataCollectionFeedback.msg" NAME_WE)
 add_dependencies(infrastructure_msgs_generate_messages_py _infrastructure_msgs_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility

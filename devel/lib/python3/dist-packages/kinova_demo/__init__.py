@@ -6,7 +6,7 @@ from os import path as os_path
 from pkgutil import extend_path
 from sys import path as sys_path
 
-__extended_path = '/home/nigel/kinova_ws/src/kinova-ros/kinova_demo/nodes'.split(';')
+__extended_path = '/home/nigel/full_kinova_ws/src/kinova-ros/kinova_demo/nodes'.split(';')
 for p in reversed(__extended_path):
     sys_path.insert(0, p)
     del p

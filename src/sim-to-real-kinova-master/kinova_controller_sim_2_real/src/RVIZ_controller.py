@@ -30,10 +30,17 @@ import serial
 import time
 #from qrtestRGB import main_f
 import subprocess
-    
+import roslib; roslib.load_manifest('kinova_demo')
+import rospy
+
+import actionlib
+import kinova_msgs.msg
+from kinova_msgs.msg import FingerPosition
+import matplotlib.pyplot as plt
 # base pose : position [0.6972, 0, 0.8] orientation [0, 90, 0]
 # vary poses based on the base pose. 
-
+#output.goal=FingerPosition()
+#output.goal_id=actionlib.msg.actionlib_msgs.msg._GoalID()
 class robot(object):
     def __init__(self, robot_name):
         # Initialize Moveit interface
@@ -43,6 +50,8 @@ class robot(object):
             self.hold=time.time()
             self.pub = rospy.Publisher("/route_finish", Bool,queue_size=1)
             self.pub2 = rospy.Publisher("/test_finish",Bool,queue_size=1)
+            self.finger_action_status = rospy.Subscriber('/j2s7s300_driver/fingers_action/finger_positions/result',kinova_msgs.msg.SetFingersPositionActionResult,self.finger_action_status_sub)
+            self.finger_pub = rospy.Publisher("/j2s7s300_driver/fingers_action/finger_positions/goal",kinova_msgs.msg.SetFingersPositionActionGoal,queue_size=1)
             self.open_close = rospy.Subscriber('/hand_control',String,self.hand_control)
             self.command_sub=rospy.Subscriber('/sim2real/joint_angle_command',JointState, self.joint_angle_client, queue_size=1)
             # self.filename = rospy.get_param("~filename")
@@ -59,7 +68,7 @@ class robot(object):
             rospy.sleep(2)
             self.disp_traj = moveit_msgs.msg.DisplayTrajectory()
             self.disp_traj.trajectory_start = self.robot.get_current_state()
-            self.arm_joints_sub = rospy.Subscriber("/j2s7s300_driver/out/joint_state", JointState, self.get_arm_joints)
+            self.arm_joints_sub = rospy.Subscriber("/j2s7s300_driver/out/joint_state", JointState, self.get_arm_joints,tcp_nodelay=True)
             self.arm_joint_states = []
             self.prev_arm_js = []
             self.arm_traj = []
@@ -71,13 +80,32 @@ class robot(object):
             self.group.allow_replanning(1)
             self.route=[]
             self.hand='n'
+            self.finger_pose=[0,0,0]
+            self.count=0
+            self.updated_position=False
+            self.all_poses=[]
+            self.all_times=[]
+            self.all_goals=[]
+            self.time=0
+            self.ready_for_action=True
+            self.fingers=[0,0,0]
+            self.next_output=kinova_msgs.msg.SetFingersPositionActionGoal()
             # self.pubPlanningScene = rospy.Publisher("planning_scene" PlanningScene)
             # rospy.wait_for_service("/get_planning_scene", 10.0)
             # get_planning_scene = rospy.ServiceProxy('/get_planning_scene', GetPlanningScene)
             # request = PlanningSceneComponents(components=PlanningSceneComponents.ALLOWED_COLLISION_MATRIX)
             # response = get_planning_scene(request)
 
-
+    def finger_action_status_sub(self,msg):
+        status=msg.status.status
+        #print(msg.status.goal_id.id, status,msg.result.fingers.finger1,msg.result.fingers.finger2,msg.result.fingers.finger3)
+        if (status in [3,4,5,8,9]):# & (msg.status.goal_id.id == self.id):
+            self.ready_for_action=True
+        else:
+            self.ready_for_action=False
+        if np.average(np.array(self.fingers)-np.array([msg.result.fingers.finger1,msg.result.fingers.finger2,msg.result.fingers.finger3]))/np.average([msg.result.fingers.finger1,msg.result.fingers.finger2,msg.result.fingers.finger3])>0.5:
+            print('massive step noticed, likely failure. Consider redoing this test?')
+        
     def allow_collision(self):
         # self.pubPlanningScene = rospy.Publisher("planning_scene", PlanningScene)
         ps = PlanningScene()
@@ -99,10 +127,6 @@ class robot(object):
         # print "gripper name", self.gripper
         applyScene = self.aps(ps)
         print (ps)
-        # ps.robot_state =  getScene.robot_state
-        # ps.fixed_frame_transforms = getScene.fixed_frame_transforms
-        # ps.allowed_collision_matrix = getScene.allowed_collision_matrix
-        # ps.link            
     def hand_control(self,msg):
         print('message contents',msg)
         if 'c' in msg.data:
@@ -120,10 +144,16 @@ class robot(object):
 
     def get_arm_joints(self, msg):
         #print(msg)
-        self.arm_joint_states = msg.position
-        if len(self.prev_arm_js) > 0 and max(np.absolute(np.array(self.arm_joint_states) - np.array(self.prev_arm_js))) > 0.01:
-            self.arm_traj.append(self.arm_joint_states)
-        self.prev_arm_js = self.arm_joint_states
+        #print('received messege at',time.time())
+        if time.time()-self.time>0.08:
+            self.time=time.time()
+            self.arm_joint_states = msg.position
+            if len(self.prev_arm_js) > 0 and max(np.absolute(np.array(self.arm_joint_states) - np.array(self.prev_arm_js))) > 0.01:
+                self.arm_traj.append(self.arm_joint_states)
+            self.prev_arm_js = self.arm_joint_states
+            self.finger_pose=msg.position[-6:-3]
+            self.updated_position=True
+        
 
     def planner_type(self, planner_type):
         if planner_type == "RRT":
@@ -165,6 +195,27 @@ class robot(object):
         rospy.sleep(2)
 
     def move_finger(self, cmd):
+        #cmd is a list of length 4. first index is the lift, either 0 or 1, next three are finger actions, 0-1
+        '''
+        output=kinova_msgs.msg.SetFingersPositionActionGoal()
+        #finger_range=[6,7000]
+        output.header.seq=self.count
+        self.count +=1
+        #output.header.stamp=time.time()
+        #output.goal_id.stamp=time.time()
+        output.goal_id.id='/j2s7s300_gripper_command_action_server-'+str(self.count)+'-'+str(time.time())
+        
+        while (not(self.updated_position)) | (not(self.ready_for_action)):
+            time.sleep(0.01)
+        output.goal.fingers.finger1=max(self.finger_pose[0]*7000/1.44+cmd[1]*500,0)
+        output.goal.fingers.finger2=max(self.finger_pose[1]*7000/1.44+cmd[2]*500,0)
+        output.goal.fingers.finger3=max(self.finger_pose[2]*7000/1.44+cmd[3]*500,0)
+        self.next_output=output
+        self.fingers=[output.goal.fingers.finger1,output.goal.fingers.finger2,output.goal.fingers.finger3]
+        self.all_goals.append([output.goal.fingers.finger1,output.goal.fingers.finger2,output.goal.fingers.finger3])
+        self.all_poses.append(self.finger_pose)
+        self.all_times.append(time.time())
+        '''
         if cmd == "Close":
             self.gripper.set_named_target("Close")
             # self.gripper.go(wait=True)
@@ -178,23 +229,26 @@ class robot(object):
             self.gripper.set_joint_value_target(cmd)
         self.gripper.go(wait=True)
         rospy.sleep(2)
+        '''
+        #print('sent command',output.goal_id.id,output.goal.fingers.finger1,output.goal.fingers.finger2,output.goal.fingers.finger3)
+        self.finger_pub.publish(output)
+        self.updated_position=False
+        self.ready_for_action=False
+        rospy.sleep(0.03)
+        '''
 
     def display_Trajectory(self):
         self.disp_traj_publisher = rospy.Publisher("/move_group/display_planned_path", moveit_msgs.msg.DisplayTrajectory, queue_size=20)
         self.disp_traj.trajectory.append(self.plan)
-        print (self.disp_traj.trajectory)
+        #print (self.disp_traj.trajectory)
         self.disp_traj_publisher.publish(self.disp_traj)
 
     def move_to_Joint(self, joint_states):
         joint_goal = JointState()
         joint_goal.position = joint_states
-        print('joint goal, should be jointstate with positions values',joint_goal)
+        #print('joint goal, should be jointstate with positions values',joint_goal)
         self.group.set_joint_value_target(joint_goal.position)
         self.plan = self.group.plan()
-        #print('the faulty plan',self.plan)
-        #print('plan part 1',self.plan[0])
-        #print('plan part 2',self.plan[1])
-        # self.group.set_planning_time(5)
         self.group.go(wait=True)
         self.group.execute(self.plan[1], wait=True)
         self.group.stop()
@@ -214,7 +268,6 @@ class robot(object):
             return None
         # save traj
         else:
-
             # print self.plan.joint_trajectory.points
             for a in range(len(self.plan.joint_trajectory.points)):
                 temp = self.plan.joint_trajectory.points[a].positions
@@ -1082,10 +1135,96 @@ if __name__ == '__main__':
     Robot.get_Object([1.5, 0.02, 2], [0, -0.8, 0, 1.0], "wall") # wall
     Robot.get_Object([2, 2, 0.02], [0, 0, -.075, 1.0], "floor") # wall
     Robot.get_Object([0.6, 0.5, 0.1], [0, -0.7, 0.7, 1.0], "camera bar") # wall
+    speed1=1
+    speed2=2
+    speed3=3
+    print(f'testing different finger speeds, in theory a speed of 0.1 should take {speed1} seconds, a speed of 0.2 should take {speed2} and a speed of 0.3 should take {speed3}.')
+    print('0.1 signal')
+    start=time.time()
+    '''
+    while (Robot.finger_pose[0]<1.4)|(Robot.finger_pose[1]<1.4):
+        Robot.move_finger([0,0.2,0.2,0.2])
+        #print(Robot.finger_pose)
+    end=time.time()
+    print('closing with 0.4 took',end-start,'seconds')
+    start=time.time()
+    while (Robot.finger_pose[0]>0.05)|(Robot.finger_pose[1]>0.05):
+        Robot.move_finger([0,-0.2,-0.2,-0.2])
+    end=time.time()
+    print('opening with 0.4 took',end-start,'seconds')
+    start=time.time()
+    while (Robot.finger_pose[0]<1.4)|(Robot.finger_pose[1]<1.4):
+        Robot.move_finger([0,0.6,0.6,0.6])
+    end=time.time()
+    print('closing with 0.6 took',end-start,'seconds')
+    start=time.time()
+    while (Robot.finger_pose[0]>0.05)|(Robot.finger_pose[1]>0.05):
+        Robot.move_finger([0,-0.6,-0.6,-0.6])
+    end=time.time()
+    print('opening with 0.6 took',end-start,'seconds')
+    start=time.time()
+    while (Robot.finger_pose[0]<1.4)|(Robot.finger_pose[1]<1.4):
+        Robot.move_finger([0,0.8,0.8,0.8])
+    end=time.time()
+    print('closing with 0.8 took',end-start,'seconds')
+    start=time.time()
+    while (Robot.finger_pose[0]>0.05)|(Robot.finger_pose[1]>0.05):
+        Robot.move_finger([0,-0.8,-0.8,-0.8])
+    end=time.time()
+    print('opening with 0.8 took',end-start,'seconds')
+    x=np.copy(Robot.all_times)
+    y=np.copy(Robot.all_poses)
+    y2=np.copy(Robot.all_goals)
+    plt.plot(x,y[:,0]*7000/1.44)
+    plt.plot(x,y[:,1]*7000/1.44)
+    plt.plot(x,y[:,2]*7000/1.44)
+    plt.plot(x,y2[:,0],marker='.')
+    plt.plot(x,y2[:,1])
+    plt.plot(x,y2[:,2])
+    plt.legend(['finger 1','finger 2','finger 3','finger 1 control','finger 2 control','finger 3 control'])
+    plt.show()
+    '''
+    '''
+    print('closing with 0.1')
+    old=time.time()
+    Robot.move_finger([0,0.1,0.1,0.1])
+    Robot.move_finger([0,0.1,0.1,0.1])
+    Robot.move_finger([0,0.1,0.1,0.1])
+    print('this took',time.time()-old)
+    print('opening with 0.1')
+    old=time.time()
+    Robot.move_finger([0,-0.1,-0.1,-0.1])
+    Robot.move_finger([0,-0.1,-0.1,-0.1])
+    Robot.move_finger([0,-0.1,-0.1,-0.1])
+    print('this took',time.time()-old)
+    print('closing with 0.3')
+    old=time.time()
+    Robot.move_finger([0,0.3,0.3,0.3])
+    Robot.move_finger([0,0.3,0.3,0.3])
+    Robot.move_finger([0,0.3,0.3,0.3])
+    print('this took',time.time()-old)    
+    print('opening with 0.3')
+    old=time.time()
+    Robot.move_finger([0,-0.3,-0.3,-0.3])
+    Robot.move_finger([0,-0.3,-0.3,-0.3])
+    Robot.move_finger([0,-0.3,-0.3,-0.3])
+    print('this took',time.time()-old)
+    print('closing with 1')
+    old=time.time()
+    Robot.move_finger([0,1,1,1])
+    Robot.move_finger([0,1,1,1])
+    Robot.move_finger([0,1,1,1])    
+    print('this took',time.time()-old)    
+    print('opening with 1')
+    old=time.time()
+    Robot.move_finger([0,-1,-1,-1])
+    Robot.move_finger([0,-1,-1,-1])
+    Robot.move_finger([0,-1,-1,-1])
+    print('this took',time.time()-old)
+    '''
     print('ready to go captain!')
     #Robot.move_to_Goal([0.21, -0.26, 0.5, 0.64, 0.317, 0.42,0.55])
     #Robot.move_to_Joint(test_joint)
-    
     while True:
         Robot.pub.publish(False)
         if Robot.hand=='c':
@@ -1110,7 +1249,6 @@ if __name__ == '__main__':
                 print('theoretically we are done with the route.')
                 Robot.pub.publish(True)
         rospy.sleep(0.5)
-    
     '''
     Robot.move_to_Goal([0.07, -0.644, 0.01, 90, 180, 0])
     Robot.move_to_Goal([0,0.7,0.5,90,165,180])
@@ -1131,92 +1269,3 @@ if __name__ == '__main__':
     # grab_point = []
     # grab_point2 = []
     '''
-    
-    # #get dat
-    # data = rospy.wait_for_message('/webcam', String)
-    # data2 = rospy.wait_for_message('/web_blue', String)
-    # #strip
-    # grab_point = stripper(data)
-    # grab_point2 = stripper(data2)
-
-    # print(grab_point[0],grab_point2[0])
-    # Robot.get_Object([0.04, 0.04, 0.06], [grab_point2[0]+arm_error_x, grab_point2[1], 0.02, 1.0], "blue") # define blue object as barrier
-    # pickerupper(grab_point, arm_error_x)
-
-    # Robot.scene.remove_world_object("blue")
-
-    # pickerupper(grab_point2, arm_error_x)
-    #     # #rospy.loginfo('Got a point',data)
-        
-        # #get each piece in string
-        # p = list(str(data).split(" "))
-        # point_x = p[1]
-        # point_y = p[2]
-
-        # point_x = point_x.replace('"[', '')
-        # point_x = float(point_x.replace(',', ''))
-        # point_y = float(point_y.replace(',', ''))
-
-        # p2 = list(str(data2).split(" "))
-        # point_x2 = p2[1]
-        # point_y2 = p2[2]
-        # priority2 = p2[3]
-
-        # point_x2 = point_x2.replace('"[', '')
-        # point_x2 = float(point_x2.replace(',', ''))
-        # point_y2 = float(point_y2.replace(',', ''))
-        # priority2 = float(priority2.replace(']"', ''))
-        # if priority == 1:
-
-        #     grab_point = [point_x, point_y, priority]
-
-        # # End up here
-        # if priority == 2 and len(go_to_point) == 0:
-
-        #     go_to_point = [point_x, point_y, priority]
-        
-        # if priority2 == 1:
-
-        #     grab_point2 = [point_x2, point_y2, priority2]
-
-
-
-
-    #Robot.move_to_Goal(,-0.59,0.035,90,165,0])
-    # benchmark_feature_2()
-    # read_poses = readfile("kg_s_rectblock_2.csv")
-    # print np.array(read_poses[1])
-    # find_pose(read_poses, [0.03, -0.58, 0.015, 90, 180, 0])
-    # print check_pose_f_or_s(read_poses, read_poses[2])SSS
-    
-
-    # Robot.get_Object([0.13125, 0.10125, 0.93125], [0.0, -0.66, (-0.05 + 0.465625 + 0.01), 1.0], "cube") # get cube
-    # Robot.get_Object([0.02, 0.49, 0.50], [-0.38, -0.49, (-0.05 + 0.25 + 0.01), 1.0], "wall") # wall
-    # rospy.sleep(2)
-    # lift_pose = [-0.24, -0.8325, 0.30, 90, 180, 0] # lifting object
-    # Robot.move_to_Goal(lift_pose)
-    
-    # rospy.sleep(2)
-    
-    # Robot.move_to_Goal([0,0.7,0.2,90,165,180])
-    # Robot.move_to_Goal([-.21,0.33,0.3,90,165,270])
-    # Robot.move_to_Goal([-.3875,-.1,0.05,90,165,180])
-    #Robot.move_finger("Open")
-    # Robot.move_to_Goal([-.3875,.1,0.05,90,165,180])
-    #rospy.sleep(1)
-    #Robot.move_finger("Close")
-    # Robot.move_to_Goal([-.3875,.1,0.2,90,165,180])
-    # Robot.move_to_Goal([0.02,0.7,0.2,90,165,180])
-    # Robot.move_finger("Open")
-    # # rospy.sleep(2)
-    # Robot.move_to_Goal([0.03, -0.59, 0.015, 90, 180, 0])    
-    # Robot.scene.remove_world_object()
-    # rospy.sleep(2) # this 2 seconds is important for rrt* to work
-
-    # # Robot.planner_type("RRT*")
-    # Robot.move_to_Goal([0.07, -0.644, 0.01, 90, 180, 0]) # move close the object
-
-    #Robot.move_finger('Close')
-
-
-

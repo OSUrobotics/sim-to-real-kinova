@@ -193,7 +193,7 @@ class KinovaGripper_Env:
         fingers_6D_pose=self.get_finger_pos()
         fingers_6D_pose = fingers_6D_pose + list(self.wrist_pose) + list(obj_pose) + joint_states + [obj_size[0], obj_size[1], obj_size[2]*2] + finger_obj_dist + [x_angle, z_angle] 
         print('this is the obs data',fingers_6D_pose)
-        return fingers_6D_pose     
+        return fingers_6D_pose
     
     
     ####Gives x,y,z position of fingers#####

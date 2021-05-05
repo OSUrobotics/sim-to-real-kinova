@@ -4,5 +4,5 @@ PROJECT_PKG_CONFIG_INCLUDE_DIRS = "".split(';') if "" != "" else []
 PROJECT_CATKIN_DEPENDS = "moveit_core;pluginlib;roscpp;tf_conversions".replace(';', ' ')
 PKG_CONFIG_LIBRARIES_WITH_PREFIX = "".split(';') if "" != "" else []
 PROJECT_NAME = "j2s6s300_ikfast"
-PROJECT_SPACE_DIR = "/home/nigel/kinova_ws/install"
+PROJECT_SPACE_DIR = "/home/nigel/full_kinova_ws/install"
 PROJECT_VERSION = "0.0.0"

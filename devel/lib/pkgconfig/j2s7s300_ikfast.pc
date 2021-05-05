@@ -1,4 +1,4 @@
-prefix=/home/nigel/kinova_ws/devel
+prefix=/home/nigel/full_kinova_ws/devel
 
 Name: j2s7s300_ikfast
 Description: Description of j2s7s300_ikfast

@@ -25,21 +25,21 @@ class ImageProcessor():
     def get_object_pose(self, img_msg):
     
         ##Box Pixel values in the Image##
-        x = 100 # Start Pixel in Height
-        y = 350 # Start Pixel in Width
+        x = 150 # Start Pixel in Height
+        y = 250 # Start Pixel in Width
         h = 600 # Height in pixels    
-        w = 550 # Width in pixels
+        w = 650 # Width in pixels
         
         # Aruko Marker Info
         marker_size = 3.6 #cm 
         
         # Marker IDs
-        ee_marker_id = 1  # end-effector
-        obj_marker_id = 0  # object
-        finger1_dist_id = 5 # Finger 1 Dist
-        finger1_tip_id = 3  # Finger 1 Tip
-        finger2_dist_id = 4 # Finger 2 Dist  
-        finger2_tip_id = 2  # Finger 1 Tip
+        ee_marker_id = 608  # end-effector
+        obj_marker_id = 495  # object
+        finger1_dist_id = 189 # Finger 1 Dist
+        finger1_tip_id = 331# Finger 1 Tip
+        finger2_dist_id = 411 # Finger 2 Dist  
+        finger2_tip_id = 190  # Finger 1 Tip
 
         # Get the saved camera and distortion matrices from calibration
         mtx = np.load('/home/nigel/camera_mtx2.npy') # camera matrix
@@ -47,7 +47,7 @@ class ImageProcessor():
 
 
         # Define Aruco Dictionary 
-        aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_5X5_1000)
+        aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_ARUCO_ORIGINAL)
         parameters = aruco.DetectorParameters_create()
 
         #Lists for storing marker positions
