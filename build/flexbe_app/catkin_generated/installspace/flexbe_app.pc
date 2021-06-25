@@ -1,8 +1,0 @@
-prefix=/home/nigel/kinova_ws/install
-
-Name: flexbe_app
-Description: Description of flexbe_app
-Version: 2.2.4
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib -lflexbe_app
-Requires: 

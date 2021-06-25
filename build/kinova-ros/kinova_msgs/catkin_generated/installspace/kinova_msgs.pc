@@ -1,8 +1,0 @@
-prefix=/home/nigel/full_kinova_ws/install
-
-Name: kinova_msgs
-Description: Description of kinova_msgs
-Version: 0.0.1
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: actionlib_msgs geometry_msgs message_runtime

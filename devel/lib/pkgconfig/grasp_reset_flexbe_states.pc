@@ -1,8 +1,0 @@
-prefix=/home/nigel/full_kinova_ws/devel
-
-Name: grasp_reset_flexbe_states
-Description: Description of grasp_reset_flexbe_states
-Version: 1.0.0
-Cflags: -I/home/nigel/full_kinova_ws/src/sim-to-real-kinova-master/grasp-reset-v2/grasp_reset_flexbe_states/src
-Libs: -L${prefix}/lib -lgrasp_reset_flexbe_states
-Requires: 

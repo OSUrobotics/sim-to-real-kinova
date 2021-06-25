@@ -1,8 +1,0 @@
-prefix=/home/nigel/full_kinova_ws/install
-
-Name: grasp_classifier_individual_sim_2_real
-Description: Description of grasp_classifier_individual_sim_2_real
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

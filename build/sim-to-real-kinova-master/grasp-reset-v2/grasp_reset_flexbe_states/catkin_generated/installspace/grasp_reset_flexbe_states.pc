@@ -1,8 +1,0 @@
-prefix=/home/nigel/full_kinova_ws/install
-
-Name: grasp_reset_flexbe_states
-Description: Description of grasp_reset_flexbe_states
-Version: 1.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib -lgrasp_reset_flexbe_states
-Requires: 

@@ -1,8 +1,0 @@
-prefix=/home/nigel/full_kinova_ws/install
-
-Name: kinova_controller_sim_2_real
-Description: Description of kinova_controller_sim_2_real
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

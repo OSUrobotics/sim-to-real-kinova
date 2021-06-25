@@ -1,8 +1,0 @@
-prefix=/home/nigel/full_kinova_ws/install
-
-Name: j2s7s300_ikfast
-Description: Description of j2s7s300_ikfast
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: moveit_core pluginlib roscpp tf_conversions

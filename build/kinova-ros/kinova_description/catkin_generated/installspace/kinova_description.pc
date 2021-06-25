@@ -1,8 +1,0 @@
-prefix=/home/nigel/full_kinova_ws/install
-
-Name: kinova_description
-Description: Description of kinova_description
-Version: 0.0.1
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

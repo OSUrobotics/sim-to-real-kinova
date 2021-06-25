@@ -1,8 +1,0 @@
-#goal
-bool stage_start
----
-#result
-bool stage_result
----
-#feedback
-string stage_status

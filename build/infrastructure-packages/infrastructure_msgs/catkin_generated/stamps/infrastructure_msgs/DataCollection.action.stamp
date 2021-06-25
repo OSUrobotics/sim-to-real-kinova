@@ -1,9 +1,0 @@
-#goal
-bool collection_start
----
-#result
-bool collection_stop
----
-#feedback
-bool collection_status
-

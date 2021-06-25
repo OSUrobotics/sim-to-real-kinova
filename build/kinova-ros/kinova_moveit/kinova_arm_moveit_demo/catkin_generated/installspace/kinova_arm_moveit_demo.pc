@@ -1,8 +1,0 @@
-prefix=/home/nigel/full_kinova_ws/install
-
-Name: kinova_arm_moveit_demo
-Description: Description of kinova_arm_moveit_demo
-Version: 0.6.3
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib 
-Requires: moveit_core moveit_ros_planning_interface interactive_markers eigen_conversions
