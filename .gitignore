@@ -1,2 +1,7 @@
 build/
 devel/
+
+*.pyc
+
+.idea/
+.vscode/
