@@ -21,7 +21,7 @@ img_points = [] # 2D points in image plane
 # size = 0.025 #m or 25 cm 
 
 
-images = glob.glob('/home/nuha/kinova_ws/src/traj-control/images/*.jpg')
+images = glob.glob('/home/jimzers/sim-to-real-kinova/kinova_pkg/camera_calibration/*.png')
 
 for fname in images:
     img = cv2.imread(fname)

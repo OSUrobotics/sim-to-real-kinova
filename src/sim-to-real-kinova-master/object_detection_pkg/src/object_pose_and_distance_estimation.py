@@ -89,8 +89,13 @@ class ImageProcessor():
         # Get the saved camera and distortion matrices from calibration
         #mtx = np.load('/home/nigel/kinova_ws/kinova_pkg/src/camera_mtx.npy') # camera matrix
         #dist = np.load('/home/nigel/kinova_ws/kinova_pkg/src/dist_mtx.npy')  # distortion matrix
-        mtx = np.load('/home/nigel/camera_mtx2.npy') # camera matrix
-        dist = np.load('/home/nigel/dist_mtx2.npy')  # distortion matrix
+        #
+        # mtx = np.load('/home/nigel/camera_mtx2.npy') # camera matrix
+        # dist = np.load('/home/nigel/dist_mtx2.npy')  # distortion matrix
+
+        mtx = np.load('/home/jimzers/sim-to-real-kinova/camera_mtx.npy')  # camera matrix
+        dist = np.load('/home/jimzers/sim-to-real-kinova/dist_mtx.npy')  # distortion matrix
+
         #mtx = np.load('/home/nigel/charuco_cam.npy') # camera matrix
         #dist = np.load('/home/nigel/charuco_dist.npy')  # distortion matrix
         # Define Aruco Dictionary 
@@ -537,9 +542,14 @@ class ImageProcessor():
             cv2.imwrite(filename,gray)
             #self.finger2_dist_angle_pub.publish(finger2_dist_angle)
 
+            # TODO: WTF IS THIS COUNT VARIABLE??
             if count > 4:
+                print('the count is more than 4')
+
                 count = 0 
                 im_num+=1
+
+                # we are publishing a float32. numpy array. where's the numpy wrapper?
                 publisher=Float32MultiArray()
                 publisher.layout.dim.append(MultiArrayDimension())
                 publisher.layout.dim[0].label = 'angles'
@@ -549,10 +559,12 @@ class ImageProcessor():
                     publisher.data=finger_angles
                     self.finger_angle_pub.publish(publisher)
                     #print('finger angles', finger_angles)
+
+                # publish the finger distances to objects
                 if len(finger_object_dist) == 4:
                     publisher.layout.dim[0].label = 'finger object dist'
                     publisher.data=finger_object_dist
-                    #print('finger obj dist',finger_object_dist)
+                    print('finger obj dist',finger_object_dist)
                     self.finger_dist_pub.publish(publisher)
                     
                     
