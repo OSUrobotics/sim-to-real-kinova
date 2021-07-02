@@ -1,9 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 '''
 Author(s): Yi Herng Ong
 Purpose: Use MoveIt interface to plan paths for Kinova Jaco arm for executing new pose hallucination benchmark 
 Date: June 2019
+
+HOW THE FUCK DID HE GET THIS TO WORK ON PYTHON3
 '''
 
 import rospy
@@ -98,13 +100,13 @@ class robot(object):
 
     def finger_action_status_sub(self,msg):
         status=msg.status.status
-        #print(msg.status.goal_id.id, status,msg.result.fingers.finger1,msg.result.fingers.finger2,msg.result.fingers.finger3)
+        #print (msg.status.goal_id.id, status,msg.result.fingers.finger1,msg.result.fingers.finger2,msg.result.fingers.finger3)
         if (status in [3,4,5,8,9]):# & (msg.status.goal_id.id == self.id):
             self.ready_for_action=True
         else:
             self.ready_for_action=False
         if np.average(np.array(self.fingers)-np.array([msg.result.fingers.finger1,msg.result.fingers.finger2,msg.result.fingers.finger3]))/np.average([msg.result.fingers.finger1,msg.result.fingers.finger2,msg.result.fingers.finger3])>0.5:
-            print('massive step noticed, likely failure. Consider redoing this test?')
+            print ('massive step noticed, likely failure. Consider redoing this test?')
         
     def allow_collision(self):
         # self.pubPlanningScene = rospy.Publisher("planning_scene", PlanningScene)
@@ -128,23 +130,23 @@ class robot(object):
         applyScene = self.aps(ps)
         print (ps)
     def hand_control(self,msg):
-        print('message contents',msg)
+        print ('message contents',msg)
         if 'c' in msg.data:
-            print('closing')
+            print ('closing')
             self.hand='c'
         elif 'o' in msg.data:
-            print('opening')
+            print ('opening')
             self.hand='o'
         elif '1' in msg.data:
-            print('closing 1 finger')
+            print ('closing 1 finger')
             self.hand='1'
         elif '2' in msg.data:
-            print('closing 2 fingers')
+            print ('closing 2 fingers')
             self.hand='2'
 
     def get_arm_joints(self, msg):
-        #print(msg)
-        #print('received messege at',time.time())
+        #print (msg)
+        #print ('received messege at',time.time())
         if time.time()-self.time>0.08:
             self.time=time.time()
             self.arm_joint_states = msg.position
@@ -217,7 +219,10 @@ class robot(object):
         self.all_times.append(time.time())
         '''
         if cmd == "Close":
-            self.gripper.set_named_target("Close")
+            print('is the gripper actually closing???')
+            # self.gripper.set_named_target("Close")
+            self.gripper.set_joint_value_target([1.1, 1.1, 1.1])
+            self.gripper_plan = self.gripper.plan()
             # self.gripper.go(wait=True)
         elif cmd == "Open":
             self.gripper.set_named_target("Open")
@@ -227,10 +232,12 @@ class robot(object):
             self.gripper.set_joint_value_target([1,1,0.2])
         else:
             self.gripper.set_joint_value_target(cmd)
+
+        print("here goes...")
         self.gripper.go(wait=True)
         rospy.sleep(2)
         '''
-        #print('sent command',output.goal_id.id,output.goal.fingers.finger1,output.goal.fingers.finger2,output.goal.fingers.finger3)
+        #print ('sent command',output.goal_id.id,output.goal.fingers.finger1,output.goal.fingers.finger2,output.goal.fingers.finger3)
         self.finger_pub.publish(output)
         self.updated_position=False
         self.ready_for_action=False
@@ -246,16 +253,23 @@ class robot(object):
     def move_to_Joint(self, joint_states):
         joint_goal = JointState()
         joint_goal.position = joint_states
-        #print('joint goal, should be jointstate with positions values',joint_goal)
+        #print ('joint goal, should be jointstate with positions values',joint_goal)
         self.group.set_joint_value_target(joint_goal.position)
         self.plan = self.group.plan()
         self.group.go(wait=True)
-        self.group.execute(self.plan[1], wait=True)
+
+        print("executing da plan.... move_to_joint")
+        print(joint_states)
+        # print(self.plan)
+
+        # self.group.execute(self.plan[1], wait=True)
+        self.group.execute(self.plan, wait=True)
+
         self.group.stop()
         self.group.clear_pose_targets()
         rospy.sleep(2)
 
-    def move_to_waypoint(self, p1, pose_or_goal):
+    def move_to_waypoint(self, p1, pose_or_goal): # THIS DOESN'T GET USED BRUH
         # from current move to p1
         # print "current pose", self.group.get_current_pose()
         if pose_or_goal == "goal":
@@ -317,7 +331,7 @@ class robot(object):
         return xyz + rpy 
 
     def joint_angle_client(self,msg):
-        print('message received')
+        print ('message received')
         self.route.append(list(msg.position))
         self.hold=time.time()
     
@@ -563,7 +577,7 @@ def main():
     ############################### BENCHMARK PIPELINE ######################################
     # Open reset port
     # ser = serial.Serial('/dev/ttyACM2')
-    print('i hope this isnt getting called')
+    print ('i hope this isnt getting called')
     # Set initial pose and base pose
     initial_pose = [0.02, -0.58, 0.015, 90, 180, 0] # about 10 cm away from object, treat it as home pose for the benchmark
     lift_pose = [-0.24, -0.8325, 0.30, 90, 180, 0] # lifting object
@@ -1067,7 +1081,7 @@ def stripper(data):
 
 def pickerupper(grab_point, arm_error_x):
 
-    print(grab_point[0] + arm_error_x)
+    print (grab_point[0] + arm_error_x)
     #Robot.move_finger("Close")
     # #if len(grab_point) > 0 and len(go_to_point) > 0:
     # 
@@ -1095,7 +1109,7 @@ def pickerupper(grab_point, arm_error_x):
 
 if __name__ == '__main__':
     #main
-    print('main in rviz controller')
+    print ('main in rviz controller')
     arm_error_x = 0.01
     
     goal_joints1 = [2.915011253031598e-06, 3.141125001472557, 0.816810382494447, 4.3594885760972195, -1.036030871184044e-06, 3.1416020986126925, -1.0120726343479318e-06]
@@ -1138,40 +1152,40 @@ if __name__ == '__main__':
     speed1=1
     speed2=2
     speed3=3
-    print(f'testing different finger speeds, in theory a speed of 0.1 should take {speed1} seconds, a speed of 0.2 should take {speed2} and a speed of 0.3 should take {speed3}.')
-    print('0.1 signal')
+    print ('testing different finger speeds, in theory a speed of 0.1 should take {} seconds, a speed of 0.2 should take {} and a speed of 0.3 should take {}.'.format(speed1, speed2, speed3))
+    print ('0.1 signal')
     start=time.time()
     '''
     while (Robot.finger_pose[0]<1.4)|(Robot.finger_pose[1]<1.4):
         Robot.move_finger([0,0.2,0.2,0.2])
-        #print(Robot.finger_pose)
+        #print (Robot.finger_pose)
     end=time.time()
-    print('closing with 0.4 took',end-start,'seconds')
+    print ('closing with 0.4 took',end-start,'seconds')
     start=time.time()
     while (Robot.finger_pose[0]>0.05)|(Robot.finger_pose[1]>0.05):
         Robot.move_finger([0,-0.2,-0.2,-0.2])
     end=time.time()
-    print('opening with 0.4 took',end-start,'seconds')
+    print ('opening with 0.4 took',end-start,'seconds')
     start=time.time()
     while (Robot.finger_pose[0]<1.4)|(Robot.finger_pose[1]<1.4):
         Robot.move_finger([0,0.6,0.6,0.6])
     end=time.time()
-    print('closing with 0.6 took',end-start,'seconds')
+    print ('closing with 0.6 took',end-start,'seconds')
     start=time.time()
     while (Robot.finger_pose[0]>0.05)|(Robot.finger_pose[1]>0.05):
         Robot.move_finger([0,-0.6,-0.6,-0.6])
     end=time.time()
-    print('opening with 0.6 took',end-start,'seconds')
+    print ('opening with 0.6 took',end-start,'seconds')
     start=time.time()
     while (Robot.finger_pose[0]<1.4)|(Robot.finger_pose[1]<1.4):
         Robot.move_finger([0,0.8,0.8,0.8])
     end=time.time()
-    print('closing with 0.8 took',end-start,'seconds')
+    print ('closing with 0.8 took',end-start,'seconds')
     start=time.time()
     while (Robot.finger_pose[0]>0.05)|(Robot.finger_pose[1]>0.05):
         Robot.move_finger([0,-0.8,-0.8,-0.8])
     end=time.time()
-    print('opening with 0.8 took',end-start,'seconds')
+    print ('opening with 0.8 took',end-start,'seconds')
     x=np.copy(Robot.all_times)
     y=np.copy(Robot.all_poses)
     y2=np.copy(Robot.all_goals)
@@ -1185,48 +1199,50 @@ if __name__ == '__main__':
     plt.show()
     '''
     '''
-    print('closing with 0.1')
+    print ('closing with 0.1')
     old=time.time()
     Robot.move_finger([0,0.1,0.1,0.1])
     Robot.move_finger([0,0.1,0.1,0.1])
     Robot.move_finger([0,0.1,0.1,0.1])
-    print('this took',time.time()-old)
-    print('opening with 0.1')
+    print ('this took',time.time()-old)
+    print ('opening with 0.1')
     old=time.time()
     Robot.move_finger([0,-0.1,-0.1,-0.1])
     Robot.move_finger([0,-0.1,-0.1,-0.1])
     Robot.move_finger([0,-0.1,-0.1,-0.1])
-    print('this took',time.time()-old)
-    print('closing with 0.3')
+    print ('this took',time.time()-old)
+    print ('closing with 0.3')
     old=time.time()
     Robot.move_finger([0,0.3,0.3,0.3])
     Robot.move_finger([0,0.3,0.3,0.3])
     Robot.move_finger([0,0.3,0.3,0.3])
-    print('this took',time.time()-old)    
-    print('opening with 0.3')
+    print ('this took',time.time()-old)    
+    print ('opening with 0.3')
     old=time.time()
     Robot.move_finger([0,-0.3,-0.3,-0.3])
     Robot.move_finger([0,-0.3,-0.3,-0.3])
     Robot.move_finger([0,-0.3,-0.3,-0.3])
-    print('this took',time.time()-old)
-    print('closing with 1')
+    print ('this took',time.time()-old)
+    print ('closing with 1')
     old=time.time()
     Robot.move_finger([0,1,1,1])
     Robot.move_finger([0,1,1,1])
     Robot.move_finger([0,1,1,1])    
-    print('this took',time.time()-old)    
-    print('opening with 1')
+    print ('this took',time.time()-old)    
+    print ('opening with 1')
     old=time.time()
     Robot.move_finger([0,-1,-1,-1])
     Robot.move_finger([0,-1,-1,-1])
     Robot.move_finger([0,-1,-1,-1])
-    print('this took',time.time()-old)
+    print ('this took',time.time()-old)
     '''
-    print('ready to go captain!')
+    print ('ready to go captain!')
     #Robot.move_to_Goal([0.21, -0.26, 0.5, 0.64, 0.317, 0.42,0.55])
     #Robot.move_to_Joint(test_joint)
     while True:
         Robot.pub.publish(False)
+
+        # MARKER: IF HAND IS TRYING TO CLOSE
         if Robot.hand=='c':
             Robot.hand='n'
             Robot.move_finger("Close")
@@ -1241,12 +1257,12 @@ if __name__ == '__main__':
             Robot.move_finger("2Finger")
         if (time.time()-Robot.hold)>1:
             if len(Robot.route) >0:
-                print('starting to move around',Robot.route)
+                print ('starting to move around',Robot.route)
                 Robot.pub.publish(False)
                 for i in Robot.route:
                     Robot.move_to_Joint(i)
                 Robot.route=[]
-                print('theoretically we are done with the route.')
+                print ('theoretically we are done with the route.')
                 Robot.pub.publish(True)
         rospy.sleep(0.5)
     '''
