@@ -1,9 +1,22 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ###############
-# Author: Paresh HAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHAHA
+# Author: Paresh
 # Purpose: Simulation to Real Implementation on Kinova
 # Summer 2020
+
+"""
+Running this file
+Move to a general psoition where it expects the obvject to be. Close the arm lift and move to the right side.
+Put it in a box
+
+Needs the camera
+Records in a topic: success and failure, the metrics the moment before it starts to lift
+
+Echo the metric stream
+
+
+"""
 ###############
 
 import rospy
@@ -44,20 +57,14 @@ if __name__ == '__main__':
                     [5.190161145209341, 4.60857097161013, 6.263025710359904, 1.1623586288440768, 10.551653030723402, 4.765531827305003, 12.649429282436563],\
         '''
         #[5.31152459187756, 4.6414903058445995, 6.256269270674373, 1.0651639017005448, 10.636814530797523, 4.775946917696085, 12.78615064647905],\
-        robot_grasp_joints=[[5.301863708707188, 4.642172075083661, 6.25642586454647, 1.0640270648102172, 10.638482734904347, 4.773731167669139, 12.787761326306331],\
-                    [5.1712862572995135, 4.612319104528309, 6.258938290718851, 1.1500339187933535, 10.562352546718905, 4.76536884184629, 12.666124106678053],\
-                    [5.283578977294923, 4.655589613287698, 6.2539922679423565, 1.0363660089900546, 10.668026778773251, 4.774261669358283, 12.831719463259178],\
-                    [5.291669660686583, 4.620667581913489, 6.259802220176472, 1.1244778254987895, 10.582222924244205, 4.775655035240613, 12.699355030760062],\
-                    [5.31152459187756, 4.6414903058445995, 6.256269270674373, 1.0651639017005448, 10.636814530797523, 4.775946917696085, 12.78615064647905],\
-                    [5.231036406884313, 4.623028207903735, 6.256276194893207, 1.1181681310861193, 10.588668839346633, 4.7726222273912295, 12.710124854208342],\
-                    [5.190161145209341, 4.60857097161013, 6.263025710359904, 1.1623586288440768, 10.551653030723402, 4.765531827305003, 12.649429282436563],\
-                    [5.292494707992289, 4.617425449602426, 6.262907998639722, 1.1245324203011362, 10.581492152841088, 4.773212383888791, 12.698122519807571],\
-                    [5.194395038710349, 4.61755328133475, 6.258866918001637, 1.1237466546215082, 10.583468218369926, 4.77062485657367, 12.701494081747612],\
-                    [5.180549796835245, 4.616609457044426, 6.257989140106346, 1.1261925017666372, 10.581176834568023, 4.765731031754541, 12.69837072642117]]
+
+        # TELEOPERATE AND GET THESE POSES
+        robot_grasp_joints=[[4.787913565738247, 4.111181163247628, -0.041037394089898364, 1.4583572660975874, 3.1750041399937095, 4.1034252392049915, 6.151559102934638]]
         env = KinovaGripper_Env()
         rospy.set_param('exec_done', "false")
         cont=controller()
-        finger_close_percent = rospy.get_param('close_percent')
+        # finger_close_percent = rospy.get_param('close_percent')
+
         rospy.Subscriber('/route_finish',Bool,cont.route)
         done=rospy.Subscriber('/test_finish',Bool,cont.test)
         hand=rospy.Publisher('/hand_control',String,queue_size=1)
@@ -74,12 +81,12 @@ if __name__ == '__main__':
         Flag=True
         #11.550346961618606, 4.113509564988685, 6.578729076518911, 0.5496185585281591, 4.53057230960389, 4.964140261390971, 6.412245289398134
         i=0
-        abba=[5.31152459187756, 4.6414903058445995, 6.256269270674373, 1.0651639017005448, 10.636814530797523, 4.775946917696085, 12.78615064647905]
-        for i in range(10):
+        # abba=[5.31152459187756, 4.6414903058445995, 6.256269270674373, 1.0651639017005448, 10.636814530797523, 4.775946917696085, 12.78615064647905]
+        for i in range(len(robot_grasp_joints)):
             print('moving on to iteration', i)
-            a=True
-            b=True
-            c=True
+            a=True  # this is signifying the positioning of the hand to pregrasp position
+            b=True  # this is signifying the closing of the hand
+            c=True  # This is signifying the finishing of the test. (has checked for reward)
             input('start test?')
             start=time.time()
             timer=time.time()+120000
@@ -87,24 +94,25 @@ if __name__ == '__main__':
             rospy.sleep(2)
             reset_mechanism.publish(1)
             while c:
-                if ((time.time()-start)>=10)&(a):
+                # print('a:', a, 'b:', b, 'c:', c, 'route done:', cont.route_done)
+                if ((time.time()-start)>=10) and (a):  # MOVING TO START POSITION
                     print('moving to start position')
                     env.go_to_home(robot_grasp_joints[i])
                     a=False
-                if cont.route_done&(b):
+                if cont.route_done and (b):  # PUBLISHES SOMETHING TO CLOSE THE HAND
                     rospy.sleep(4)
                     data2=env.get_obs()
                     print('route done, closing the hand')
-                    hand.publish('c')
+                    hand.publish('c')  # publishes to '/hand_control'
                     cont.route_done=False
                     timer=time.time()
-                if ((time.time()-timer)>7)&(b):
+                if ((time.time()-timer)>7) and (b):
                     data=env.get_obs()
                     print('this is what data is in graps classifier test',data)
                     print('hand closed and aruco stuff settled, moving to the goal')
                     env.go_to_goal()
                     b=False
-                if (cont.test_done) & (not(a)) & (not(b)):
+                if (cont.test_done) and (not(a)) and (not(b)):
                     print('we have gotten into this part of the program')
                     c=False
                     result=rospy.get_param('Goal')
@@ -117,6 +125,7 @@ if __name__ == '__main__':
             print('made it out')
             publisher=Float32MultiArray()
             publisher.layout.dim.append(MultiArrayDimension())
+            # this is the metrics
             publisher.layout.dim[0].label = 'pregrasp_data'
             publisher.layout.dim[0].size = len(data2)
             publisher.layout.dim[0].stride = len(data2)
