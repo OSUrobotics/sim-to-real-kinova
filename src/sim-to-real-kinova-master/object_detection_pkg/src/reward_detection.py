@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 import cv2
@@ -35,15 +35,15 @@ class ImageProcessor():
         
         # Marker IDs
         ee_marker_id = 608  # end-effector
-        obj_marker_id = 495  # object
+        obj_marker_id = 509  # object
         finger1_dist_id = 189 # Finger 1 Dist
         finger1_tip_id = 331# Finger 1 Tip
         finger2_dist_id = 411 # Finger 2 Dist  
         finger2_tip_id = 190  # Finger 1 Tip
 
         # Get the saved camera and distortion matrices from calibration
-        mtx = np.load('/home/nigel/camera_mtx2.npy') # camera matrix
-        dist = np.load('/home/nigel/dist_mtx2.npy')  # distortion matrix
+        mtx = np.load('/home/mechagodzilla/sim-to-real-kinova/camera_mtx.npy') # camera matrix
+        dist = np.load('/home/mechagodzilla/sim-to-real-kinova/dist_mtx.npy')  # distortion matrix
 
 
         # Define Aruco Dictionary 
@@ -60,8 +60,8 @@ class ImageProcessor():
         except CvBridgeError as e:
             print(e)
         
-        #Cropping Image
-        cv_image = cv_image[y:y+h, x:x+w]
+        #Cropping Image  # TODO!!
+        # cv_image = cv_image[y:y+h, x:x+w]
         
         #Convert in gray scale
         gray = cv2.cvtColor(cv_image,cv2.COLOR_BGR2GRAY)
@@ -110,7 +110,7 @@ class ImageProcessor():
                 #self.test_done.publish(False)
 
         #Display
-        cv2.imshow('Window', cv_image)
+        cv2.imshow('reward_detection.py window', cv_image)
         cv2.waitKey(3)
             
     

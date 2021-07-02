@@ -15,6 +15,7 @@ set(OpenCV_DIR /usr/share/OpenCV/)
 
 # use this directory if you don't already have opencv installed. and followed the instructions on building cmake properly
 #set(OpenCV_DIR ~/ihateopencv/build/)
+#set(OpenCV_DIR ~/adam-research/opencv_build_hell/build/)
 
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
