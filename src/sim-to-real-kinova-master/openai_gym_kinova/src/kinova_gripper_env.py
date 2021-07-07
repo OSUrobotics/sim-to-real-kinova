@@ -32,6 +32,7 @@ from rospy_tutorials.msg import Floats
 
 # finger velocity control
 from kinova_msgs.msg import PoseVelocityWithFingerVelocity
+from std_msgs.msg import Bool
 
 #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -104,6 +105,8 @@ class KinovaGripper_Env:
 
         # wtf does queue_size actually do???
         self.finger_velocity_pub = rospy.Publisher('/j2s7s300_driver/in/cartesian_velocity_with_finger_velocity', PoseVelocityWithFingerVelocity, queue_size=10)
+        self.finger_velocity_controller_pub = rospy.Publisher('/finger_velocity', PoseVelocityWithFingerVelocity, queue_size=10)
+        self.finish_velocity_controller_pub = rospy.Publisher('/finish_velocity_controller', Bool, queue_size=1)
 
         self.obs_pub = rospy.Publisher('/sim2real/obs', Float32MultiArray, queue_size=10)
         self.reset = rospy.Publisher('/sim2real/reset', Int32, queue_size=10)
@@ -117,6 +120,8 @@ class KinovaGripper_Env:
             finger_joint_state_value[0] = self.finger_angle[0]
             finger_joint_state_value[1] = self.finger_angle[1]
             finger_joint_state_value[2] = self.finger_angle[2]
+
+            # TODO: WTF ARE THESE? THEY DON'T EVEN MAKE SENSE??????
             finger_joint_state_value[3] = self.finger_angle[3]
             finger_joint_state_value[4] = self.finger_angle[2]
             finger_joint_state_value[5] = self.finger_angle[3]
@@ -186,6 +191,7 @@ class KinovaGripper_Env:
     
     # Function to get the dimensions of the object
     def get_obj_size(self):
+        # TODO: get rid of hard coding...
         return [42, 42, 110]
 
 
@@ -248,7 +254,7 @@ class KinovaGripper_Env:
         #total_reward, info, done = self.get_reward_DataCollection()
         return obs, total_reward, done, info
 
-    def step(self, action):
+    def old_vel_step(self, action):
         # TODO: scale to between -6800 - 6800
         # TODO: EVALUATE THIS METHOD
         self.finger_vel_goal = PoseVelocityWithFingerVelocity()
@@ -269,6 +275,57 @@ class KinovaGripper_Env:
         ### Get this reward for grasp classifier collection ###
         # total_reward, info, done = self.get_reward_DataCollection()
         return obs, total_reward, done, info
+
+    def step(self, action):
+        # TODO: scale to between -6800 - 6800
+        # TODO: EVALUATE THIS METHOD
+        self.finger_vel_goal = PoseVelocityWithFingerVelocity()
+        self.finger_vel_goal.finger1 = action[0]
+        self.finger_vel_goal.finger2 = action[1]
+        self.finger_vel_goal.finger3 = action[2]
+
+        self.finger_velocity_controller_pub.publish(self.finger_vel_goal)
+
+        obs = self.get_obs()
+        obs_pub_msg = Float32MultiArray()
+        obs_pub_msg.data.append(obs)
+        self.obs_pub.publish(obs_pub_msg)
+
+        ### Get this reward for RL training ###
+        total_reward, info, reward_check_done = self.get_reward()
+
+        # TODO: it seems that reward is labelling as finished too early. we need to fix that to default to not finishing
+        # if done:
+        #     print('Finishing here!')
+        #     self.finish_velocity_controller_pub.publish(True)
+
+        joint_check_done = self.check_joint_done()
+
+        # done = reward_check_done or joint_check_done  # check either condition giving a done condition
+        done = joint_check_done
+
+        if done:  # todo: turn back to reward
+            print('Finishing here!')
+            self.finish_velocity_controller_pub.publish(True)
+
+        ### Get this reward for grasp classifier collection ###
+        # total_reward, info, done = self.get_reward_DataCollection()
+        return obs, total_reward, done, info
+
+    def check_joint_done(self, threshold=2.4):
+        # checks the joint states, and if the joint states are closed, then return True
+        finger_joint_state_value = [0, 0, 0]
+        finger1 = self.joint_states.position[7]
+        finger2 = self.joint_states.position[8]
+        # finger3 = self.joint_states.position[9]
+
+        # we don't care about the 3rd finger
+        total_pos = finger1 + finger2
+        print(total_pos)
+
+        is_done = total_pos >= threshold
+
+        return is_done
     
     
     def go_to_goal(self):
@@ -347,8 +404,9 @@ class KinovaGripper_Env:
     
     def joint_state_callback(self, msg):
         self.joint_states = msg
-        #if np.random.rand()>0.95:
-        #    print('joint states',self.joint_states.position)
+
+        # lmao do some actual updates here!
+        # print('joint states:', self.joint_states.position)
      
 
     def finger_state_callback(self, msg):

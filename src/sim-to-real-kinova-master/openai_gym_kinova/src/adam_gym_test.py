@@ -107,11 +107,10 @@ if __name__ == '__main__':
 
         rospy.sleep(5)
 
-
         # desired velocities - recreate finger movement
-        finger1_vel = 0.1
-        finger2_vel = 0.1
-        finger3_vel = 0.1
+        finger1_vel = 0.25
+        finger2_vel = 0.25
+        finger3_vel = 0.25
 
         desired_vel = np.array([finger1_vel, finger2_vel, finger3_vel])
         # need to scale to between 0-6800 for kinova gripper
@@ -119,29 +118,44 @@ if __name__ == '__main__':
 
         print('scaled vel:', scaled_vel)
 
-        for i in range(100 * 8): # ~8 seconds of commands
+        done = False
+
+        for i in range(100):
             obs, reward, done, info = env.step(scaled_vel)
-            rospy.sleep(1/100)
-            # note: change to ros timer???
+            rospy.sleep(0.25)
 
-        # desired_vel = -desired_vel
+            if done:
+                break
+
+        # first, open the thing up to open hand
+        env.step_pos(np.array([0, 0, 0]))
+
+        rospy.sleep(5)
+
+        # """
+        # OSCILLATE BETWEEN OPENING AND CLOSING FINGERS!!!
+        # """
+        #
+        # # desired velocities - recreate finger movement
+        # finger1_vel = 0.25
+        # finger2_vel = 0.25
+        # finger3_vel = 0.25
+        #
+        # desired_vel = np.array([finger1_vel, finger2_vel, finger3_vel])
         # # need to scale to between 0-6800 for kinova gripper
         # scaled_vel = lerp(desired_vel)
         #
-        # for i in range(10):
-        #     obs, reward, done, info = env.step(scaled_vel)
-        #     rospy.sleep(0.1)
+        # print('scaled vel:', scaled_vel)
         #
-        # desired_vel = -desired_vel
-        # # need to scale to between 0-6800 for kinova gripper
-        # scaled_vel = lerp(desired_vel)
-        # for i in range(10):
+        # for i in range(5): # ~8 seconds of commands
         #     obs, reward, done, info = env.step(scaled_vel)
-        #     rospy.sleep(0.1)
-
-
-
-        print('End of testbed.')
+        #     rospy.sleep(3)
+        #     # note: change to ros timer???
+        #
+        #     # flip hehe
+        #     scaled_vel = -scaled_vel
+        #
+        # print('End of testbed.')
 
         rospy.spin()
 
