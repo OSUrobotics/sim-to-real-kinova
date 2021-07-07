@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     try:
         # TODO: instead of sleeping, listen to a "ready" channel or service.
-        rospy.sleep(2.0)
+        rospy.sleep(5.0)
 
         # TODO Note: if some shit breaks, add stuff here
         print('Starting file: adam_gym_test.py')
@@ -79,12 +79,72 @@ if __name__ == '__main__':
         reset_mechanism = rospy.Publisher('reset_start', Int32, queue_size=1)
 
 
+        # New stuff - related to velocity controller. NOTE: The queue size is only 1!
+        finish_pub = rospy.Publisher('/finish_velocity_controller', Bool, queue_size=1)
+
+
         # TRY SOME SHIT OUT HERE
         # TODO: REMOVE THIS TESTBED
 
-        # try to
-        # env.get_obs()
+        input('Press enter to continue...')
+
+        # try to get the env observations
+        obs = env.get_obs()
+        print('TEST OUTPUT!')
+        print(obs)
+        print('END TEST OUTPUT!')
+
+
+        def lerp(action_arr, old_min=-1, old_max=1, new_min=-6800, new_max=6800):
+            # first: scale to proper min max
+            np_arr = np.array(action_arr)
+            scale_factor = (new_max - new_min) / (old_max - old_min)
+            scaled_arr = (np_arr - old_min) * scale_factor + new_min
+            return scaled_arr
+
+        # first, open the thing up to open hand
+        env.step_pos(np.array([0, 0, 0]))
+
+        rospy.sleep(5)
+
+
+        # desired velocities - recreate finger movement
+        finger1_vel = 0.1
+        finger2_vel = 0.1
+        finger3_vel = 0.1
+
+        desired_vel = np.array([finger1_vel, finger2_vel, finger3_vel])
+        # need to scale to between 0-6800 for kinova gripper
+        scaled_vel = lerp(desired_vel)
+
+        print('scaled vel:', scaled_vel)
+
+        for i in range(100 * 8): # ~8 seconds of commands
+            obs, reward, done, info = env.step(scaled_vel)
+            rospy.sleep(1/100)
+            # note: change to ros timer???
+
+        # desired_vel = -desired_vel
+        # # need to scale to between 0-6800 for kinova gripper
+        # scaled_vel = lerp(desired_vel)
+        #
+        # for i in range(10):
+        #     obs, reward, done, info = env.step(scaled_vel)
+        #     rospy.sleep(0.1)
+        #
+        # desired_vel = -desired_vel
+        # # need to scale to between 0-6800 for kinova gripper
+        # scaled_vel = lerp(desired_vel)
+        # for i in range(10):
+        #     obs, reward, done, info = env.step(scaled_vel)
+        #     rospy.sleep(0.1)
+
+
+
         print('End of testbed.')
+
+        rospy.spin()
+
 
     except rospy.ROSInterruptExeception:
         print('ERROR: Program interrupted before completion')

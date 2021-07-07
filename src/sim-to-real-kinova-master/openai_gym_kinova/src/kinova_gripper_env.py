@@ -30,6 +30,9 @@ from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import String, Float32, Float32MultiArray, Int32
 from rospy_tutorials.msg import Floats
 
+# finger velocity control
+from kinova_msgs.msg import PoseVelocityWithFingerVelocity
+
 #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class KinovaGripper_Env:
@@ -98,13 +101,17 @@ class KinovaGripper_Env:
         ###Publisher###
         self.finger_command_pub = rospy.Publisher('/sim2real/finger_command', FingerPosition, queue_size=10)
         self.joint_angle_command_pub = rospy.Publisher('/sim2real/joint_angle_command', JointState, queue_size=10)
+
+        # wtf does queue_size actually do???
+        self.finger_velocity_pub = rospy.Publisher('/j2s7s300_driver/in/cartesian_velocity_with_finger_velocity', PoseVelocityWithFingerVelocity, queue_size=10)
+
         self.obs_pub = rospy.Publisher('/sim2real/obs', Float32MultiArray, queue_size=10)
         self.reset = rospy.Publisher('/sim2real/reset', Int32, queue_size=10)
         
     ### Finger Position in Radians ###
     def get_joint_states(self): 
         temp = list(self.joint_states.position)
-        print(temp)     
+        # print(temp)
         finger_joint_state_value = [0, 0, 0, 0, 0, 0]
         if self.finger_angle!=[]:
             finger_joint_state_value[0] = self.finger_angle[0]
@@ -199,26 +206,34 @@ class KinovaGripper_Env:
 
         fingers_6D_pose=self.get_finger_pos()
         fingers_6D_pose = fingers_6D_pose + list(self.wrist_pose) + list(obj_pose) + joint_states + [obj_size[0], obj_size[1], obj_size[2]*2] + finger_obj_dist + [x_angle, z_angle] 
-        print('this is the obs data',fingers_6D_pose)
+        # print('this is the obs data',fingers_6D_pose)
         return fingers_6D_pose
     
     
     ####Gives x,y,z position of fingers#####
     def get_finger_pos(self):
         return self.finger_pose_list
-    
-    
-        #Function to step the hardware forward in time
-    def step(self, action):
+
+    #Function to step the hardware forward in time
+    def step_pos(self, action):
         total_reward = 0
         self.finger_pos_goal = FingerPosition()
-        self.finger_pos_goal.finger1 = action.finger1
-        self.finger_pos_goal.finger2 = action.finger2
-        self.finger_pos_goal.finger3 = action.finger3
+        # self.finger_pos_goal.finger1 = action.finger1
+        # self.finger_pos_goal.finger2 = action.finger2
+        # self.finger_pos_goal.finger3 = action.finger3
+        self.finger_pos_goal.finger1 = action[0]
+        self.finger_pos_goal.finger2 = action[1]
+        self.finger_pos_goal.finger3 = action[2]
+
         self.finger_command_pub.publish(self.finger_pos_goal)
-        
+
+        counter = 0
+
         while not rospy.get_param('exec_done'):
             rospy.sleep(0.1)
+            counter += 1
+
+        print("number of cycles:", counter)
 
         rospy.set_param('exec_done', "false")
         obs = self.get_obs()
@@ -231,7 +246,29 @@ class KinovaGripper_Env:
 
         ### Get this reward for grasp classifier collection ###
         #total_reward, info, done = self.get_reward_DataCollection()
-        return obs, total_reward, done, info 
+        return obs, total_reward, done, info
+
+    def step(self, action):
+        # TODO: scale to between -6800 - 6800
+        # TODO: EVALUATE THIS METHOD
+        self.finger_vel_goal = PoseVelocityWithFingerVelocity()
+        self.finger_vel_goal.finger1 = action[0]
+        self.finger_vel_goal.finger2 = action[1]
+        self.finger_vel_goal.finger3 = action[2]
+
+        self.finger_velocity_pub.publish(self.finger_vel_goal)
+
+        obs = self.get_obs()
+        obs_pub_msg = Float32MultiArray()
+        obs_pub_msg.data.append(obs)
+        self.obs_pub.publish(obs_pub_msg)
+
+        ### Get this reward for RL training ###
+        total_reward, info, done = self.get_reward()
+
+        ### Get this reward for grasp classifier collection ###
+        # total_reward, info, done = self.get_reward_DataCollection()
+        return obs, total_reward, done, info
     
     
     def go_to_goal(self):
