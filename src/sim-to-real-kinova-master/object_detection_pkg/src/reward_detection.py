@@ -25,8 +25,8 @@ class ImageProcessor():
     def get_object_pose(self, img_msg):
     
         ##Box Pixel values in the Image##
-        x = 150 # Start Pixel in Height
-        y = 250 # Start Pixel in Width
+        x = 150 + 100 # Start Pixel in Height
+        y = 250 + 50 # Start Pixel in Width
         h = 600 # Height in pixels    
         w = 650 # Width in pixels
         
@@ -61,7 +61,11 @@ class ImageProcessor():
             print(e)
         
         #Cropping Image  # TODO!!
+        # Notes: This is hardcoded to the right side of the image. We only want to detect the right side. LOL
+
         # cv_image = cv_image[y:y+h, x:x+w]
+        cv_image = cv_image[y:y+h, -x-w:-x]
+        # print(cv_image.shape)
         
         #Convert in gray scale
         gray = cv2.cvtColor(cv_image,cv2.COLOR_BGR2GRAY)
@@ -71,7 +75,9 @@ class ImageProcessor():
         if np.all(ids != None):
 
             rvec, tvec, __ = aruco.estimatePoseSingleMarkers(corners,marker_size, mtx, dist)
-            
+
+            # count markers. if you get 3+ hand related then you have a hand
+            # then you can check prescence of object marker
             for i in range(ids.size):
                 #Draw reference frame for the marker
                 
@@ -97,14 +103,14 @@ class ImageProcessor():
             aruco.drawDetectedMarkers(cv_image, corners, ids)
 
             if len(obj_marker) > 0 :
-                rospy.set_param('Goal', "true")
+                rospy.set_param('Goal', True)
                 #print("Lift Detected")
                 self.test_done.publish(True)
             elif marker_count > 3:
                 self.test_done.publish(True)
                 #print('hand without object detected')
             else:
-                rospy.set_param('Goal', "false") 
+                rospy.set_param('Goal', False)
                 #print("No Marker Found")
                 self.test_done.publish(False)
                 #self.test_done.publish(False)

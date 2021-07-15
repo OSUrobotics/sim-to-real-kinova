@@ -557,8 +557,8 @@ class ImageProcessor():
                         finger1_dist_angle = np.pi*2 - np.arctan((m4 - m3)/(1+ m3*m4))  ###  ->   <  this side angle of finger  
                     '''
 
-                    print('finger obj dist',finger_object_dist)
-                    print('finger pose',finger_pose)
+                    # print('finger obj dist',finger_object_dist)
+                    # print('finger pose',finger_pose)
                     # print('image shape before showing:', cv_image.shape)
                     # # resize = cv2.resize(image, width=1280)
                     # cv2.imshow('COOL Window', cv_image)
@@ -606,7 +606,7 @@ class ImageProcessor():
 
 
                         if len(finger_pose) == 4:
-                            print('finger pose',finger_pose)
+                            # print('finger pose',finger_pose)
                             self.finger_poses.append(finger_pose)
                             finger_array=np.array(self.finger_poses)
                             temp=[]
@@ -622,10 +622,10 @@ class ImageProcessor():
                             xerr=np.average(np.abs(err_matrix[0,:,0]))
                             yerr=np.average(np.abs(err_matrix[0,:,1]))
                             toterr=np.average(np.abs(err_matrix[0,:,0:2]))
-                            print('x err',xerr)
-                            print('y err',yerr)
-                            print('total err',toterr)
-                            print('==================================================================')
+                            # print('x err',xerr)
+                            # print('y err',yerr)
+                            # print('total err',toterr)
+                            # print('==================================================================')
                             publisher.layout.dim[0].label = 'x,y,z'
                             publisher.layout.dim[0].size = 12
                             publisher.layout.dim[0].stride = 12
@@ -648,7 +648,7 @@ class ImageProcessor():
 
         #Display
         # print('window size: ', cv_image.shape)
-        cv2.imshow('object_pose_and_distance_estimation window', cv_image)
+        # cv2.imshow('object_pose_and_distance_estimation window', cv_image)
         
         cv2.waitKey(3)
         

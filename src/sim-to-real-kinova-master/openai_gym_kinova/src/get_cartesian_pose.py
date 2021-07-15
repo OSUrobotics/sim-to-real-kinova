@@ -35,6 +35,7 @@ def debug_loop():
 
     while not rospy.is_shutdown():
         pose = group.get_current_pose().pose
+        # joint_states = group.get_
         print ("====================")
         print (pose)
 
