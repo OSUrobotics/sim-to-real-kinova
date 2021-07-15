@@ -160,7 +160,7 @@ if __name__ == '__main__':
         rospy.spin()
 
 
-    except rospy.ROSInterruptException:
+    except rospy.ROSInterruptExeception:
         print('ERROR: Program interrupted before completion')
 
 

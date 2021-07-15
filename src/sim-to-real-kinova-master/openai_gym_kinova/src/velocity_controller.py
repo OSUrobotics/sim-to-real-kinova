@@ -3,6 +3,8 @@
 # control this with python2!
 
 # ros and kinova stuff
+import copy
+
 import rospy
 
 # finger velocity control
@@ -19,7 +21,7 @@ class VelocityController:
 
     def __init__(self, vel_pub_channel='/j2s7s300_driver/in/cartesian_velocity_with_finger_velocity',
                  vel_sub_channel='/finger_velocity', finish_sub_channel='/finish_velocity_controller'):
-        self.done = False
+        self.done = True  # should we start this as true?
 
         # most recent velocity
         self.finger_velocity = PoseVelocityWithFingerVelocity()
@@ -43,6 +45,10 @@ class VelocityController:
             self.finger_velocity.finger1 = new_vel.finger1
             self.finger_velocity.finger2 = new_vel.finger2
             self.finger_velocity.finger3 = new_vel.finger3
+        if self.done:
+            self.finger_velocity.finger1 = 0
+            self.finger_velocity.finger2 = 0
+            self.finger_velocity.finger3 = 0
 
     def finish(self, msg):
         """
@@ -50,7 +56,11 @@ class VelocityController:
         sets self.done to value of boolean. Note: we don't handle finger velocity here.
         This can also turn the velocity controller on.
         """
-        self.done = msg
+        if not msg.data:  # reset all the finger velocities to 0 if we're starting the process over again.
+            self.finger_velocity.finger1 = 0
+            self.finger_velocity.finger2 = 0
+            self.finger_velocity.finger3 = 0
+        self.done = msg.data
 
     def pub(self):
         """
@@ -59,9 +69,16 @@ class VelocityController:
         Note: You need to run this at 100hz in order to have the proper velocity movement
         """
         if self.done:
-            self.finger_velocity.finger1 = 0
-            self.finger_velocity.finger2 = 0
-            self.finger_velocity.finger3 = 0
+            print("I'm done")
+            # self.finger_velocity.finger1 = 0
+            # self.finger_velocity.finger2 = 0
+            # self.finger_velocity.finger3 = 0
+
+            # copy_finger_velocity = copy.deepcopy(self.finger_velocity)
+            # copy_finger_velocity.finger1 = 1
+            # copy_finger_velocity.finger2 = 2
+            # copy_finger_velocity.finger3 = 3
+            # self.finger_velocity_pub.publish(copy_finger_velocity)
             return False
 
         # in between here: we are safe from a change in self.finger_velocity (see update_velocity() comments)

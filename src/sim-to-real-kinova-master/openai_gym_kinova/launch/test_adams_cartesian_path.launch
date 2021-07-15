@@ -20,6 +20,9 @@
 
   <include file="$(find object_detection_pkg)/launch/object_detection.launch"/>
 
+  <param name="move_group/trajectory_execution/allowed_execution_duration_scaling" value="4.0" />
+  <param name="move_group/trajectory_execution/execution_duration_monitoring" value="false" />
+
   <node pkg="openai_gym_kinova" name="velocity_controller" type="velocity_controller.py" />
   <node pkg="openai_gym_kinova" name="cartesian_controller" type="cartesian_controller.py" />
 

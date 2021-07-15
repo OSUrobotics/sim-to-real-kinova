@@ -25,6 +25,25 @@ import numpy as np
 from kinova_gripper_env import KinovaGripper_Env
 
 
+class Controller:
+    """
+    I have no fucking clue what this does. Look at earlier versions of this in grasp_classifier_test.py
+    """
+
+    def __init__(self):
+        self.test_done = False
+        self.route_done = False
+        self.errors = []
+
+    def route(self, msg):
+        self.route_done = msg.data
+
+    def test(self, msg):
+        # print('test_finished')
+        self.test_done = msg.data
+
+    def update(self, msg):
+        self.errors = msg
 
 
 if __name__ == '__main__':
@@ -42,6 +61,23 @@ if __name__ == '__main__':
 
         # this parameter keeps the kinova_gripper_env running in ROS wrapper code
         rospy.set_param('exec_done', 'false')
+
+        cont = Controller()  # init controller object.
+
+        rospy.Subscriber('/route_finish', Bool, cont.route)
+        done = rospy.Subscriber('/test_finish', Bool, cont.test)
+        hand = rospy.Publisher('/hand_control', String, queue_size=1)
+        collector = rospy.Publisher('/data_to_save', Float32MultiArray, queue_size=10)
+        err_checker = rospy.Subscriber('/total_errors', Float32MultiArray, cont.update)
+
+        # finger positions. this is poopy
+        finger_pos = FingerPosition()
+        finger_pos.finger1 = 0
+        finger_pos.finger2 = 0
+        finger_pos.finger3 = 0
+        count = 0
+        reset_mechanism = rospy.Publisher('reset_start', Int32, queue_size=1)
+
 
         # New stuff - related to velocity controller. NOTE: The queue size is only 1!
         finish_pub = rospy.Publisher('/finish_velocity_controller', Bool, queue_size=1)
@@ -67,58 +103,32 @@ if __name__ == '__main__':
             return scaled_arr
 
         # first, open the thing up to open hand
-        # env.step_pos(np.array([0, 0, 0]))
+        env.step_pos(np.array([0, 0, 0]))
 
         # rospy.sleep(5)
-
-        # desired velocities - recreate finger movement
-        finger1_vel = 0.25
-        finger2_vel = 0.25
-        finger3_vel = 0.25
-
-        desired_vel = np.array([finger1_vel, finger2_vel, finger3_vel])
-        # need to scale to between 0-6800 for kinova gripper
-        scaled_vel = lerp(desired_vel)
-
-        print('scaled vel:', scaled_vel)
-
-        for trial_idx in range(10):
-
-            # env.step_pos(np.array([0, 0, 0]))
-            obs = env.reset()
-            # rospy.sleep(5)
-            # while not rospy.get_param('finish_reset'):
-            #     rospy.loginfo('waiting for reset...')
-            #     rospy.sleep(1)
-
-            input('Press enter to continue...')
-
-
-            rospy.loginfo('=================starting grabbing stage')
-
-            done = False
-
-            while not done:  # or turn this into for loop
-                obs, reward, done, info = env.step(scaled_vel)
-                rospy.sleep(0.25)
-                if done:
-                    rospy.loginfo('=== stopping the closing of fingers...')
-
-            # rospy.sleep(7)
-            # while not rospy.get_param('finish_finger'):
-            #     rospy.loginfo('waiting for finger...')
-            #     rospy.sleep(1)
-
-            # once set as done, check reward
-            reward = env.check_reward()
-
-            # while not rospy.get_param('finish_reward_check'):
-            #     rospy.loginfo('waiting for reward...')
-            #     rospy.sleep(1)
-
-            print("trial:", trial_idx, "reward:", reward)
-
-
+        #
+        # """
+        # OSCILLATE BETWEEN OPENING AND CLOSING FINGERS!!!
+        # """
+        #
+        # # desired velocities - recreate finger movement
+        # finger1_vel = 0.25
+        # finger2_vel = 0.25
+        # finger3_vel = 0.25
+        #
+        # desired_vel = np.array([finger1_vel, finger2_vel, finger3_vel])
+        # # need to scale to between 0-6800 for kinova gripper
+        # scaled_vel = lerp(desired_vel)
+        #
+        # print('scaled vel:', scaled_vel)
+        #
+        # for i in range(5): # ~8 seconds of commands
+        #     obs, reward, done, info = env.step(scaled_vel)
+        #     rospy.sleep(2.5)
+        #     # note: change to ros timer???
+        #
+        #     # flip hehe
+        #     scaled_vel = -scaled_vel
 
         print('End of testbed.')
 
