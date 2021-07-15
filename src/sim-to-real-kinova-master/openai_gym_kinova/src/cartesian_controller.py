@@ -8,14 +8,13 @@ import rospy
 from std_msgs.msg import Float32MultiArray, Bool
 from geometry_msgs.msg import Point, Pose
 
-
 import moveit_commander
 import moveit_msgs.msg
 
 import actionlib
-from openai_gym_kinova.msg import GoToPoseOrientationCartesianAction, GoToPoseOrientationCartesianFeedback, GoToPoseOrientationCartesianResult
+from openai_gym_kinova.msg import GoToPoseOrientationCartesianAction, GoToPoseOrientationCartesianFeedback, \
+    GoToPoseOrientationCartesianResult
 from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, GoToJointStateResult
-
 
 
 class CartesianController:
@@ -40,19 +39,21 @@ class CartesianController:
         self.current_pose_pub = rospy.Publisher('/current_pose', Pose, queue_size=10)
 
         self.goal_state_cartesian_sub = rospy.Subscriber('/goal_state_cartesian', Point,
-                                                         self.go_to_pose_cartesian, queue_size=1)  # turn this into an action
-
-        self.goal_state_orientation_cartesian_sub = rospy.Subscriber('/goal_state_orientation_cartesian', Pose,
-                                                         self.go_to_pose_orientation_cartesian,
+                                                         self.go_to_pose_cartesian,
                                                          queue_size=1)  # turn this into an action
 
+        self.goal_state_orientation_cartesian_sub = rospy.Subscriber('/goal_state_orientation_cartesian', Pose,
+                                                                     self.go_to_pose_orientation_cartesian,
+                                                                     queue_size=1)  # turn this into an action
+
         self.display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
-                                                   moveit_msgs.msg.DisplayTrajectory,
-                                                   queue_size=20)
+                                                            moveit_msgs.msg.DisplayTrajectory,
+                                                            queue_size=20)
 
-
-
-        self.server = actionlib.SimpleActionServer('go_to_pose_orientation_cartesian', GoToPoseOrientationCartesianAction, execute_cb=self.go_to_pose_orientation_cartesian_callback, auto_start=False)
+        self.server = actionlib.SimpleActionServer('go_to_pose_orientation_cartesian',
+                                                   GoToPoseOrientationCartesianAction,
+                                                   execute_cb=self.go_to_pose_orientation_cartesian_callback,
+                                                   auto_start=False)
         self.server.start()
 
         self.joint_server = actionlib.SimpleActionServer(
@@ -105,7 +106,7 @@ class CartesianController:
         (plan, fraction) = self.group.compute_cartesian_path(
             waypoints,  # waypoints to follow
             0.01,  # eef_step
-            0.0)  # jump_threshold
+            420.0)  # jump_threshold
 
         # execute the path
         self.group.execute(plan, True)
@@ -142,21 +143,20 @@ class CartesianController:
         (plan, fraction) = self.group.compute_cartesian_path(
             waypoints,  # waypoints to follow
             0.01,  # eef_step
-            0.0)  # jump_threshold
+            420.0)  # jump_threshold
 
         # # display the trajectory
         # display_trajectory = moveit_msgs.msg.DisplayTrajectory()
         # display_trajectory.trajectory_start = self.robot.get_current_state()
         # display_trajectory.trajectory.append(plan)
         #
-        # # Publish
+        # # Publish trajectory to Rviz
         # self.display_trajectory_publisher.publish(display_trajectory)
 
         # execute the path
         self.group.execute(plan, wait=True)
         self.group.stop()
         self.group.clear_pose_targets()
-
 
     def go_to_pose_orientation_cartesian_callback(self, pose_msg):
         rospy.loginfo('Executing pose orientation cartesian callback.')
@@ -194,15 +194,7 @@ class CartesianController:
         (plan, fraction) = self.group.compute_cartesian_path(
             waypoints,  # waypoints to follow
             0.01,  # eef_step
-            0.0)  # jump_threshold
-
-        # # display the trajectory
-        # display_trajectory = moveit_msgs.msg.DisplayTrajectory()
-        # display_trajectory.trajectory_start = self.robot.get_current_state()
-        # display_trajectory.trajectory.append(plan)
-        #
-        # # Publish
-        # self.display_trajectory_publisher.publish(display_trajectory)
+            420.0)  # jump_threshold
 
         # execute the path
         rospy.loginfo('starting...')
@@ -229,7 +221,6 @@ class CartesianController:
 
         self.joint_server.publish_feedback(feedback)
 
-
         if self.joint_server.is_preempt_requested():
             self.joint_server.set_preempted()
             success = False
@@ -253,7 +244,6 @@ class CartesianController:
 
         # Calling ``stop()`` ensures that there is no residual movement
         self.group.stop()
-
         self.group.clear_pose_targets()
 
         result.end_state = Bool(True)
@@ -261,26 +251,6 @@ class CartesianController:
 
         if success:
             self.joint_server.set_succeeded(result)
-
-    def go_to_home_joint_state(self, msg):
-
-        joint_goal = self.group.get_current_joint_values()
-        joint_goal[0] = 4.946186294586092
-        joint_goal[1] = 2.83876274182412
-        joint_goal[2] = 6.2808348012014825
-        joint_goal[3] = 0.7578871767047117
-        joint_goal[4] = 4.630829672001013
-        joint_goal[5] = 4.488419263237898
-        joint_goal[6] = -1.2506944837795144
-
-        # The go command can be called with joint values, poses, or without any
-        # parameters if you have already set the pose or joint target for the group
-        self.group.go(joint_goal, wait=True)
-
-        # Calling ``stop()`` ensures that there is no residual movement
-        self.group.stop()
-
-        self.group.clear_pose_targets()
 
 
 def cartesian_control_loop():
@@ -296,8 +266,6 @@ def cartesian_control_loop():
     while not rospy.is_shutdown():
         cartesian_controller.publish_current_pose()
         rate.sleep()
-
-    rospy.spin()  # ???
 
 
 if __name__ == '__main__':

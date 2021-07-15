@@ -3,8 +3,6 @@
 # control this with python2!
 
 # ros and kinova stuff
-import copy
-
 import rospy
 
 # finger velocity control
@@ -15,8 +13,6 @@ from std_msgs.msg import Bool
 class VelocityController:
     """
     Publisher that publishes by velocity.
-
-    TODO: ASYNC SHENANGIANS WITH SELF.DONE???
     """
 
     def __init__(self, vel_pub_channel='/j2s7s300_driver/in/cartesian_velocity_with_finger_velocity',
@@ -30,7 +26,8 @@ class VelocityController:
         self.finger_velocity_pub = rospy.Publisher(vel_pub_channel,
                                                    PoseVelocityWithFingerVelocity, queue_size=10)
         # subscriber channel, this is the callback to updating velocity.
-        self.finger_velocity_sub = rospy.Subscriber(vel_sub_channel, PoseVelocityWithFingerVelocity, self.update_velocity, queue_size=10)
+        self.finger_velocity_sub = rospy.Subscriber(vel_sub_channel, PoseVelocityWithFingerVelocity,
+                                                    self.update_velocity, queue_size=10)
 
         # sub channel to the finish state
         self.finish_sub = rospy.Subscriber(finish_sub_channel, Bool, self.finish, queue_size=10)
@@ -70,20 +67,11 @@ class VelocityController:
         """
         if self.done:
             print("I'm done")
-            # self.finger_velocity.finger1 = 0
-            # self.finger_velocity.finger2 = 0
-            # self.finger_velocity.finger3 = 0
-
-            # copy_finger_velocity = copy.deepcopy(self.finger_velocity)
-            # copy_finger_velocity.finger1 = 1
-            # copy_finger_velocity.finger2 = 2
-            # copy_finger_velocity.finger3 = 3
-            # self.finger_velocity_pub.publish(copy_finger_velocity)
             return False
 
         # in between here: we are safe from a change in self.finger_velocity (see update_velocity() comments)
 
-        # note: everytime this publishes, IIRC the other velocities will be
+        # published the stored finger velocities. "buffer"/filter system
         self.finger_velocity_pub.publish(self.finger_velocity)
         return True
 
