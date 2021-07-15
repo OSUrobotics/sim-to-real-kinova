@@ -198,7 +198,9 @@ class robot(object):
 
     def move_finger(self, cmd):
         #cmd is a list of length 4. first index is the lift, either 0 or 1, next three are finger actions, 0-1
-        '''
+
+        # this code below is nigels joint velocity stuff
+
         output=kinova_msgs.msg.SetFingersPositionActionGoal()
         #finger_range=[6,7000]
         output.header.seq=self.count
@@ -209,15 +211,21 @@ class robot(object):
         
         while (not(self.updated_position)) | (not(self.ready_for_action)):
             time.sleep(0.01)
-        output.goal.fingers.finger1=max(self.finger_pose[0]*7000/1.44+cmd[1]*500,0)
-        output.goal.fingers.finger2=max(self.finger_pose[1]*7000/1.44+cmd[2]*500,0)
-        output.goal.fingers.finger3=max(self.finger_pose[2]*7000/1.44+cmd[3]*500,0)
-        self.next_output=output
-        self.fingers=[output.goal.fingers.finger1,output.goal.fingers.finger2,output.goal.fingers.finger3]
-        self.all_goals.append([output.goal.fingers.finger1,output.goal.fingers.finger2,output.goal.fingers.finger3])
-        self.all_poses.append(self.finger_pose)
-        self.all_times.append(time.time())
-        '''
+
+        # # 7000 => fully closed/ LERP b/w 1.44
+        # # 500 => radians speed
+        # # cmd => the desired joint velocities
+        # #
+        # output.goal.fingers.finger1=max(self.finger_pose[0]*7000/1.44+cmd[1]*500,0)
+        # output.goal.fingers.finger2=max(self.finger_pose[1]*7000/1.44+cmd[2]*500,0)
+        # output.goal.fingers.finger3=max(self.finger_pose[2]*7000/1.44+cmd[3]*500,0)
+        # self.next_output=output
+        # self.fingers=[output.goal.fingers.finger1,output.goal.fingers.finger2,output.goal.fingers.finger3]
+        # self.all_goals.append([output.goal.fingers.finger1,output.goal.fingers.finger2,output.goal.fingers.finger3])
+        # self.all_poses.append(self.finger_pose)
+        # self.all_times.append(time.time())
+
+
         if cmd == "Close":
             print('is the gripper actually closing???')
             # self.gripper.set_named_target("Close")
