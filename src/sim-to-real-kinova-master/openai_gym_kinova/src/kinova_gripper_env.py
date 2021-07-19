@@ -21,6 +21,9 @@ from geometry_msgs.msg import Point, Pose
 import actionlib
 from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, GoToJointStateResult, GoToJointStateGoal
 
+from sensor_msgs.msg import Image
+import cv2
+from cv_bridge import CvBridge, CvBridgeError
 
 class KinovaGripper_Env:
     def __init__(self):
@@ -62,20 +65,6 @@ class KinovaGripper_Env:
         # lift the object to this pose
         self.manual_lift_pose_cartesian = [0.0416, -0.5779, 0.3166, 0.7910, -0.0854, 0.1197, 0.5937]
 
-        # THE JOINT ANGLES ARE FROM BOTTOM TO END EFFECTOR
-        # self.joint_angle1 = [4.76, 4.52, -0.015, 1.43, 3.21, 4.53, 6.22]
-        # # Pick Up
-        # self.joint_angle2 = [4.78, 4.13, -0.04, 1.24, 3.21, 4.33, 6.23]
-        # # Move slightly to the right
-        # self.joint_angle3 = [4.99, 4.16, 0.05, 1.36, 3.21, 4.25, 6.15]
-        # # Move more to the right
-        # self.joint_angle4 = [4.99, 4.16, 0.05, 1.36, 3.21, 4.25, 6.15]
-        # # Move slightly forward
-        # self.joint_angle5 = [4.98, 4.20, 0.05, 1.52, 3.21, 4.13, 6.14]
-        # # Move more to the right
-        # self.joint_angle6 = [5.10, 4.20, 0.09, 1.51, 3.21, 4.13, 6.10]
-        # # Move down
-        # self.joint_angle7 = [5.11, 4.49, 0.08, 1.65, 3.18, 4.28, 6.12]
         self.finger_angle = []
 
         ###Subscribers###
@@ -117,6 +106,23 @@ class KinovaGripper_Env:
         self.obs_pub = rospy.Publisher('/sim2real/obs', Float32MultiArray, queue_size=10)
         self.reset_pub = rospy.Publisher('/sim2real/reset', Int32, queue_size=10)
 
+        self.most_recent_image = Image()
+        self.bridge = CvBridge()
+        self.image_sub = rospy.Subscriber('/usb_cam/image_raw', Image, self.update_most_recent_image)
+
+    def update_most_recent_image(self, img_msg):
+        """
+        Updates the self.most_recent_image with the most recent image from the camera feed.
+
+        """
+        try:
+            img = self.bridge.imgmsg_to_cv2(img_msg, "rgb8")
+            # RGB_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # only if you have a bgr by default (opencv is weird)
+            self.most_recent_image = img
+        except CvBridgeError as e:
+            print(e)
+            print('trying to read the image')
+
     def update_current_pose(self, pose_msg):
         self.current_pose = pose_msg
 
@@ -130,7 +136,7 @@ class KinovaGripper_Env:
             finger_joint_state_value[1] = self.finger_angle[1]
             finger_joint_state_value[2] = self.finger_angle[2]
 
-            # TODO: WTF ARE THESE? THEY DON'T EVEN MAKE SENSE??????
+            # TODO: what are these
             finger_joint_state_value[3] = self.finger_angle[3]
             finger_joint_state_value[4] = self.finger_angle[2]
             finger_joint_state_value[5] = self.finger_angle[3]
@@ -208,19 +214,31 @@ class KinovaGripper_Env:
 
     # Function to return global or local transformation matrix
     def get_obs(self):  # Finger Joint states, Object Distance, Angles
-        obj_pose = self.get_obj_pose()
+        obj_pose = self.get_obj_pose()  # TODO
         obj_pose = np.copy(obj_pose)
-        x_angle, z_angle = self.get_angles()
-        joint_states = self.get_joint_states()
-        obj_size = self.get_obj_size()
-        finger_obj_dist = self.get_finger_obj_dist()
-        fingers_6D_pose = []
+        x_angle, z_angle = self.get_angles()  # TODO - JK
+        joint_states = self.get_joint_states()  # TODO
+        obj_size = self.get_obj_size()  # TODO
+        finger_obj_dist = self.get_finger_obj_dist()  # TODO
+        # fingers_6D_pose = []
 
-        fingers_6D_pose = self.get_finger_pos()
-        fingers_6D_pose = fingers_6D_pose + list(self.wrist_pose) + list(obj_pose) + joint_states + \
+        fingers_6D_pose = self.get_finger_pos()  # TODO
+        res_obs = fingers_6D_pose + list(self.wrist_pose) + list(obj_pose) + joint_states + \
                           [obj_size[0], obj_size[1], obj_size[2] * 2] + finger_obj_dist + [x_angle, z_angle]
         # print('this is the obs data',fingers_6D_pose)
-        return fingers_6D_pose
+
+        print('==================== start obs ===========================')
+        print('wrist pose:', self.wrist_pose)
+        print('obj_pose:', obj_pose)
+        print('joint_states:', joint_states)
+        print('object size??:', [obj_size[0], obj_size[1], obj_size[2] * 2])
+        print('finger obj dist:', finger_obj_dist)
+        # print('x and z angles:', [x_angle, z_angle])  # nah we dont use these
+        print('==================== start obs ===========================')
+
+        res_obs = np.array(res_obs)
+        print('=============== the shape??? =', res_obs.shape)
+        return res_obs
 
     ####Gives x,y,z position of fingers#####
     def get_finger_pos(self):
@@ -276,16 +294,18 @@ class KinovaGripper_Env:
         # total_reward, info, reward_check_done = self.get_reward()
 
         total_reward = 0  # sparse rewards lol
-        info = {}  # i love diagnostic info
+        info = {
+            'curr_image': self.most_recent_image
+        }  # i love diagnostic info
 
         # TODO: it seems that reward is labelling as finished too early. we need to fix that to default to not finishing
         # if done:
         #     print('Finishing here!')
         #     self.finish_velocity_controller_pub.publish(True)
 
-        rospy.loginfo('=== checking joint done')
+        # rospy.loginfo('=== checking joint done')
         joint_check_done = self.check_joint_done()
-        rospy.loginfo('=== done checking joint done')
+        # rospy.loginfo('=== done checking joint done')
 
         # done = reward_check_done or joint_check_done  # check either condition giving a done condition
         done = joint_check_done
@@ -293,6 +313,12 @@ class KinovaGripper_Env:
         if done:  # todo: turn back to reward
             print('Finishing here!')
             self.finish_velocity_controller_pub.publish(True)
+
+
+        # make sure everything is numpy array
+        # TODO: you could refactor the messages to actually output numpy arrays...
+        obs = np.array(obs)
+        # total_reward = np.array(total_reward)
 
         return obs, total_reward, done, info
 
