@@ -1,0 +1,10 @@
+# Define the goal
+float32 x
+float32 y
+float32 z
+---
+# Define the result
+std_msgs/Bool end_state
+---
+# Define a feedback message
+std_msgs/Bool is_finished

@@ -49,7 +49,7 @@ class Logger(object):
             video_path.mkdir(parents=True, exist_ok=True)
 
             self.video_recorder = VideoRecorder(dir_name=self.video_path_name, height=1080, width=1920, camera_id=0,
-                                                fps=30)
+                                                fps=4)
 
         # marker telling us whether we should record the current episode
         self.record_curr_episode = True
@@ -152,7 +152,7 @@ class Logger(object):
             self.video_recorder.save('video_' + str(self.episode_num))
             # this is bad practice, but just make a new video recorder lol
             self.video_recorder = VideoRecorder(dir_name=self.video_path_name, height=1080, width=1920, camera_id=0,
-                                                fps=30)
+                                                fps=4)
 
         self.episode_num += 1
 

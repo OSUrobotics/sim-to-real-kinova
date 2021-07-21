@@ -20,6 +20,8 @@ from geometry_msgs.msg import Point, Pose
 
 import actionlib
 from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, GoToJointStateResult, GoToJointStateGoal
+from openai_gym_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, AddPositionalNoiseResult, AddPositionalNoiseGoal
+from openai_gym_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, AddOrientationNoiseResult, AddOrientationNoiseGoal
 
 from sensor_msgs.msg import Image
 import cv2
@@ -58,7 +60,18 @@ class KinovaGripper_Env:
         # self.home_orientation_cartesian = [0.0396, -0.5164, 0.2085, 0.7228, -0.0835, .0192, 0.6856]
         self.home_orientation_cartesian = [0.0329, -0.4842, 0.3109, 0.7778, -0.0420, 0.0475, 0.6252]
         # TODO: change out with alejo's UR5 pertubation code
-        self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7978, -0.0791, 0.1117, 0.5871]
+        # self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7978, -0.0791, 0.1117, 0.5871]
+        self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7071, 0.0, 0.0, 0.7071]  # manually set the quaternions lol
+
+        """
+        python2
+        import tf
+        import numpy as np
+        
+        tf.transformations.quaternion_from_euler(np.pi/2,0,0)
+        array([0.70710678, 0.        , 0.        , 0.70710678])
+        """
+
         # this is a set position we move our hand to, after we've closed and lifted the hand.
         self.check_reward_orientation_cartesian = [-0.1345, -0.5653, 0.2592, 0.7367, -0.1048, 0.0256, 0.6674]
 
@@ -100,6 +113,9 @@ class KinovaGripper_Env:
         self.goal_state_cartesian_pub = rospy.Publisher('/goal_state_cartesian', Point, queue_size=10)
         self.goal_state_orientation_cartesian_pub = rospy.Publisher('/goal_state_orientation_cartesian', Pose,
                                                                     queue_size=10)
+
+        self.add_positional_noise_pub = rospy.Publisher('/add_positional_noise', Pose,
+                                                         queue_size=1)  # turn this into an action, use custom msg too
 
         self.current_pose_sub = rospy.Publisher('/current_pose', Pose, self.update_current_pose, queue_size=10)
 
@@ -224,10 +240,11 @@ class KinovaGripper_Env:
 
         fingers_6D_pose = self.get_finger_pos()  # TODO
         res_obs = fingers_6D_pose + list(self.wrist_pose) + list(obj_pose) + joint_states + \
-                          [obj_size[0], obj_size[1], obj_size[2] * 2] + finger_obj_dist + [x_angle, z_angle]
+                          [obj_size[0], obj_size[1], obj_size[2] * 2] + finger_obj_dist #+ [x_angle, z_angle]
         # print('this is the obs data',fingers_6D_pose)
 
         print('==================== start obs ===========================')
+        print('finger_pose:', fingers_6D_pose)  # size 12
         print('wrist pose:', self.wrist_pose)
         print('obj_pose:', obj_pose)
         print('joint_states:', joint_states)
@@ -238,6 +255,20 @@ class KinovaGripper_Env:
 
         res_obs = np.array(res_obs)
         print('=============== the shape??? =', res_obs.shape)
+
+        """
+        Quick rundown of observation space:
+        1. Finger poses. XYZ coords of finger 1 and finger 2 (the top fingers). size 12
+        fing1 dist pos, fing1 tip pos, fing2 dist pos, fing2 tip pos
+        
+        2. wrist pose. XYZ coord. size 3
+        3. object pos. XYZ coord. size 3
+        4. joint states. 6 of them. TODO ADD MORE. size 6
+        5. object size. XYZ dims. size 3
+        6. finger to object distances. size 4
+        fing1 distal, fing1 tip, fing2 distal, fing2 tip
+        """
+
         return res_obs
 
     ####Gives x,y,z position of fingers#####
@@ -416,6 +447,14 @@ class KinovaGripper_Env:
         print('Feedback received:', msg)
 
     def reset(self):
+        """
+        Reset to the grasping position.
+
+        Returns
+        -------
+        obs - first observation
+
+        """
         rospy.loginfo('--------------------starting reset check')
 
         # this would bring the arm back home.
@@ -459,6 +498,81 @@ class KinovaGripper_Env:
         rospy.loginfo('-------------------ending reset')
 
         return obs
+
+    def add_positional_noise(self, x_noise=0, y_noise=0, z_noise=0):
+        """
+        Add positional noise to the hand
+
+        Parameters
+        ----------
+        x_noise - bounds on x noise (forward backwards)
+        y_noise - bounds on y noise (side to side)
+        z_noise - bounds on z noise (height)
+
+        Returns
+        -------
+
+        """
+
+        # turn off the grasping controller to take velocities.
+        self.finish_velocity_controller_pub.publish(True)
+        rospy.sleep(0.1)  # wait a lil
+
+        noise_goal = AddPositionalNoiseGoal()
+        noise_goal.x = x_noise
+        noise_goal.y = y_noise
+        noise_goal.z = z_noise
+
+        rospy.loginfo('=== adding positional noise')
+        client = actionlib.SimpleActionClient('add_positional_noise_as', AddPositionalNoiseAction)
+        client.wait_for_server()
+        client.send_goal(noise_goal, feedback_cb=self.feedback_cb)
+        client.wait_for_result()
+        result = client.get_result()
+
+        # self.add_positional_noise_pub.publish(self.current_pose)
+
+        # not finished anymore! re-enable the grasping controller to take velocities.
+        self.finish_velocity_controller_pub.publish(False)
+
+        return result
+
+    def add_orientational_noise(self, roll_noise=0, pitch_noise=0, yaw_noise=0):
+        """
+        Add orientational noise to the hand
+
+        Parameters
+        ----------
+        roll - around x axis, radians
+        pitch - around y axis, radians
+        yaw - around z axis, radians
+
+        Returns
+        -------
+
+        """
+
+        # turn off the grasping controller to take velocities.
+        self.finish_velocity_controller_pub.publish(True)
+        rospy.sleep(0.1)  # wait a lil
+
+        noise_goal = AddOrientationNoiseGoal()
+        noise_goal.roll = roll_noise
+        noise_goal.pitch = pitch_noise
+        noise_goal.yaw = yaw_noise
+
+        rospy.loginfo('=== adding orientation noise')
+        client = actionlib.SimpleActionClient('add_orientation_noise_as', AddOrientationNoiseAction)
+        client.wait_for_server()
+        client.send_goal(noise_goal, feedback_cb=self.feedback_cb)
+        client.wait_for_result()
+        result = client.get_result()
+
+        # not finished anymore! re-enable the grasping controller to take velocities.
+        self.finish_velocity_controller_pub.publish(False)
+
+        return result
+
 
     def joint_state_callback(self, msg):
         self.joint_states = msg

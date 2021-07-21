@@ -11,10 +11,41 @@ from geometry_msgs.msg import Point, Pose
 import moveit_commander
 import moveit_msgs.msg
 
+from tf.transformations import quaternion_from_euler
+from tf.transformations import euler_from_quaternion
+
 import actionlib
 from openai_gym_kinova.msg import GoToPoseOrientationCartesianAction, GoToPoseOrientationCartesianFeedback, \
     GoToPoseOrientationCartesianResult
-from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, GoToJointStateResult
+from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, \
+    GoToJointStateResult  # go to joint state
+from openai_gym_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, \
+    AddOrientationNoiseResult  # add orientation noise
+from openai_gym_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, \
+    AddPositionalNoiseResult  # add orientation noise
+
+
+def all_close(goal, actual, tolerance):
+    """
+    Convenience method for testing if a list of values are within a tolerance of their counterparts in another list
+    @param: goal       A list of floats, a Pose or a PoseStamped
+    @param: actual     A list of floats, a Pose or a PoseStamped
+    @param: tolerance  A float
+    @returns: bool
+    """
+    all_equal = True
+    if type(goal) is list:
+        for index in range(len(goal)):
+            if abs(actual[index] - goal[index]) > tolerance:
+                return False
+
+    elif type(goal) is geometry_msgs.msg.PoseStamped:
+        return all_close(goal.pose, actual.pose, tolerance)
+
+    elif type(goal) is geometry_msgs.msg.Pose:
+        return all_close(pose_to_list(goal), pose_to_list(actual), tolerance)
+
+    return True
 
 
 class CartesianController:
@@ -31,7 +62,8 @@ class CartesianController:
         self.scene = moveit_commander.PlanningSceneInterface()
         self.group = moveit_commander.MoveGroupCommander("arm")  # just wanna control the arm.
         self.group.set_planning_time(10)  # idk what this does.
-        self.group.set_planner_id("RRTstarkConfigDefault")
+        # self.group.set_planner_id("RRTstarkConfigDefault")
+        self.group.set_planner_id("PRMstarkConfigDefault")
 
         # NOTE: WE GIVE AND RECEIVE IN FLOAT32 SO THAT OTHER MODULES DON'T NEED TO IMPORT MOVEIT COMMANDER. FUCK PYTHON2
         self.current_pose_cartesian_pub = rospy.Publisher('/current_pose_cartesian', Point, queue_size=10)
@@ -59,6 +91,19 @@ class CartesianController:
         self.joint_server = actionlib.SimpleActionServer(
             "go_to_joint_state_as", GoToJointStateAction, execute_cb=self.go_to_joint_state, auto_start=False)
         self.joint_server.start()
+
+        self.pos_noise_server = actionlib.SimpleActionServer(
+            "add_positional_noise_as", AddPositionalNoiseAction, execute_cb=self.add_positional_noise, auto_start=False)
+        self.pos_noise_server.start()
+
+        self.orientation_noise_server = actionlib.SimpleActionServer(
+            "add_orientation_noise_as", AddOrientationNoiseAction, execute_cb=self.add_orientation_noise,
+            auto_start=False)
+        self.orientation_noise_server.start()
+
+        # self.add_positional_noise_sub = rospy.Subscriber('/add_positional_noise', Pose,
+        #                                                              self.add_positional_noise,
+        #                                                              queue_size=1)  # turn this into an action
 
     def publish_current_pose_cartesian(self):
         """
@@ -251,6 +296,158 @@ class CartesianController:
 
         if success:
             self.joint_server.set_succeeded(result)
+
+    def add_positional_noise(self, msg):
+        """
+        Add positional noise to the current position.
+
+        Parameters
+        ----------
+        msg - AddPositionalNoiseAction. has x, y, z for desired noise pertubation
+
+
+        Returns
+        -------
+
+        """
+        x_noise = msg.x
+        y_noise = msg.y
+        z_noise = msg.z
+
+        feedback = AddPositionalNoiseFeedback()
+        result = AddPositionalNoiseResult()
+
+        feedback.is_finished = Bool(False)
+        result.end_state = Bool(False)
+
+        self.pos_noise_server.publish_feedback(feedback)
+
+        if self.pos_noise_server.is_preempt_requested():
+            self.pos_noise_server.set_preempted()
+            success = False
+            rospy.loginfo('lmao you cant stop this shit')
+
+        waypoints = []
+
+        wpose = self.group.get_current_pose().pose
+        waypoints.append(copy.deepcopy(wpose))
+
+        # set up the end goal pose
+        wpose.position.x += x_noise
+        wpose.position.y += y_noise
+        wpose.position.z += z_noise
+
+        ## use these for a different noiser
+        wpose.orientation.x += 0
+        wpose.orientation.y += 0
+        wpose.orientation.z += 0
+        wpose.orientation.w += 0
+
+        waypoints.append(copy.deepcopy(wpose))
+
+        # compute the path
+        (plan, fraction) = self.group.compute_cartesian_path(
+            waypoints,  # waypoints to follow
+            0.002,  # eef_step
+            420.0)  # jump_threshold
+
+        # execute the path
+        rospy.loginfo('starting...')
+        self.group.execute(plan, wait=True)
+
+        rospy.loginfo('done executing')
+        self.group.stop()
+        self.group.clear_pose_targets()
+
+        result.end_state = Bool(True)
+        success = True
+
+        if success:
+            self.pos_noise_server.set_succeeded(result)
+
+    def add_orientation_noise(self, msg):
+
+        # Step 1: Get current pose
+        # Step 2: Convert current quaternion orientation to euler
+        # Step 3: Add rotation orientation to euler representation
+        # Step 4: Convert euler representation back to quaternion
+        # Step 5: Set new quaternion orientation as the target pose for cartesian stuff
+        # Step 6: Execute.
+
+        pitch_noise = msg.pitch  # around y axis
+        roll_noise = msg.roll  # around x axis
+        yaw_noise = msg.yaw  # around z axis
+
+        feedback = AddOrientationNoiseFeedback()
+        result = AddOrientationNoiseResult()
+
+        feedback.is_finished = Bool(False)
+        result.end_state = Bool(False)
+
+        self.orientation_noise_server.publish_feedback(feedback)
+
+        if self.orientation_noise_server.is_preempt_requested():
+            self.orientation_noise_server.set_preempted()
+            success = False
+            rospy.loginfo('lmao you cant stop this shit')
+
+        waypoints = []
+
+        # Step 1: Get current pose
+        wpose = self.group.get_current_pose().pose
+        waypoints.append(copy.deepcopy(wpose))
+
+        # Step 2: Convert current quaternion orientation to euler
+        quat_vec = [wpose.orientation.x, wpose.orientation.y, wpose.orientation.z, wpose.orientation.w]
+        # http://docs.ros.org/en/jade/api/tf/html/python/transformations.html#tf.transformations.euler_from_quaternion
+        angles = euler_from_quaternion(quat_vec)  # angles is size 3, its a tuple
+
+        # Step 3: Add rotation orientation to euler representation
+        new_angles = [0, 0, 0]
+        new_angles[0] = angles[0] + roll_noise
+        new_angles[1] = angles[1] + pitch_noise
+        new_angles[2] = angles[2] + yaw_noise
+
+        # Step 4: Convert euler representation back to quaternion
+        new_quat_vec = quaternion_from_euler(new_angles[0], new_angles[1], new_angles[2])
+
+        # Step 5: Set new quaternion orientation as the target pose for cartesian stuff
+        # no changes to position
+        wpose.position.x += 0
+        wpose.position.y += 0
+        wpose.position.z += 0
+
+        ## set up the new end goal pose
+        wpose.orientation.x = new_quat_vec[0]
+        wpose.orientation.y = new_quat_vec[1]
+        wpose.orientation.z = new_quat_vec[2]
+        wpose.orientation.w = new_quat_vec[3]
+
+        waypoints.append(copy.deepcopy(wpose))
+
+        # # compute the path
+        # (plan, fraction) = self.group.compute_cartesian_path(
+        #     waypoints,  # waypoints to follow
+        #     0.002,  # eef_step
+        #     420.0)  # jump_threshold
+        #
+        # # Step 6: Execute.
+        # rospy.loginfo('starting...')
+        # self.group.execute(plan, wait=True)
+
+        # The go command can be called with joint values, poses, or without any
+        # parameters if you have already set the pose or joint target for the group
+        self.group.go(wpose, wait=True)
+
+        rospy.loginfo('done executing')
+        self.group.stop()
+        self.group.clear_pose_targets()
+
+        result.end_state = Bool(True)
+        success = True
+
+        if success:
+            self.orientation_noise_server.set_succeeded(result)
 
 
 def cartesian_control_loop():

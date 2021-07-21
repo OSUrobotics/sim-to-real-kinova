@@ -72,6 +72,8 @@ add_action_files(
   FILES
   GoToPoseOrientationCartesian.action
   GoToJointState.action
+  AddOrientationNoise.action
+  AddPositionalNoise.action
 )
 
 ## Generate added messages and services with any dependencies listed here
