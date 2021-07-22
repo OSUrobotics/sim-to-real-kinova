@@ -19,6 +19,8 @@ from std_msgs.msg import Bool
 from geometry_msgs.msg import Point, Pose
 
 import actionlib
+from openai_gym_kinova.msg import GoToPoseOrientationCartesianAction, GoToPoseOrientationCartesianFeedback, \
+    GoToPoseOrientationCartesianResult, GoToPoseOrientationCartesianGoal
 from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, GoToJointStateResult, GoToJointStateGoal
 from openai_gym_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, AddPositionalNoiseResult, AddPositionalNoiseGoal
 from openai_gym_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, AddOrientationNoiseResult, AddOrientationNoiseGoal
@@ -306,6 +308,15 @@ class KinovaGripper_Env:
         # total_reward, info, done = self.get_reward_DataCollection()
         return obs, total_reward, done, info
 
+    def get_info(self):
+        info = {
+            'curr_image': self.most_recent_image,
+            'curr_pose': self.current_pose,
+            'start_pose': self.pre_grasp_orientation_cartesian
+        }
+
+        return info
+
     def step(self, action):
         # TODO: scale to between -6800 - 6800
         # TODO: EVALUATE THIS METHOD
@@ -325,9 +336,7 @@ class KinovaGripper_Env:
         # total_reward, info, reward_check_done = self.get_reward()
 
         total_reward = 0  # sparse rewards lol
-        info = {
-            'curr_image': self.most_recent_image
-        }  # i love diagnostic info
+        info = self.get_info()
 
         # TODO: it seems that reward is labelling as finished too early. we need to fix that to default to not finishing
         # if done:
@@ -498,6 +507,32 @@ class KinovaGripper_Env:
         rospy.loginfo('-------------------ending reset')
 
         return obs
+
+    def move_arm_orientation_cartesian_action(self, cartesian_goal):
+        """
+        Moves the arm to given cartesian coordinate.
+        input: cartesian_goal, should be an array [pos_x, pos_y, pos_z, ori_x, ori_y, ori_z, ori_w]
+
+        """
+        goal_pose = Pose()
+
+        goal_pose.position.x = cartesian_goal[0]
+        goal_pose.position.y = cartesian_goal[1]
+        goal_pose.position.z = cartesian_goal[2]
+
+        goal_pose.orientation.x = cartesian_goal[3]
+        goal_pose.orientation.y = cartesian_goal[4]
+        goal_pose.orientation.z = cartesian_goal[5]
+        goal_pose.orientation.w = cartesian_goal[6]
+
+        action_goal = GoToPoseOrientationCartesianGoal()
+        action_goal.goal_pose = goal_pose
+
+        client = actionlib.SimpleActionClient('go_to_pose_orientation_cartesian_as', GoToPoseOrientationCartesianAction)
+        client.wait_for_server()
+        client.send_goal(action_goal, feedback_cb=self.feedback_cb)
+        client.wait_for_result()
+        result = client.get_result()
 
     def add_positional_noise(self, x_noise=0, y_noise=0, z_noise=0):
         """

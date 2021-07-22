@@ -22,7 +22,7 @@ from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, 
 from openai_gym_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, \
     AddOrientationNoiseResult  # add orientation noise
 from openai_gym_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, \
-    AddPositionalNoiseResult  # add orientation noise
+    AddPositionalNoiseResult  # add positional noise
 
 
 def all_close(goal, actual, tolerance):
@@ -53,10 +53,6 @@ class CartesianController:
     Cartesian controller. Pog
     """
 
-    # create messages that are used to publish feedback/result
-    _feedback = GoToPoseOrientationCartesianFeedback()
-    _result = GoToPoseOrientationCartesianResult()
-
     def __init__(self, ):
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
@@ -82,11 +78,11 @@ class CartesianController:
                                                             moveit_msgs.msg.DisplayTrajectory,
                                                             queue_size=20)
 
-        self.server = actionlib.SimpleActionServer('go_to_pose_orientation_cartesian',
+        self.pose_orientation_server = actionlib.SimpleActionServer('go_to_pose_orientation_cartesian_as',
                                                    GoToPoseOrientationCartesianAction,
                                                    execute_cb=self.go_to_pose_orientation_cartesian_callback,
                                                    auto_start=False)
-        self.server.start()
+        self.pose_orientation_server.start()
 
         self.joint_server = actionlib.SimpleActionServer(
             "go_to_joint_state_as", GoToJointStateAction, execute_cb=self.go_to_joint_state, auto_start=False)
@@ -205,8 +201,20 @@ class CartesianController:
 
     def go_to_pose_orientation_cartesian_callback(self, pose_msg):
         rospy.loginfo('Executing pose orientation cartesian callback.')
-        self._feedback = Bool(False)
-        self.server.publish_feedback(self._feedback)
+        success = True
+
+        feedback = GoToPoseOrientationCartesianFeedback()
+        result = GoToPoseOrientationCartesianResult()
+
+        feedback.is_finished = Bool(False)
+        result.end_state = Bool(False)
+
+        self.pose_orientation_server.publish_feedback(feedback)
+
+        if self.pose_orientation_server.is_preempt_requested():
+            self.pose_orientation_server.set_preempted()
+            success = False
+            rospy.loginfo('lmao you cant stop this shit')
 
         # assumes Pose
         pos_x = pose_msg.position.x
@@ -245,10 +253,16 @@ class CartesianController:
         rospy.loginfo('starting...')
         self.group.execute(plan, wait=True)
 
+        # Calling ``stop()`` ensures that there is no residual movement
+        self.group.stop()
+        self.group.clear_pose_targets()
+
         rospy.loginfo('done executing')
-        self._feedback = Bool(True)
-        self.server.publish_feedback(self._feedback)
-        self.server.set_succeeded(True)
+        result.end_state = Bool(True)
+        success = True
+
+        if success:
+            self.pose_orientation_server.set_succeeded(result)
 
     def go_to_joint_state(self, msg):
         """

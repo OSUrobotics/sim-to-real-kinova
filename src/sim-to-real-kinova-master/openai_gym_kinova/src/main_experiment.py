@@ -306,6 +306,9 @@ if __name__ == '__main__':
             logger.record_current_episode(True)  # set recording on
 
             obs = env.get_obs()  # get the most recent observation
+            info = env.get_info()
+
+            logger.record_starting_position(obs, info)
 
             for timestep_idx in range(max_timesteps):  # or turn this into for loop
                 print('timestep:', timestep_idx)

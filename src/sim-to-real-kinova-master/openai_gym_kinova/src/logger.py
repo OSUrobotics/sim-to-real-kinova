@@ -61,6 +61,9 @@ class Logger(object):
         self.tmp_reward = []
         self.tmp_done = []
 
+        self.translation_errors = []  # in some metric space unit lol
+        self.quaternion_distances = []  # these are just rotation differences, in radians
+
     def record_current_episode(self, record_episode=True):
         """
         Flag the current episode for recording.
@@ -72,6 +75,60 @@ class Logger(object):
         self.record_curr_episode = record_episode
         if self._use_video:
             self.video_recorder.init(enabled=True)
+
+    def record_starting_position(self, obs, info):
+        """
+        Record the starting position of the object. Feed in the variables from the first time step.
+        TODO: incorporate this with log_single_step when it's the first step detected?? (auto)
+        TODO: pareshs code
+
+        Parameters
+        ----------
+        obs - the observation
+
+        Returns
+        -------
+
+        """
+        # TODO: Grab the XYZ position of the object
+        # Step 0: set up the base rotation
+
+        # Step 1.1: Get XYZ position of the object
+        obj_pos = obs[15:18]
+        # Step 1.2: Get XYZ position of the end effector JK it's at 0 0 0 <=== whats the hard coding?
+        end_effector_pos = np.array([0, 0, 0])
+
+        # Step 1.3: Get orientation of the end effector (and make sure the XYZ is 0 0 0?)
+        curr_pose = info['curr_pose']
+        curr_orientation = curr_pose[-4:]
+        start_pose = info['start_pose']
+        start_orientation = start_pose[-4:]
+
+        # Step 2: Calculate translation error from optimal grasp (place on x axis).
+        # curr_pose_pos = np.array(curr_pose[:3])
+        # start_pose_pos = np.array(start_pose[:3])
+        # pos_delta = curr_pose_pos - start_pose_pos
+        # translation_error = np.sqrt(np.sum(pos_delta ** 2))
+
+        pos_delta = obj_pos - end_effector_pos
+        translation_error = np.sqrt(np.sum(pos_delta ** 2))
+
+        # Step 2.1: Turn translation error negative if x is negative as well
+        x_delta = obj_pos - end_effector_pos
+        if x_delta < 0:
+            translation_error = -translation_error
+
+        # Step 3: Calculate quaternion distance (y axis) - between WHAT? base rotation? I guess base rotation is [pi/2, 0, 0] since we do 90deg roll on the x-axis of the base frame
+        # Step 4: Yeah what is the rotation?
+        quaternion_dot_prod = np.dot(start_orientation, curr_orientation)
+        angle_difference = np.arccos(quaternion_dot_prod)  # in degrees
+        quat_distance = np.rad2deg(angle_difference)  # in radians
+
+        # Last step: Place in a class wide variable, that can be used to generate a plot.
+        # Note: You'll want to keep track of successes over multiple episodes as well.
+
+        self.translation_errors.append(translation_error)
+        self.quaternion_distances.append(quat_distance)
 
     def log_single_step(self, action, obs, next_obs, reward, done, info):
         """
