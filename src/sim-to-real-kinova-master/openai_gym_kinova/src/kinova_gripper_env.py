@@ -5,6 +5,7 @@
 # Purpose: Simulation to Real Implementation on Kinova
 # Summer 2020
 ###############
+import copy
 
 import numpy as np
 
@@ -28,6 +29,9 @@ from openai_gym_kinova.msg import AddOrientationNoiseAction, AddOrientationNoise
 from sensor_msgs.msg import Image
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
+
+# lmao is this safe
+from euler_quaternion_transforms import quaternion_from_euler, euler_from_quaternion
 
 class KinovaGripper_Env:
     def __init__(self):
@@ -381,14 +385,14 @@ class KinovaGripper_Env:
 
         rospy.loginfo('lifting right now')
 
-        self.move_arm_orientation_cartesian(self.manual_lift_pose_cartesian)
-        rospy.sleep(7)  # wait a bit before taking more actions
+        self.move_arm_orientation_cartesian_action(self.manual_lift_pose_cartesian)
+        # rospy.sleep(7)  # wait a bit before taking more actions
 
         rospy.loginfo('moving to check reward orientation')
 
         # move to the manually set goal position on the right
-        self.move_arm_orientation_cartesian(self.check_reward_orientation_cartesian)
-        rospy.sleep(7)  # wait for the arm to finish moving
+        self.move_arm_orientation_cartesian_action(self.check_reward_orientation_cartesian)
+        # rospy.sleep(7)  # wait for the arm to finish moving
 
         rospy.loginfo('waiting a bit before reward check...')
         rospy.set_param('Goal', False)  # turn the reward check off!
@@ -455,7 +459,7 @@ class KinovaGripper_Env:
     def feedback_cb(self, msg):
         print('Feedback received:', msg)
 
-    def reset(self):
+    def reset(self, x_noise=0, y_noise=0, z_noise=0, roll_noise=0, pitch_noise=0, yaw_noise=0):
         """
         Reset to the grasping position.
 
@@ -489,14 +493,16 @@ class KinovaGripper_Env:
         rospy.sleep(2)  # TODO: i added this in before leaving the lab on wednesday. if this doesn't work then cry...
 
         # move hand to the home position
-        rospy.loginfo('=== move to home')
-        self.move_arm_orientation_cartesian(self.home_orientation_cartesian)
-        rospy.sleep(8)  # wait for the arm to finish moving. otherwise it will get interrupted
+        # rospy.loginfo('=== move to home')
+        # self.move_arm_orientation_cartesian_action(self.home_orientation_cartesian)
+        # # rospy.sleep(8)  # wait for the arm to finish moving. otherwise it will get interrupted
+        #
+        # # go to the pregrasp orientation
+        # rospy.loginfo('=== move to pregrasp')
+        # self.move_arm_orientation_cartesian_action(self.pre_grasp_orientation_cartesian)
+        # # rospy.sleep(7)  # wait for the arm to finish moving. otherwise it will get interrupted
 
-        # go to the pregrasp orientation
-        rospy.loginfo('=== move to pregrasp')
-        self.move_arm_orientation_cartesian(self.pre_grasp_orientation_cartesian)
-        rospy.sleep(7)  # wait for the arm to finish moving. otherwise it will get interrupted
+        self.go_to_noisy_pregrasp(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise, pitch_noise=pitch_noise, yaw_noise=yaw_noise)
 
         # get the parameters required by openai gym wrapper
         obs = self.get_obs()
@@ -608,6 +614,40 @@ class KinovaGripper_Env:
 
         return result
 
+
+    def go_to_noisy_pregrasp(self, x_noise=0, y_noise=0, z_noise=0, roll_noise=0, pitch_noise=0, yaw_noise=0):
+        
+        # NOTE: POOR DESIGN! WE RIP THE ORIENTATION NOISE STUFF FROM CARTESIAN CONTROLLER
+        # Step 1: Get current pose
+        wpose = copy.deepcopy(self.pre_grasp_orientation_cartesian)
+
+        # Step 2: Convert current quaternion orientation to euler
+        quat_vec = wpose[-4:]
+        # http://docs.ros.org/en/jade/api/tf/html/python/transformations.html#tf.transformations.euler_from_quaternion
+        angles = euler_from_quaternion(quat_vec)  # angles is size 3, its a tuple
+
+        # Step 3: Add rotation orientation to euler representation
+        new_angles = [0, 0, 0]
+        new_angles[0] = angles[0] + roll_noise
+        new_angles[1] = angles[1] + pitch_noise
+        new_angles[2] = angles[2] + yaw_noise
+
+        # Step 4: Convert euler representation back to quaternion
+        new_quat_vec = quaternion_from_euler(new_angles[0], new_angles[1], new_angles[2])
+
+        # Step 5: Set new quaternion orientation as the target pose for cartesian stuff
+        # no changes to position
+        wpose[0] += x_noise
+        wpose[1] += y_noise
+        wpose[2] += z_noise
+
+        ## set up the new end goal pose
+        new_quat_vec = np.array(new_quat_vec)
+
+        goal_pose = np.concatenate((wpose[:3], new_quat_vec))
+        print("================ OUR GOAL POSE:", goal_pose)
+
+        self.move_arm_orientation_cartesian_action(goal_pose)
 
     def joint_state_callback(self, msg):
         self.joint_states = msg

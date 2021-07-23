@@ -94,14 +94,15 @@ class Logger(object):
         # Step 0: set up the base rotation
 
         # Step 1.1: Get XYZ position of the object
-        obj_pos = obs[15:18]
+        obj_pos = obs[15:18]  # TODO: NOTE THE REAL LIFE ERROR IN SOME SEPARATE EXPERIMENTS
         # Step 1.2: Get XYZ position of the end effector JK it's at 0 0 0 <=== whats the hard coding?
         end_effector_pos = np.array([0, 0, 0])
 
         # Step 1.3: Get orientation of the end effector (and make sure the XYZ is 0 0 0?)
-        curr_pose = info['curr_pose']
+        curr_pose_unformatted = info['curr_pose']
+        curr_pose = np.array([curr_pose_unformatted.position.x, curr_pose_unformatted.position.y, curr_pose_unformatted.position.z, curr_pose_unformatted.orientation.x, curr_pose_unformatted.orientation.y, curr_pose_unformatted.orientation.z, curr_pose_unformatted.orientation.w])
         curr_orientation = curr_pose[-4:]
-        start_pose = info['start_pose']
+        start_pose = info['start_pose']  # this is already an array
         start_orientation = start_pose[-4:]
 
         # Step 2: Calculate translation error from optimal grasp (place on x axis).
@@ -114,7 +115,7 @@ class Logger(object):
         translation_error = np.sqrt(np.sum(pos_delta ** 2))
 
         # Step 2.1: Turn translation error negative if x is negative as well
-        x_delta = obj_pos - end_effector_pos
+        x_delta = obj_pos[0] - end_effector_pos[0]
         if x_delta < 0:
             translation_error = -translation_error
 

@@ -25,27 +25,27 @@ from openai_gym_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFe
     AddPositionalNoiseResult  # add positional noise
 
 
-def all_close(goal, actual, tolerance):
-    """
-    Convenience method for testing if a list of values are within a tolerance of their counterparts in another list
-    @param: goal       A list of floats, a Pose or a PoseStamped
-    @param: actual     A list of floats, a Pose or a PoseStamped
-    @param: tolerance  A float
-    @returns: bool
-    """
-    all_equal = True
-    if type(goal) is list:
-        for index in range(len(goal)):
-            if abs(actual[index] - goal[index]) > tolerance:
-                return False
-
-    elif type(goal) is geometry_msgs.msg.PoseStamped:
-        return all_close(goal.pose, actual.pose, tolerance)
-
-    elif type(goal) is geometry_msgs.msg.Pose:
-        return all_close(pose_to_list(goal), pose_to_list(actual), tolerance)
-
-    return True
+# def all_close(goal, actual, tolerance):
+#     """
+#     Convenience method for testing if a list of values are within a tolerance of their counterparts in another list
+#     @param: goal       A list of floats, a Pose or a PoseStamped
+#     @param: actual     A list of floats, a Pose or a PoseStamped
+#     @param: tolerance  A float
+#     @returns: bool
+#     """
+#     all_equal = True
+#     if type(goal) is list:
+#         for index in range(len(goal)):
+#             if abs(actual[index] - goal[index]) > tolerance:
+#                 return False
+#
+#     elif type(goal) is geometry_msgs.msg.PoseStamped:
+#         return all_close(goal.pose, actual.pose, tolerance)
+#
+#     elif type(goal) is geometry_msgs.msg.Pose:
+#         return all_close(pose_to_list(goal), pose_to_list(actual), tolerance)
+#
+#     return True
 
 
 class CartesianController:
@@ -217,14 +217,14 @@ class CartesianController:
             rospy.loginfo('lmao you cant stop this shit')
 
         # assumes Pose
-        pos_x = pose_msg.position.x
-        pos_y = pose_msg.position.y
-        pos_z = pose_msg.position.z
+        pos_x = pose_msg.goal_pose.position.x
+        pos_y = pose_msg.goal_pose.position.y
+        pos_z = pose_msg.goal_pose.position.z
 
-        ori_x = pose_msg.orientation.x
-        ori_y = pose_msg.orientation.y
-        ori_z = pose_msg.orientation.z
-        ori_w = pose_msg.orientation.w
+        ori_x = pose_msg.goal_pose.orientation.x
+        ori_y = pose_msg.goal_pose.orientation.y
+        ori_z = pose_msg.goal_pose.orientation.z
+        ori_w = pose_msg.goal_pose.orientation.w
 
         waypoints = []
 

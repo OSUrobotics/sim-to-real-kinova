@@ -271,10 +271,12 @@ if __name__ == '__main__':
         print('relative path:', rel_dirname)
 
         # agent = RandomAgent([0, 1700, 3400])
-        agent = RLAgent(trained_policy_path=os.path.join(rel_dirname, trained_policy_path))
+        # agent = RLAgent(trained_policy_path=os.path.join(rel_dirname, trained_policy_path))
+        agent = ConstantAgent(6800)
 
         # load logger
-        log_dir = '/home/mechagodzilla/sim-to-real-kinova/rl_agent_v1_logs/'
+        # log_dir = '/home/mechagodzilla/sim-to-real-kinova/rl_agent_v1_logs/'
+        log_dir = os.path.join(rel_dirname, 'constant_agent_logs/')
         logger = Logger(log_dir=log_dir, use_video=True)
 
         max_timesteps = 100
@@ -285,19 +287,17 @@ if __name__ == '__main__':
 
         for trial_idx in range(10):
 
-            _ = env.reset()  # NOTE: THE OBSERVATION FROM HERE DOESN'T CONTAIN THE OBJECT LOL
+            _ = env.reset(x_noise=0.03, y_noise=-0.02, z_noise=0, roll_noise=0, pitch_noise=0, yaw_noise=-np.pi/12)  # NOTE: THE OBSERVATION FROM HERE DOESN'T CONTAIN THE OBJECT LOL
 
             done = False
 
-            input('Trial ' + str(trial_idx) + ' | ' + 'Press enter to add positional noise...')
-
-            env.add_positional_noise(0.025, -0.025, 0)
-
-            # TODO: add orientation noise
-
-            input('Press enter to add orientation noise')
-
-            env.add_orientational_noise(0, 0, np.pi / 12)  # wrt to the base i believe
+            # input('Trial ' + str(trial_idx) + ' | ' + 'Press enter to add positional noise...')
+            #
+            # env.add_positional_noise(0.025, -0.025, 0)
+            #
+            # input('Press enter to add orientation noise')
+            #
+            # env.add_orientational_noise(0, 0, np.pi / 12)  # wrt to the base i believe
 
             input('Press enter to start grasp attempt')
 
