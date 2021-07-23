@@ -79,9 +79,9 @@ class CartesianController:
                                                             queue_size=20)
 
         self.pose_orientation_server = actionlib.SimpleActionServer('go_to_pose_orientation_cartesian_as',
-                                                   GoToPoseOrientationCartesianAction,
-                                                   execute_cb=self.go_to_pose_orientation_cartesian_callback,
-                                                   auto_start=False)
+                                                                    GoToPoseOrientationCartesianAction,
+                                                                    execute_cb=self.go_to_pose_orientation_cartesian_callback,
+                                                                    auto_start=False)
         self.pose_orientation_server.start()
 
         self.joint_server = actionlib.SimpleActionServer(

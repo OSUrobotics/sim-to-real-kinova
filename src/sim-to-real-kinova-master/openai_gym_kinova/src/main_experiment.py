@@ -70,6 +70,7 @@ class RandomAgent(Agent):
         action = np.array(list([np.random.choice(self.options)]) * 3)
         return action
 
+
 class ContinuousRandomAgent(Agent):
     """
     shitty action class
@@ -87,6 +88,7 @@ class ContinuousRandomAgent(Agent):
         """
         action = np.random.uniform(self.min_speed, self.max_speed, size=(3,))
         return action
+
 
 class ConstantAgent(Agent):
     """
@@ -287,7 +289,8 @@ if __name__ == '__main__':
 
         for trial_idx in range(10):
 
-            _ = env.reset(x_noise=0.03, y_noise=-0.02, z_noise=0, roll_noise=0, pitch_noise=0, yaw_noise=-np.pi/12)  # NOTE: THE OBSERVATION FROM HERE DOESN'T CONTAIN THE OBJECT LOL
+            _ = env.reset(x_noise=0.03, y_noise=-0.02, z_noise=0, roll_noise=0, pitch_noise=0,
+                          yaw_noise=-np.pi / 12)  # NOTE: THE OBSERVATION FROM HERE DOESN'T CONTAIN THE OBJECT LOL
 
             done = False
 

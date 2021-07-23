@@ -23,8 +23,10 @@ import actionlib
 from openai_gym_kinova.msg import GoToPoseOrientationCartesianAction, GoToPoseOrientationCartesianFeedback, \
     GoToPoseOrientationCartesianResult, GoToPoseOrientationCartesianGoal
 from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, GoToJointStateResult, GoToJointStateGoal
-from openai_gym_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, AddPositionalNoiseResult, AddPositionalNoiseGoal
-from openai_gym_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, AddOrientationNoiseResult, AddOrientationNoiseGoal
+from openai_gym_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, AddPositionalNoiseResult, \
+    AddPositionalNoiseGoal
+from openai_gym_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, AddOrientationNoiseResult, \
+    AddOrientationNoiseGoal
 
 from sensor_msgs.msg import Image
 import cv2
@@ -32,6 +34,7 @@ from cv_bridge import CvBridge, CvBridgeError
 
 # lmao is this safe
 from euler_quaternion_transforms import quaternion_from_euler, euler_from_quaternion
+
 
 class KinovaGripper_Env:
     def __init__(self):
@@ -67,7 +70,8 @@ class KinovaGripper_Env:
         self.home_orientation_cartesian = [0.0329, -0.4842, 0.3109, 0.7778, -0.0420, 0.0475, 0.6252]
         # TODO: change out with alejo's UR5 pertubation code
         # self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7978, -0.0791, 0.1117, 0.5871]
-        self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7071, 0.0, 0.0, 0.7071]  # manually set the quaternions lol
+        self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7071, 0.0, 0.0,
+                                                0.7071]  # manually set the quaternions lol
 
         """
         python2
@@ -121,7 +125,7 @@ class KinovaGripper_Env:
                                                                     queue_size=10)
 
         self.add_positional_noise_pub = rospy.Publisher('/add_positional_noise', Pose,
-                                                         queue_size=1)  # turn this into an action, use custom msg too
+                                                        queue_size=1)  # turn this into an action, use custom msg too
 
         self.current_pose_sub = rospy.Publisher('/current_pose', Pose, self.update_current_pose, queue_size=10)
 
@@ -246,7 +250,7 @@ class KinovaGripper_Env:
 
         fingers_6D_pose = self.get_finger_pos()  # TODO
         res_obs = fingers_6D_pose + list(self.wrist_pose) + list(obj_pose) + joint_states + \
-                          [obj_size[0], obj_size[1], obj_size[2] * 2] + finger_obj_dist #+ [x_angle, z_angle]
+                  [obj_size[0], obj_size[1], obj_size[2] * 2] + finger_obj_dist  # + [x_angle, z_angle]
         # print('this is the obs data',fingers_6D_pose)
 
         print('==================== start obs ===========================')
@@ -357,7 +361,6 @@ class KinovaGripper_Env:
         if done:  # todo: turn back to reward
             print('Finishing here!')
             self.finish_velocity_controller_pub.publish(True)
-
 
         # make sure everything is numpy array
         # TODO: you could refactor the messages to actually output numpy arrays...
@@ -502,7 +505,8 @@ class KinovaGripper_Env:
         # self.move_arm_orientation_cartesian_action(self.pre_grasp_orientation_cartesian)
         # # rospy.sleep(7)  # wait for the arm to finish moving. otherwise it will get interrupted
 
-        self.go_to_noisy_pregrasp(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise, pitch_noise=pitch_noise, yaw_noise=yaw_noise)
+        self.go_to_noisy_pregrasp(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise,
+                                  pitch_noise=pitch_noise, yaw_noise=yaw_noise)
 
         # get the parameters required by openai gym wrapper
         obs = self.get_obs()
@@ -614,9 +618,8 @@ class KinovaGripper_Env:
 
         return result
 
-
     def go_to_noisy_pregrasp(self, x_noise=0, y_noise=0, z_noise=0, roll_noise=0, pitch_noise=0, yaw_noise=0):
-        
+
         # NOTE: POOR DESIGN! WE RIP THE ORIENTATION NOISE STUFF FROM CARTESIAN CONTROLLER
         # Step 1: Get current pose
         wpose = copy.deepcopy(self.pre_grasp_orientation_cartesian)

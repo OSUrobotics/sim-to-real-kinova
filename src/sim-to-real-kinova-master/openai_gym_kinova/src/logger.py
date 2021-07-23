@@ -100,7 +100,10 @@ class Logger(object):
 
         # Step 1.3: Get orientation of the end effector (and make sure the XYZ is 0 0 0?)
         curr_pose_unformatted = info['curr_pose']
-        curr_pose = np.array([curr_pose_unformatted.position.x, curr_pose_unformatted.position.y, curr_pose_unformatted.position.z, curr_pose_unformatted.orientation.x, curr_pose_unformatted.orientation.y, curr_pose_unformatted.orientation.z, curr_pose_unformatted.orientation.w])
+        curr_pose = np.array(
+            [curr_pose_unformatted.position.x, curr_pose_unformatted.position.y, curr_pose_unformatted.position.z,
+             curr_pose_unformatted.orientation.x, curr_pose_unformatted.orientation.y,
+             curr_pose_unformatted.orientation.z, curr_pose_unformatted.orientation.w])
         curr_orientation = curr_pose[-4:]
         start_pose = info['start_pose']  # this is already an array
         start_orientation = start_pose[-4:]
