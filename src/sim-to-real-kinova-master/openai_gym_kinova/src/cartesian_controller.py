@@ -57,7 +57,7 @@ class CartesianController:
         self.robot = moveit_commander.RobotCommander()
         self.scene = moveit_commander.PlanningSceneInterface()
         self.group = moveit_commander.MoveGroupCommander("arm")  # just wanna control the arm.
-        self.group.set_planning_time(10)  # idk what this does.
+        self.group.set_planning_time(5)  # idk what this does.
         # self.group.set_planner_id("RRTstarkConfigDefault")
         self.group.set_planner_id("PRMstarkConfigDefault")
 
@@ -200,6 +200,8 @@ class CartesianController:
         self.group.clear_pose_targets()
 
     def go_to_pose_orientation_cartesian_callback(self, pose_msg):
+        self.group.set_planning_time(10)
+
         rospy.loginfo('Executing pose orientation cartesian callback.')
         success = True
 
@@ -243,15 +245,21 @@ class CartesianController:
 
         waypoints.append(copy.deepcopy(wpose))
 
-        # compute the path
-        (plan, fraction) = self.group.compute_cartesian_path(
-            waypoints,  # waypoints to follow
-            0.01,  # eef_step
-            420.0)  # jump_threshold
+        USE_CARTESIAN_PATH = True
 
-        # execute the path
-        rospy.loginfo('starting...')
-        self.group.execute(plan, wait=True)
+        if USE_CARTESIAN_PATH:
+            # compute the path
+            (plan, fraction) = self.group.compute_cartesian_path(
+                waypoints,  # waypoints to follow
+                0.01,  # eef_step
+                420.0)  # jump_threshold
+
+            # execute the path
+            rospy.loginfo('starting...')
+            self.group.execute(plan, wait=True)
+
+        else:
+            self.group.go(wpose, wait=True)
 
         # Calling ``stop()`` ensures that there is no residual movement
         self.group.stop()
@@ -269,6 +277,7 @@ class CartesianController:
         Action callback to go to home state (i hardcoded it for now lol)
         TODO: unhard code it
         """
+        self.group.set_planning_time(5)
 
         success = True
 

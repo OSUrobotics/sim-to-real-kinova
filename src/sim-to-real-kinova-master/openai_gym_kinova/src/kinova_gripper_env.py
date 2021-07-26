@@ -70,7 +70,7 @@ class KinovaGripper_Env:
         self.home_orientation_cartesian = [0.0329, -0.4842, 0.3109, 0.7778, -0.0420, 0.0475, 0.6252]
         # TODO: change out with alejo's UR5 pertubation code
         # self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7978, -0.0791, 0.1117, 0.5871]
-        self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7071, 0.0, 0.0,
+        self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.1700, 0.7071, 0.0, 0.0,
                                                 0.7071]  # manually set the quaternions lol
 
         """
@@ -505,6 +505,9 @@ class KinovaGripper_Env:
         # self.move_arm_orientation_cartesian_action(self.pre_grasp_orientation_cartesian)
         # # rospy.sleep(7)  # wait for the arm to finish moving. otherwise it will get interrupted
 
+        rospy.loginfo('=== move to pregrasp')
+        self.move_arm_orientation_cartesian_action(self.pre_grasp_orientation_cartesian)
+
         self.go_to_noisy_pregrasp(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise,
                                   pitch_noise=pitch_noise, yaw_noise=yaw_noise)
 
@@ -648,6 +651,7 @@ class KinovaGripper_Env:
         new_quat_vec = np.array(new_quat_vec)
 
         goal_pose = np.concatenate((wpose[:3], new_quat_vec))
+        print("================ PREGRASP POSITION:", self.pre_grasp_orientation_cartesian)
         print("================ OUR GOAL POSE:", goal_pose)
 
         self.move_arm_orientation_cartesian_action(goal_pose)

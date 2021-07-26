@@ -137,11 +137,32 @@ class Noiser:
             self.noise_permutation_counter = 0
             self.reset_counter = 0
 
-            # this is doggy doo list comprehension
-            self.noise_permutation_arr = [[x, y, z, roll, pitch, yaw] for x in x_noise for y in y_noise for z in z_noise
+            # this is doggy doo list comprehension no working
+            self.noise_permutation_arr = [np.array([x, y, z, roll, pitch, yaw]) for x in x_noise for y in y_noise for z in z_noise
                                           for roll in roll_noise for pitch in pitch_noise for yaw in yaw_noise]
+            # self.noise_permutation_arr = []
+            # for x in x_noise:
+            #     for y in y_noise:
+            #         for z in z_noise:
+            #             for roll in roll_noise:
+            #                 for pitch in pitch_noise:
+            #                     for yaw in yaw_noise:
+            #                         self.noise_permutation_arr.append(np.array([x, y, z, roll, pitch, yaw]))
+
+            print('============== ALL LA PERMS')
+            print(self.noise_permutation_arr)
 
     def sample_noise(self):
+        """
+        Returns noise as a numpy array.
+
+        If the noise range is from fixed values, a reset counter and permutation counter system is provided.
+        TODO: write some more docs on how the permutation counter and reset counter works.
+
+        Returns
+        -------
+
+        """
         if self.noise_range == 'random':
 
             if self.noise_distribution == 'uniform':
@@ -161,7 +182,7 @@ class Noiser:
                 pitch = np.random.choice(self.pitch_noise)
                 yaw = np.random.choice(self.yaw_noise)
 
-            return [x, y, z, roll, pitch, yaw]
+            return np.array([x, y, z, roll, pitch, yaw])
 
         elif self.noise_range == 'fixed':
             if self.noise_permutation_counter == len(self.noise_permutation_arr):
