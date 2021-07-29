@@ -3,6 +3,7 @@ import numpy as np
 from typing import List
 
 from utils import lerp, state_dim_setup
+from DDPGfD import DDPGfD
 
 
 class Agent:

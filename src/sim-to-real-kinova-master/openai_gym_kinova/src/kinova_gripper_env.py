@@ -70,9 +70,9 @@ class KinovaGripper_Env:
         self.home_orientation_cartesian = [0.0329, -0.4842, 0.3109, 0.7778, -0.0420, 0.0475, 0.6252]
         # TODO: change out with alejo's UR5 pertubation code
         # self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7978, -0.0791, 0.1117, 0.5871]
-        self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.1700, 0.7071, 0.0, 0.0,
+        self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2000, 0.7071, 0.0, 0.0,
                                                 0.7071]  # manually set the quaternions lol
-
+        # 0.0329 -0.4842 0.3109 0.7778 -0.0420 0.0475 0.6252
         """
         python2
         import tf
@@ -83,10 +83,17 @@ class KinovaGripper_Env:
         """
 
         # this is a set position we move our hand to, after we've closed and lifted the hand.
-        self.check_reward_orientation_cartesian = [-0.1345, -0.5653, 0.2592, 0.7367, -0.1048, 0.0256, 0.6674]
+        # self.check_reward_orientation_cartesian = [-0.1345, -0.5653, 0.2592, 0.7367, -0.1048, 0.0256, 0.6674]
+
+        self.check_reward_orientation_cartesian = [-0.1345, -0.5653, 0.2592, 0.7367, 0.0, 0.0, 0.7071]
+
+        self.manual_lift_pose_cartesian = [0.0474, -0.5923, 0.3322, 0.7367, 0.0, 0.0, 0.7071]
 
         # lift the object to this pose
-        self.manual_lift_pose_cartesian = [0.0416, -0.5779, 0.3166, 0.7910, -0.0854, 0.1197, 0.5937]
+        # self.manual_lift_pose_cartesian = [0.0416, -0.5779, 0.3166, 0.7910, -0.0854, 0.1197, 0.5937]
+
+        self.manual_lift_pose_joints = [4.790961287289734, 3.665523791692134, -0.26567353817115813, 1.0119433570554284, 2.9079988048956733, 4.072775184535378, 6.506378979184729]
+        self.home_joints = [4.946186294586092, 2.83876274182412, 6.2808348012014825, 0.7578871767047117, 4.630829672001013, 4.488419263237898, -1.2506944837795144]
 
         self.finger_angle = []
 
@@ -352,7 +359,7 @@ class KinovaGripper_Env:
         #     self.finish_velocity_controller_pub.publish(True)
 
         # rospy.loginfo('=== checking joint done')
-        joint_check_done = self.check_joint_done()
+        joint_check_done = self.check_joint_done(threshold=2.1)
         # rospy.loginfo('=== done checking joint done')
 
         # done = reward_check_done or joint_check_done  # check either condition giving a done condition
@@ -373,7 +380,7 @@ class KinovaGripper_Env:
         rospy.loginfo('======================starting reward check')
 
         # step 0: just wait a bit. buffer.
-        rospy.sleep(7)
+        rospy.sleep(3)
 
         # step 1: lift the thing. we put to a fixed position, but technically you should move it straight up
         # first get the current pose
@@ -388,14 +395,27 @@ class KinovaGripper_Env:
 
         rospy.loginfo('lifting right now')
 
-        self.move_arm_orientation_cartesian_action(self.manual_lift_pose_cartesian)
-        # rospy.sleep(7)  # wait a bit before taking more actions
+        # self.move_arm_orientation_cartesian_action(self.manual_lift_pose_cartesian)
+        # # rospy.sleep(7)  # wait a bit before taking more actions
+
+        # move arm back to real kinova home joint state.
+        rospy.loginfo('=== move to lifting joint state')
+        joint_goal = JointState()
+        client = actionlib.SimpleActionClient('go_to_joint_state_as', GoToJointStateAction)
+        client.wait_for_server()
+        goal = GoToJointStateGoal()
+        joint_goal.position = self.manual_lift_pose_joints
+        goal.goal_joint_state = joint_goal
+        client.send_goal(goal, feedback_cb=self.feedback_cb)
+        client.wait_for_result()
+        result = client.get_result()
+
 
         rospy.loginfo('moving to check reward orientation')
 
         # move to the manually set goal position on the right
         self.move_arm_orientation_cartesian_action(self.check_reward_orientation_cartesian)
-        # rospy.sleep(7)  # wait for the arm to finish moving
+        rospy.sleep(1)  # wait for the arm to finish moving
 
         rospy.loginfo('waiting a bit before reward check...')
         rospy.set_param('Goal', False)  # turn the reward check off!
@@ -488,6 +508,7 @@ class KinovaGripper_Env:
         client = actionlib.SimpleActionClient('go_to_joint_state_as', GoToJointStateAction)
         client.wait_for_server()
         goal = GoToJointStateGoal()
+        joint_goal.position = self.home_joints
         goal.goal_joint_state = joint_goal
         client.send_goal(goal, feedback_cb=self.feedback_cb)
         client.wait_for_result()

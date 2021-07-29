@@ -294,17 +294,26 @@ class CartesianController:
             success = False
             rospy.loginfo('lmao you cant stop this shit')
 
-        # joint_state_pos_arr = msg.position  # get the joint states from the msg
+        joint_state_pos_arr = msg.goal_joint_state.position  # get the joint states from the msg
+        print(joint_state_pos_arr)
+        print('holy crap')
         # joint_goal = joint_state_pos_arr[:7]  # you could do this
 
         joint_goal = self.group.get_current_joint_values()
-        joint_goal[0] = 4.946186294586092
-        joint_goal[1] = 2.83876274182412
-        joint_goal[2] = 6.2808348012014825
-        joint_goal[3] = 0.7578871767047117
-        joint_goal[4] = 4.630829672001013
-        joint_goal[5] = 4.488419263237898
-        joint_goal[6] = -1.2506944837795144
+        # joint_goal[0] = 4.946186294586092
+        # joint_goal[1] = 2.83876274182412
+        # joint_goal[2] = 6.2808348012014825
+        # joint_goal[3] = 0.7578871767047117
+        # joint_goal[4] = 4.630829672001013
+        # joint_goal[5] = 4.488419263237898
+        # joint_goal[6] = -1.2506944837795144
+        joint_goal[0] = joint_state_pos_arr[0]
+        joint_goal[1] = joint_state_pos_arr[1]
+        joint_goal[2] = joint_state_pos_arr[2]
+        joint_goal[3] = joint_state_pos_arr[3]
+        joint_goal[4] = joint_state_pos_arr[4]
+        joint_goal[5] = joint_state_pos_arr[5]
+        joint_goal[6] = joint_state_pos_arr[6]
 
         # The go command can be called with joint values, poses, or without any
         # parameters if you have already set the pose or joint target for the group
