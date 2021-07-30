@@ -12,8 +12,12 @@ import sys
 
 
 class ImageProcessor():
+    MARKER_TO_OBJ = {
+        509: 'CylinderB',
+        201: 'CubeM'
+    }
     def __init__(self):
-
+        # see openai_gym_kinova for more info on MARKER_TO_OBJ
         #cv bridge class
         self.bridge = CvBridge()
 
@@ -35,7 +39,7 @@ class ImageProcessor():
         
         # Marker IDs
         ee_marker_id = 608  # end-effector
-        obj_marker_id = 509  # object
+        obj_marker_id = 509  # object  # TODO: change detection so it only fires for this specific marker?
         finger1_dist_id = 189 # Finger 1 Dist
         finger1_tip_id = 331# Finger 1 Tip
         finger2_dist_id = 411 # Finger 2 Dist  
@@ -86,7 +90,7 @@ class ImageProcessor():
                     ee_marker = tvec[i]
                     marker_count+=1
                 # Save object marker pose
-                if ids[i] == obj_marker_id:
+                if ids[i].item() in self.MARKER_TO_OBJ.keys():
                     obj_marker = tvec[i]
 
                 if ids[i] == finger1_dist_id:
@@ -116,7 +120,7 @@ class ImageProcessor():
                 #self.test_done.publish(False)
 
         #Display
-        cv2.imshow('reward_detection.py window', cv_image)
+        # cv2.imshow('reward_detection.py window', cv_image)
         cv2.waitKey(3)
             
     

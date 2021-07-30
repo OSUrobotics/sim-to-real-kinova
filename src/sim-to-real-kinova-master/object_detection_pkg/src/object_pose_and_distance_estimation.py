@@ -22,7 +22,12 @@ def fix_z(vector,zval):
     return new
 
 class ImageProcessor():
+    MARKER_TO_OBJ = {
+        509: 'CylinderB',
+        201: 'CubeM'
+    }
     def __init__(self,real=True):
+        # see openai_gym_kinova for more info on MARKER_TO_OBJ
         if real:
             # Object pose publisher
             self.pose_pub = rospy.Publisher("/object_pose", Float32MultiArray, queue_size=10)
@@ -73,7 +78,7 @@ class ImageProcessor():
 
         # Marker IDs
         ee_marker_id = 608  # end-effector
-        obj_marker_id = 509  # object
+        obj_marker_id = 509  # object  # TODO: change detection so it only fires for this specific marker?
         finger1_dist_id = 189 # Finger 1 Dist
         finger1_tip_id = 331# Finger 1 Tip
         finger2_dist_id = 411 # Finger 2 Dist  
@@ -146,7 +151,7 @@ class ImageProcessor():
 
         # print(gray.shape)
 
-        #Find markers in the image 
+        #Find markers in the image
         corners, ids, rejected = aruco.detectMarkers(image=gray, dictionary=aruco_dict, parameters=parameters, cameraMatrix=mtx, distCoeff=dist)
         # winSize = (5, 5)
         # zeroZone = (-1, -1)
@@ -186,7 +191,7 @@ class ImageProcessor():
                             self.ee_corners.pop(0)
                         self.ee_corners.append(corners[i])
                         corners[i]=np.average(self.ee_corners,axis=0)
-                    if ids[i]==obj_marker_id:
+                    if ids[i].item() in self.MARKER_TO_OBJ.keys():  #ids[i]==obj_marker_id:  # bruh this is an array so need to use .item()
                         flag1=False
                         if len(self.obj_corners)>5:
                             self.obj_corners.pop(0)
@@ -239,7 +244,7 @@ class ImageProcessor():
                             self.prev_ee_rvec=np.copy(local_rotation)
                             self.prev_ee_tvec=np.copy(ee_marker1)
                     # Save object marker pose
-                    if ids[i] == obj_marker_id:
+                    if ids[i].item() in self.MARKER_TO_OBJ.keys():  # bruh this is an array so need to use .item()
                         #aruco.drawAxis(cv_image, mtx, dist, rvec[i], tvec[i], 2)
                         obj_marker = np.copy(tvec[i][0])
                         obj_marker1 = tvec[i][0]
@@ -614,6 +619,7 @@ class ImageProcessor():
                             #print('average finger pose',temp)
                             err_matrix=np.array(temp)
                             #open hand err matrix
+                            # TODO: modify this err matrix. what is it doing???
                             err_matrix=err_matrix-np.array([[-0.05,0.024,0],[-0.063,0.055,0],[0.05,0.024,0],[0.063,0.055,0]])
                             #closed hand err matrix
                             #err_matrix=err_matrix-np.array([[-0.026,0.03,0],[-0.01,0.052,0],[0.026,0.03,0],[0.01,0.052,0]])
