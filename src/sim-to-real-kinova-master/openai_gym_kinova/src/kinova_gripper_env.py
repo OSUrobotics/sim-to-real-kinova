@@ -37,6 +37,17 @@ from euler_quaternion_transforms import quaternion_from_euler, euler_from_quater
 
 
 class KinovaGripper_Env:
+    MARKER_TO_OBJ = {
+        509: 'CylinderB',
+        201: 'CubeM'
+    }
+
+    OBJ_SIZE_MAP = {
+        'CylinderB': [42, 42, 110],
+        'CubeB': [48, 48, 115],
+        'CubeM': [40, 40, 105]
+    }
+
     def __init__(self):
         self.joint_states = JointState()
         self.finger_pos = FingerPosition()
@@ -92,7 +103,9 @@ class KinovaGripper_Env:
         # lift the object to this pose
         # self.manual_lift_pose_cartesian = [0.0416, -0.5779, 0.3166, 0.7910, -0.0854, 0.1197, 0.5937]
 
-        self.manual_lift_pose_joints = [4.790961287289734, 3.665523791692134, -0.26567353817115813, 1.0119433570554284, 2.9079988048956733, 4.072775184535378, 6.506378979184729]
+        # self.manual_lift_pose_joints = [4.790961287289734, 3.665523791692134, -0.26567353817115813, 1.0119433570554284, 2.9079988048956733, 4.072775184535378, 6.506378979184729]
+        self.manual_lift_pose_joints = [4.761440679238423, 3.769106643342439, -0.2242390126672693, 0.665705051364927, 2.8509903796531098, 4.542777044247505, 6.28355175814558]
+
         self.home_joints = [4.946186294586092, 2.83876274182412, 6.2808348012014825, 0.7578871767047117, 4.630829672001013, 4.488419263237898, -1.2506944837795144]
 
         self.finger_angle = []
@@ -143,6 +156,9 @@ class KinovaGripper_Env:
         self.bridge = CvBridge()
         self.image_sub = rospy.Subscriber('/usb_cam/image_raw', Image, self.update_most_recent_image)
 
+        # TODO: this is hardcoded
+        self.obj_size = self.OBJ_SIZE_MAP['CubeM']
+
     def update_most_recent_image(self, img_msg):
         """
         Updates the self.most_recent_image with the most recent image from the camera feed.
@@ -168,9 +184,9 @@ class KinovaGripper_Env:
             finger_joint_state_value[0] = self.finger_angle[0]
             finger_joint_state_value[1] = self.finger_angle[1]
             finger_joint_state_value[2] = self.finger_angle[2]
-
-            # TODO: what are these
             finger_joint_state_value[3] = self.finger_angle[3]
+
+            # the third finger's guessed angles. TODO: remove these
             finger_joint_state_value[4] = self.finger_angle[2]
             finger_joint_state_value[5] = self.finger_angle[3]
         return finger_joint_state_value
@@ -239,7 +255,10 @@ class KinovaGripper_Env:
 
     def get_obj_size(self):
         # TODO: get rid of hard coding...
-        return [42, 42, 110]
+
+        # note: we assume that only one shape is used throughout the entire trials.
+        # this mapping is done in the init fn
+        return self.obj_size
 
     # Function to get the distance between the digits on the fingers and the object center
     def get_finger_obj_dist(self):
@@ -359,7 +378,7 @@ class KinovaGripper_Env:
         #     self.finish_velocity_controller_pub.publish(True)
 
         # rospy.loginfo('=== checking joint done')
-        joint_check_done = self.check_joint_done(threshold=2.1)
+        joint_check_done = self.check_joint_done(threshold=2.0)
         # rospy.loginfo('=== done checking joint done')
 
         # done = reward_check_done or joint_check_done  # check either condition giving a done condition
@@ -414,7 +433,7 @@ class KinovaGripper_Env:
         rospy.loginfo('moving to check reward orientation')
 
         # move to the manually set goal position on the right
-        self.move_arm_orientation_cartesian_action(self.check_reward_orientation_cartesian)
+        self.move_arm_orientation_cartesian_action(self.check_reward_orientation_cartesian, use_cartesian_path=False)
         rospy.sleep(1)  # wait for the arm to finish moving
 
         rospy.loginfo('waiting a bit before reward check...')
@@ -542,7 +561,7 @@ class KinovaGripper_Env:
 
         return obs
 
-    def move_arm_orientation_cartesian_action(self, cartesian_goal):
+    def move_arm_orientation_cartesian_action(self, cartesian_goal, use_cartesian_path=True):
         """
         Moves the arm to given cartesian coordinate.
         input: cartesian_goal, should be an array [pos_x, pos_y, pos_z, ori_x, ori_y, ori_z, ori_w]
@@ -561,6 +580,7 @@ class KinovaGripper_Env:
 
         action_goal = GoToPoseOrientationCartesianGoal()
         action_goal.goal_pose = goal_pose
+        action_goal.cartesian_path = Bool(use_cartesian_path)
 
         client = actionlib.SimpleActionClient('go_to_pose_orientation_cartesian_as', GoToPoseOrientationCartesianAction)
         client.wait_for_server()
@@ -675,7 +695,7 @@ class KinovaGripper_Env:
         print("================ PREGRASP POSITION:", self.pre_grasp_orientation_cartesian)
         print("================ OUR GOAL POSE:", goal_pose)
 
-        self.move_arm_orientation_cartesian_action(goal_pose)
+        self.move_arm_orientation_cartesian_action(goal_pose, use_cartesian_path=False)
 
     def joint_state_callback(self, msg):
         self.joint_states = msg
