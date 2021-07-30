@@ -114,7 +114,7 @@ class Noiser:
     """
 
     def __init__(self, x_noise: List, y_noise: List, z_noise: List, roll_noise: List, pitch_noise: List,
-                 yaw_noise: List, noise_range='fixed', noise_distribution='uniform'):
+                 yaw_noise: List, noise_range='fixed', noise_distribution='uniform', start_index=0):
         self.x_noise = x_noise
         self.y_noise = y_noise
         self.z_noise = z_noise
@@ -134,7 +134,7 @@ class Noiser:
                 assert len(noise_arr) == 2, 'one of your noise arrays is not length 2. should be a min and max'
         elif self.noise_range == 'fixed':
             # go through every permutation
-            self.noise_permutation_counter = 0
+            self.noise_permutation_counter = start_index
             self.reset_counter = 0
 
             # this is doggy doo list comprehension no working

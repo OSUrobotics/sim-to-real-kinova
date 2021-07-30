@@ -3,6 +3,8 @@ from pathlib import Path
 
 import numpy as np
 # import pandas as pd  # eventually... we will write csvs.
+from PIL import Image, ImageDraw, ImageFont
+
 from video import VideoRecorder
 
 # from torch.utils.tensorboard import SummaryWriter
@@ -25,7 +27,7 @@ class Logger(object):
     A class for logging stuff
     """
 
-    def __init__(self, log_dir, use_video=True, config='rl'):
+    def __init__(self, log_dir, use_video=True, config='rl', start_episode_num=1):
         """
         Initialize logging class
 
@@ -37,6 +39,7 @@ class Logger(object):
         """
         self._log_dir = log_dir
         self._use_video = use_video
+        self.rel_dirname = os.path.dirname(__file__)
 
         # create a path for the log directory
         path = Path(self._log_dir)
@@ -48,12 +51,19 @@ class Logger(object):
             video_path = Path(self.video_path_name)
             video_path.mkdir(parents=True, exist_ok=True)
 
+            # note: FPS is hardcoded to 30 == 30hz
+            # note: height and width is hardcoded to 1080x1920. see your camera for your dimensions.
             self.video_recorder = VideoRecorder(dir_name=self.video_path_name, height=1080, width=1920, camera_id=0,
-                                                fps=4)
+                                                fps=30)
+            self.debug_video_recorder = VideoRecorder(dir_name=self.video_path_name, height=1080, width=1920,
+                                                      camera_id=0,
+                                                      fps=30)
 
         # marker telling us whether we should record the current episode
         self.record_curr_episode = True
-        self.episode_num = 1
+        self.episode_num = start_episode_num
+
+        self.buffer_size = 0
 
         self.tmp_action = []
         self.tmp_obs = []
@@ -63,6 +73,9 @@ class Logger(object):
 
         self.translation_errors = []  # in some metric space unit lol
         self.quaternion_distances = []  # these are just rotation differences, in radians
+
+        self.start_pose = np.zeros((7,))  # this will be replaced in record_starting_position
+        self.noise_arr = np.zeros((6,))  # this will be replaced in record_starting_position
 
     def record_current_episode(self, record_episode=True):
         """
@@ -75,8 +88,9 @@ class Logger(object):
         self.record_curr_episode = record_episode
         if self._use_video:
             self.video_recorder.init(enabled=True)
+            self.debug_video_recorder.init(enabled=True)
 
-    def record_starting_position(self, obs, info):
+    def record_starting_position(self, obs, info, noise_info=None):
         """
         Record the starting position of the object. Feed in the variables from the first time step.
         TODO: incorporate this with log_single_step when it's the first step detected?? (auto)
@@ -134,6 +148,15 @@ class Logger(object):
         self.translation_errors.append(translation_error)
         self.quaternion_distances.append(quat_distance)
 
+        # add start pose and noise info
+        self.start_pose = start_pose
+        if noise_info is not None:
+            # TODO: figure out if we need to store start position, noises, and if we want to store in a csv.
+            curr_noise_arr = np.array(
+                [noise_info['x_noise'], noise_info['y_noise'], noise_info['z_noise'], noise_info['roll_noise'],
+                 noise_info['pitch_noise'], noise_info['yaw_noise']])
+            self.noise_arr = curr_noise_arr
+
     def log_single_step(self, action, obs, next_obs, reward, done, info):
         """
         Log a single step in the episode
@@ -163,10 +186,31 @@ class Logger(object):
         self.tmp_reward.append(reward)
         self.tmp_done.append(done)
 
+        # increment buffer size
+        self.buffer_size += 1
+
         # record image if recording video
         if self._use_video:
             img = info['curr_image']
+            # note: two versions of video recorder. one that records with just the raw info, one that records with diagnostics.
             self.video_recorder.record_image(img)
+
+            text_overlay = 'Timestep: ' + str(self.buffer_size) + '\n' + 'Action: ' + str(
+                action.round(decimals=3)) + '\n' + 'Obs: ' + str(obs.round(decimals=3)) + '\n' + \
+                           'Reward: ' + str(reward) + '\n' + 'Done: ' + str(done)
+
+            font_filepath = os.path.join(self.rel_dirname, 'fonts/arial.ttf')
+            font = ImageFont.truetype(font_filepath, 26)
+
+            # Assumes RGB!
+            pil_img = Image.fromarray(img, 'RGB')
+            draw = ImageDraw.Draw(pil_img)
+
+            # h = pil_img.size[1]
+            # draw.text((0, h-(h/4)), text_overlay, (255,255,255), font=font)
+            draw.text((0, 0), text_overlay, (255, 255, 255), font=font)
+
+            self.debug_video_recorder.record_image(pil_img)
 
     def finish_recording(self):
         """
@@ -187,18 +231,28 @@ class Logger(object):
         reward = np.array(self.tmp_reward)
         done = np.array(self.tmp_done)
 
+        translation_errors = np.array(self.translation_errors)  # in some metric space unit lol
+        quaternion_distances = np.array(self.quaternion_distances)
+
         # print('SIZES')
         # print(len(self.tmp_action))
         # print(action.shape)
         # print(action)
 
         # save a buffer of the singular episode
-        # TODO: why isn't this saving lol. look in the conversion, it probably has somethign to do with that
         np.save(os.path.join(self._log_dir, 'action_' + str(self.episode_num) + '.npy'), action)
         np.save(os.path.join(self._log_dir, 'obs_' + str(self.episode_num) + '.npy'), obs)
         np.save(os.path.join(self._log_dir, 'next_obs_' + str(self.episode_num) + '.npy'), next_obs)
         np.save(os.path.join(self._log_dir, 'reward_' + str(self.episode_num) + '.npy'), reward)
         np.save(os.path.join(self._log_dir, 'done_' + str(self.episode_num) + '.npy'), done)
+
+        np.save(os.path.join(self._log_dir, 'translation_err_' + str(self.episode_num) + '.npy'), translation_errors)
+        np.save(os.path.join(self._log_dir, 'quat_dist_' + str(self.episode_num) + '.npy'), quaternion_distances)
+
+        # TODO: save start pose, noises, and other things. maybe in a csv?
+        # noise and start pose are already numpy arrs
+        np.save(os.path.join(self._log_dir, 'start_pose_' + str(self.episode_num) + '.npy'), self.start_pose)
+        np.save(os.path.join(self._log_dir, 'noise_arr_' + str(self.episode_num) + '.npy'), self.noise_arr)
 
         # reset the arrays
         self.tmp_action = []
@@ -207,15 +261,23 @@ class Logger(object):
         self.tmp_reward = []
         self.tmp_done = []
 
+        # since start pose and noise arr will be overwritten, we don't need to worry about resetting those
+
         if self._use_video:
             print('SAVING!!!')
             # save the video
             self.video_recorder.save('video_' + str(self.episode_num))
             # this is bad practice, but just make a new video recorder lol
             self.video_recorder = VideoRecorder(dir_name=self.video_path_name, height=1080, width=1920, camera_id=0,
-                                                fps=4)
+                                                fps=30)
+
+            self.debug_video_recorder.save('debug_video_' + str(self.episode_num))
+            # this is bad practice, but just make a new video recorder lol
+            self.debug_video_recorder = VideoRecorder(dir_name=self.video_path_name, height=1080, width=1920, camera_id=0,
+                                                fps=30)
 
         self.episode_num += 1
+        self.buffer_size = 0
 
         self.record_curr_episode = False
 

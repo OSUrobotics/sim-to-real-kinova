@@ -1,5 +1,6 @@
 # Define the goal
 geometry_msgs/Pose goal_pose
+std_msgs/Bool cartesian_path
 ---
 # Define the result
 std_msgs/Bool end_state

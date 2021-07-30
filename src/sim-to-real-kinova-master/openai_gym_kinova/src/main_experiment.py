@@ -76,7 +76,7 @@ if __name__ == '__main__':
         Loading parameters from YAML file
         """
         config_path = 'experiment_configs/'
-        filename = 'constant_speed_test.yaml'
+        filename = 'real_world_data.yaml'
         config_filepath = os.path.join(rel_dirname, config_path, filename)
 
         stream = open(config_filepath, 'r')
@@ -105,11 +105,13 @@ if __name__ == '__main__':
         logger = None
         if logger_params['use_logger']:
             log_dir = os.path.join(rel_dirname, logger_params['log_dir'])
-            logger = Logger(log_dir=log_dir, use_video=logger_params['use_video'])
+            logger = Logger(log_dir=log_dir, use_video=logger_params['use_video'],
+                            start_episode_num=noise_params['start_index'] + 1)
 
         noiser = Noiser(noise_params['x_noise'], noise_params['y_noise'], noise_params['z_noise'],
                         noise_params['roll_noise'], noise_params['pitch_noise'], noise_params['yaw_noise'],
-                        noise_range=noise_params['noise_range'], noise_distribution=noise_params['noise_distribution'])
+                        noise_range=noise_params['noise_range'], noise_distribution=noise_params['noise_distribution'],
+                        start_index=noise_params['start_index'])
 
         input('Press enter to start trials...')
 
@@ -129,9 +131,12 @@ if __name__ == '__main__':
                 noise_arr, noise_counter, reset_counter = noiser.sample_noise()
                 x_noise, y_noise, z_noise, roll_noise, pitch_noise, yaw_noise = noise_arr
 
-            print('Noise parameters:\n', 'x_noise:', str(x_noise), '| y_noise:', str(y_noise), '| z_noise:', str(z_noise), '| roll_noise:', str(roll_noise), '| pitch_noise:', str(pitch_noise), '| yaw_noise:', str(yaw_noise))
+            print('Noise parameters:\n', 'x_noise:', str(x_noise), '| y_noise:', str(y_noise), '| z_noise:',
+                  str(z_noise), '| roll_noise:', str(roll_noise), '| pitch_noise:', str(pitch_noise), '| yaw_noise:',
+                  str(yaw_noise))
 
-            _ = env.reset(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise, pitch_noise=pitch_noise,
+            _ = env.reset(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise,
+                          pitch_noise=pitch_noise,
                           yaw_noise=yaw_noise)  # NOTE: THE OBSERVATION FROM HERE DOESN'T CONTAIN THE OBJECT LOL
 
             done = False
@@ -153,7 +158,16 @@ if __name__ == '__main__':
             obs = env.get_obs()  # get the most recent observation
             info = env.get_info()
 
-            logger.record_starting_position(obs, info)
+            noise_info = {
+                'x_noise': x_noise,
+                'y_noise': y_noise,
+                'z_noise': z_noise,
+                'roll_noise': roll_noise,
+                'pitch_noise': pitch_noise,
+                'yaw_noise': yaw_noise
+            }
+
+            logger.record_starting_position(obs, info, noise_info=noise_info)
 
             for timestep_idx in range(max_timesteps):  # or turn this into for loop
                 print('timestep:', timestep_idx)

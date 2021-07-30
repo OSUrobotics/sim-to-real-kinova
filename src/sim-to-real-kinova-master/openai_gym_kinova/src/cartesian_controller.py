@@ -218,6 +218,8 @@ class CartesianController:
             success = False
             rospy.loginfo('lmao you cant stop this shit')
 
+        use_cartesian_path = pose_msg.cartesian_path
+
         # assumes Pose
         pos_x = pose_msg.goal_pose.position.x
         pos_y = pose_msg.goal_pose.position.y
@@ -245,13 +247,13 @@ class CartesianController:
 
         waypoints.append(copy.deepcopy(wpose))
 
-        USE_CARTESIAN_PATH = True
+        # USE_CARTESIAN_PATH = True
 
-        if USE_CARTESIAN_PATH:
+        if use_cartesian_path:
             # compute the path
             (plan, fraction) = self.group.compute_cartesian_path(
                 waypoints,  # waypoints to follow
-                0.01,  # eef_step
+                0.002,  # eef_step
                 420.0)  # jump_threshold
 
             # execute the path
