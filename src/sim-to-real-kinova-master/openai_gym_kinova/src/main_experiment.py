@@ -76,7 +76,7 @@ if __name__ == '__main__':
         Loading parameters from YAML file
         """
         config_path = 'experiment_configs/'
-        filename = 'real_world_data.yaml'
+        filename = 'positional_noise_test.yaml'
         config_filepath = os.path.join(rel_dirname, config_path, filename)
 
         stream = open(config_filepath, 'r')
@@ -111,14 +111,16 @@ if __name__ == '__main__':
         noiser = Noiser(noise_params['x_noise'], noise_params['y_noise'], noise_params['z_noise'],
                         noise_params['roll_noise'], noise_params['pitch_noise'], noise_params['yaw_noise'],
                         noise_range=noise_params['noise_range'], noise_distribution=noise_params['noise_distribution'],
-                        start_index=noise_params['start_index'])
+                        start_index=noise_params['start_index'], fixed_list=noise_params['fixed_list'])
 
+        rospy.loginfo('There are ' + str(len(noiser.noise_permutation_arr)) + ' trials to be conducted')
+        rospy.loginfo('Starting at trial: ' + str(noise_params['start_index']))
         input('Press enter to start trials...')
 
         rate = rospy.Rate(30)  # TODO: hz param?
 
         # TODO: num of episodes based on num of permutations
-        for trial_idx in range(10):  # TODO: num of trials param?
+        for trial_idx in range(noise_params['start_index'], len(noiser.noise_permutation_arr)):  # TODO: num of trials param?
 
             input('Trial ' + str(trial_idx) + ' | ' + 'Press enter to move to noisy position...')
 
@@ -127,7 +129,7 @@ if __name__ == '__main__':
 
             x_noise, y_noise, z_noise, roll_noise, pitch_noise, yaw_noise = [0.0] * 6
 
-            if noiser.noise_range == 'fixed':
+            if noiser.noise_range in ['fixed', 'fixed_list']:
                 noise_arr, noise_counter, reset_counter = noiser.sample_noise()
                 x_noise, y_noise, z_noise, roll_noise, pitch_noise, yaw_noise = noise_arr
 
@@ -138,6 +140,10 @@ if __name__ == '__main__':
             _ = env.reset(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise,
                           pitch_noise=pitch_noise,
                           yaw_noise=yaw_noise)  # NOTE: THE OBSERVATION FROM HERE DOESN'T CONTAIN THE OBJECT LOL
+
+            # _ = env.reset_humanintheloop(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise,
+            #                              pitch_noise=pitch_noise,
+            #                              yaw_noise=yaw_noise)  # NOTE: THE OBSERVATION FROM HERE DOESN'T CONTAIN THE OBJECT LOL
 
             done = False
 

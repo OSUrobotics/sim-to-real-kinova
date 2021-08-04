@@ -108,13 +108,20 @@ def state_dim_setup(state_dim_option):
     return res_state_idx_arr
 
 
+def confirm_prompt(question: str) -> bool:
+    reply = None
+    while reply not in ("y", "n"):
+        reply = input(f"{question} (y/n): ").lower()
+    return (reply == "y")
+
+
 class Noiser:
     """
     Adds some fucking noise
     """
 
     def __init__(self, x_noise: List, y_noise: List, z_noise: List, roll_noise: List, pitch_noise: List,
-                 yaw_noise: List, noise_range='fixed', noise_distribution='uniform', start_index=0):
+                 yaw_noise: List, noise_range='fixed', noise_distribution='uniform', start_index=0, fixed_list=None):
         self.x_noise = x_noise
         self.y_noise = y_noise
         self.z_noise = z_noise
@@ -123,7 +130,7 @@ class Noiser:
         self.yaw_noise = yaw_noise
 
         self.noise_range = noise_range
-        assert self.noise_range in ['random', 'fixed'], 'your noise range is wrong. see: ' + self.noise_range
+        assert self.noise_range in ['random', 'fixed', 'fixed_list'], 'your noise range is wrong. see: ' + self.noise_range
 
         if self.noise_range == 'random':
             self.noise_distribution = noise_distribution
@@ -138,7 +145,8 @@ class Noiser:
             self.reset_counter = 0
 
             # this is doggy doo list comprehension no working
-            self.noise_permutation_arr = [np.array([x, y, z, roll, pitch, yaw]) for x in x_noise for y in y_noise for z in z_noise
+            self.noise_permutation_arr = [np.array([x, y, z, roll, pitch, yaw]) for x in x_noise for y in y_noise for z
+                                          in z_noise
                                           for roll in roll_noise for pitch in pitch_noise for yaw in yaw_noise]
             # self.noise_permutation_arr = []
             # for x in x_noise:
@@ -151,6 +159,16 @@ class Noiser:
 
             print('============== ALL LA PERMS')
             print(self.noise_permutation_arr)
+
+        elif self.noise_range == 'fixed_list':
+            self.noise_permutation_counter = start_index
+            self.reset_counter = 0
+
+            self.noise_permutation_arr = fixed_list
+
+            print('============== using fixed list. ALL LA PERMS')
+            print(self.noise_permutation_arr)
+
 
     def sample_noise(self):
         """
@@ -184,7 +202,8 @@ class Noiser:
 
             return np.array([x, y, z, roll, pitch, yaw])
 
-        elif self.noise_range == 'fixed':
+        elif self.noise_range in ['fixed', 'fixed_list']:
+            print('sampling from perm arr =========')
             if self.noise_permutation_counter == len(self.noise_permutation_arr):
                 self.noise_permutation_counter = 0
                 self.reset_counter += 1
@@ -196,3 +215,6 @@ class Noiser:
             self.noise_permutation_counter += 1
 
             return noise_arr, self.noise_permutation_counter, self.reset_counter
+
+        else:
+            print('wtf we failing')

@@ -38,6 +38,7 @@ class Logger(object):
         config - misc variable for naming which losses and metrics to record
         """
         self._log_dir = log_dir
+        self._episode_dir = os.path.join(self._log_dir, 'episodes/')
         self._use_video = use_video
         self.rel_dirname = os.path.dirname(__file__)
 
@@ -45,6 +46,9 @@ class Logger(object):
         path = Path(self._log_dir)
         path.mkdir(parents=True, exist_ok=True)
         print(path)
+
+        episodes_path = Path(self._episode_dir)
+        episodes_path.mkdir(parents=True, exist_ok=True)
 
         if use_video:  # if we are using video, make a directory for the video
             self.video_path_name = os.path.join(self._log_dir, 'video/')
@@ -240,19 +244,20 @@ class Logger(object):
         # print(action)
 
         # save a buffer of the singular episode
-        np.save(os.path.join(self._log_dir, 'action_' + str(self.episode_num) + '.npy'), action)
-        np.save(os.path.join(self._log_dir, 'obs_' + str(self.episode_num) + '.npy'), obs)
-        np.save(os.path.join(self._log_dir, 'next_obs_' + str(self.episode_num) + '.npy'), next_obs)
-        np.save(os.path.join(self._log_dir, 'reward_' + str(self.episode_num) + '.npy'), reward)
-        np.save(os.path.join(self._log_dir, 'done_' + str(self.episode_num) + '.npy'), done)
+        # why do we save each replay buffer individually? because each episode will have varying lengths. we tradeoff single file storage for this
+        np.save(os.path.join(self._episode_dir, 'action_' + str(self.episode_num).zfill(3) + '.npy'), action)
+        np.save(os.path.join(self._episode_dir, 'obs_' + str(self.episode_num).zfill(3) + '.npy'), obs)
+        np.save(os.path.join(self._episode_dir, 'next_obs_' + str(self.episode_num).zfill(3) + '.npy'), next_obs)
+        np.save(os.path.join(self._episode_dir, 'reward_' + str(self.episode_num).zfill(3) + '.npy'), reward)
+        np.save(os.path.join(self._episode_dir, 'done_' + str(self.episode_num).zfill(3) + '.npy'), done)
 
-        np.save(os.path.join(self._log_dir, 'translation_err_' + str(self.episode_num) + '.npy'), translation_errors)
-        np.save(os.path.join(self._log_dir, 'quat_dist_' + str(self.episode_num) + '.npy'), quaternion_distances)
+        np.save(os.path.join(self._episode_dir, 'translation_err_' + str(self.episode_num).zfill(3) + '.npy'), translation_errors)
+        np.save(os.path.join(self._episode_dir, 'quat_dist_' + str(self.episode_num).zfill(3) + '.npy'), quaternion_distances)
 
         # TODO: save start pose, noises, and other things. maybe in a csv?
         # noise and start pose are already numpy arrs
-        np.save(os.path.join(self._log_dir, 'start_pose_' + str(self.episode_num) + '.npy'), self.start_pose)
-        np.save(os.path.join(self._log_dir, 'noise_arr_' + str(self.episode_num) + '.npy'), self.noise_arr)
+        np.save(os.path.join(self._episode_dir, 'start_pose_' + str(self.episode_num).zfill(3) + '.npy'), self.start_pose)
+        np.save(os.path.join(self._episode_dir, 'noise_arr_' + str(self.episode_num).zfill(3) + '.npy'), self.noise_arr)
 
         # reset the arrays
         self.tmp_action = []
@@ -260,6 +265,9 @@ class Logger(object):
         self.tmp_next_obs = []
         self.tmp_reward = []
         self.tmp_done = []
+
+        self.translation_errors = []  # in some metric space unit lol
+        self.quaternion_distances = []  # these are just rotation differences, in radians
 
         # since start pose and noise arr will be overwritten, we don't need to worry about resetting those
 

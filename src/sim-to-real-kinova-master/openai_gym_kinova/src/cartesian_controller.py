@@ -59,7 +59,7 @@ class CartesianController:
         self.group = moveit_commander.MoveGroupCommander("arm")  # just wanna control the arm.
         self.group.set_planning_time(5)  # idk what this does.
         # self.group.set_planner_id("RRTstarkConfigDefault")
-        self.group.set_planner_id("PRMstarkConfigDefault")
+        # self.group.set_planner_id("PRMstarkConfigDefault")
 
         # NOTE: WE GIVE AND RECEIVE IN FLOAT32 SO THAT OTHER MODULES DON'T NEED TO IMPORT MOVEIT COMMANDER. FUCK PYTHON2
         self.current_pose_cartesian_pub = rospy.Publisher('/current_pose_cartesian', Point, queue_size=10)
@@ -218,7 +218,7 @@ class CartesianController:
             success = False
             rospy.loginfo('lmao you cant stop this shit')
 
-        use_cartesian_path = pose_msg.cartesian_path
+        use_cartesian_path = pose_msg.cartesian_path.data
 
         # assumes Pose
         pos_x = pose_msg.goal_pose.position.x

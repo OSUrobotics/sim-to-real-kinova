@@ -34,7 +34,7 @@ from cv_bridge import CvBridge, CvBridgeError
 
 # lmao is this safe
 from euler_quaternion_transforms import quaternion_from_euler, euler_from_quaternion
-
+from utils import confirm_prompt
 
 class KinovaGripper_Env:
     MARKER_TO_OBJ = {
@@ -81,9 +81,12 @@ class KinovaGripper_Env:
         self.home_orientation_cartesian = [0.0329, -0.4842, 0.3109, 0.7778, -0.0420, 0.0475, 0.6252]
         # TODO: change out with alejo's UR5 pertubation code
         # self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2103, 0.7978, -0.0791, 0.1117, 0.5871]
-        self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2000, 0.7071, 0.0, 0.0,
-                                                0.7071]  # manually set the quaternions lol
-        # 0.0329 -0.4842 0.3109 0.7778 -0.0420 0.0475 0.6252
+        # self.pre_grasp_orientation_cartesian = [0.0415, -0.5715, 0.2000, 0.7071, 0.0, 0.0,
+        #                                         0.7071]  # manually set the quaternions lol
+        # # 0.0329 -0.4842 0.3109 0.7778 -0.0420 0.0475 0.6252
+
+        self.pre_grasp_orientation_cartesian = [0.03544, -0.62044, 0.185, 0.7071, 0.0, 0.0,
+                                                0.7071]
         """
         python2
         import tf
@@ -96,7 +99,8 @@ class KinovaGripper_Env:
         # this is a set position we move our hand to, after we've closed and lifted the hand.
         # self.check_reward_orientation_cartesian = [-0.1345, -0.5653, 0.2592, 0.7367, -0.1048, 0.0256, 0.6674]
 
-        self.check_reward_orientation_cartesian = [-0.1345, -0.5653, 0.2592, 0.7367, 0.0, 0.0, 0.7071]
+        self.check_reward_orientation_cartesian = [-0.1345, -0.5653, 0.2592, 0.7071, 0.0, 0.0, 0.7071]
+
 
         self.manual_lift_pose_cartesian = [0.0474, -0.5923, 0.3322, 0.7367, 0.0, 0.0, 0.7071]
 
@@ -378,7 +382,7 @@ class KinovaGripper_Env:
         #     self.finish_velocity_controller_pub.publish(True)
 
         # rospy.loginfo('=== checking joint done')
-        joint_check_done = self.check_joint_done(threshold=2.0)
+        joint_check_done = self.check_joint_done(threshold=2.35)
         # rospy.loginfo('=== done checking joint done')
 
         # done = reward_check_done or joint_check_done  # check either condition giving a done condition
@@ -414,20 +418,24 @@ class KinovaGripper_Env:
 
         rospy.loginfo('lifting right now')
 
-        # self.move_arm_orientation_cartesian_action(self.manual_lift_pose_cartesian)
+        # lift by 10cm
+        test_lift_pose = copy.deepcopy(self.pre_grasp_orientation_cartesian)
+        test_lift_pose[2] += 0.1
+
+        self.move_arm_orientation_cartesian_action(test_lift_pose, use_cartesian_path=False)
         # # rospy.sleep(7)  # wait a bit before taking more actions
 
         # move arm back to real kinova home joint state.
-        rospy.loginfo('=== move to lifting joint state')
-        joint_goal = JointState()
-        client = actionlib.SimpleActionClient('go_to_joint_state_as', GoToJointStateAction)
-        client.wait_for_server()
-        goal = GoToJointStateGoal()
-        joint_goal.position = self.manual_lift_pose_joints
-        goal.goal_joint_state = joint_goal
-        client.send_goal(goal, feedback_cb=self.feedback_cb)
-        client.wait_for_result()
-        result = client.get_result()
+        # rospy.loginfo('=== move to lifting joint state')
+        # joint_goal = JointState()
+        # client = actionlib.SimpleActionClient('go_to_joint_state_as', GoToJointStateAction)
+        # client.wait_for_server()
+        # goal = GoToJointStateGoal()
+        # joint_goal.position = self.manual_lift_pose_joints
+        # goal.goal_joint_state = joint_goal
+        # client.send_goal(goal, feedback_cb=self.feedback_cb)
+        # client.wait_for_result()
+        # result = client.get_result()
 
 
         rospy.loginfo('moving to check reward orientation')
@@ -519,7 +527,7 @@ class KinovaGripper_Env:
         # open up the gripper.
         rospy.loginfo('=== step pos')
         self.step_pos(np.array([0, 0, 0]))
-        rospy.sleep(7)
+        rospy.sleep(5)
 
         # move arm back to real kinova home joint state.
         rospy.loginfo('=== move to kinova real home joint state')
@@ -546,7 +554,7 @@ class KinovaGripper_Env:
         # # rospy.sleep(7)  # wait for the arm to finish moving. otherwise it will get interrupted
 
         rospy.loginfo('=== move to pregrasp')
-        self.move_arm_orientation_cartesian_action(self.pre_grasp_orientation_cartesian)
+        # self.move_arm_orientation_cartesian_action(self.pre_grasp_orientation_cartesian)
 
         self.go_to_noisy_pregrasp(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise,
                                   pitch_noise=pitch_noise, yaw_noise=yaw_noise)
@@ -561,10 +569,70 @@ class KinovaGripper_Env:
 
         return obs
 
-    def move_arm_orientation_cartesian_action(self, cartesian_goal, use_cartesian_path=True):
+    def reset_humanintheloop(self, x_noise=0, y_noise=0, z_noise=0, roll_noise=0, pitch_noise=0, yaw_noise=0):
+        """
+        Reset to the grasping position.
+
+        Returns
+        -------
+        obs - first observation
+
+        """
+        rospy.loginfo('--------------------starting reset check')
+
+        # this would bring the arm back home.
+        # self.go_to_home()  # TODO: FIX CARTESIAN GO TO HOME (NEED ACTION SERVER FIRST)
+        rospy.sleep(2)
+
+        # open up the gripper.
+        rospy.loginfo('=== step pos')
+        self.step_pos(np.array([0, 0, 0]))
+        rospy.sleep(7)
+
+        # move arm back to real kinova home joint state.
+        rospy.loginfo('=== move to kinova real home joint state')
+        joint_goal = JointState()
+        client = actionlib.SimpleActionClient('go_to_joint_state_as', GoToJointStateAction)
+        client.wait_for_server()
+        goal = GoToJointStateGoal()
+        joint_goal.position = self.home_joints
+        goal.goal_joint_state = joint_goal
+        client.send_goal(goal, feedback_cb=self.feedback_cb)
+        client.wait_for_result()
+        result = client.get_result()
+
+        rospy.sleep(2)  # TODO: i added this in before leaving the lab on wednesday. if this doesn't work then cry...
+
+        rospy.loginfo('=== move to pregrasp - but with human')
+        # self.move_arm_orientation_cartesian_action(self.pre_grasp_orientation_cartesian)
+        input("please operate the hand close to the pregrasp position, then press enter to continue")
+
+        close_enough = False
+
+        while not close_enough:
+            rospy.loginfo('adding noise...')
+            self.go_to_noisy_pregrasp(x_noise=x_noise, y_noise=y_noise, z_noise=z_noise, roll_noise=roll_noise,
+                                      pitch_noise=pitch_noise, yaw_noise=yaw_noise)
+
+            close_enough = confirm_prompt("Is this close enough?")
+            print('your response: ', close_enough)
+
+
+        # get the parameters required by openai gym wrapper
+        obs = self.get_obs()
+
+        # not finished anymore! re-enable the grasping controller to take velocities.
+        self.finish_velocity_controller_pub.publish(False)
+
+        rospy.loginfo('-------------------ending reset')
+
+        return obs
+
+    def move_arm_orientation_cartesian_action(self, cartesian_goal, use_cartesian_path=False):
         """
         Moves the arm to given cartesian coordinate.
         input: cartesian_goal, should be an array [pos_x, pos_y, pos_z, ori_x, ori_y, ori_z, ori_w]
+        use_cartesian_path: use cartesian path planning. false by default (cartesian path planning sucks)
 
         """
         goal_pose = Pose()
