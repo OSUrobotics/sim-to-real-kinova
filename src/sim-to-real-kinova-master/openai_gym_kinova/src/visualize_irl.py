@@ -86,17 +86,19 @@ if __name__ == "__main__":
     xy_noise_success_plot.set(title='Grasp Success over X and Y noise from ideal object position', xlabel='X Noise (m)',
                               ylabel='Y Noise (m)')
 
+    xy_noise_success_plot.get_figure().savefig(os.path.join(results_dir, 'xy_noise_success' + '.png'))
+    xy_noise_success_plot.get_figure().clf()
+
     # draw visualization: translation error and quaternion distance to success rate
     trans_err_quat_dist_success_plot = sns.scatterplot(data=df, x='trans_err', y='quat_dist', hue='Success')
     trans_err_quat_dist_success_plot.set(
         title='Grasp Success over Translation Error (object position to ideal position) and Quaternion Distance (from ideal hand grasp)',
         xlabel='Translation Error (m)', ylabel='Quaternion Distance (rad)')
 
+    trans_err_quat_dist_success_plot.get_figure().savefig(os.path.join(results_dir, 'trans_err_quat_dist_success' + '.png'))
+    trans_err_quat_dist_success_plot.get_figure().clf()
+
     # save data to a csv
     df.to_csv(os.path.join(results_dir, 'results' + '.csv'))
-
-    # save plots to a file
-    xy_noise_success_plot.savefig(os.path.join(results_dir, 'xy_noise_success' + '.csv'))
-    trans_err_quat_dist_success_plot.savefig(os.path.join(results_dir, 'trans_err_quat_dist_success' + '.csv'))
 
     print('Finished creating visualizations.')
