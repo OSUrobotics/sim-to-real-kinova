@@ -43,7 +43,41 @@ import threading #oh boy this might get messy
 from PIL import Image, ImageFont, ImageDraw # Used to save images from rendering simulation
 import shutil
 
+import xml.etree.ElementTree as ET
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
+def rotate_around_origin(vec, how_much_rotation):
+    # vec: xyz
+    # how_much_rotation: in radians. use np.radians to covert if necessary
+    # roll, pitch, yaw.
+    rotation = R.from_euler('xyz', how_much_rotation)
+
+
+    rotated_vec = rotation.apply(vec)
+    return rotated_vec
+
+
+def rotate_around_axis(vec, theta, axis, input_unit='deg'):
+    """
+    rotate around an arbitrary axis
+
+    vec: xyz
+    theta: single angle, but now around arbitrary axis
+    axis: defined as a 3d vector direction, xyz
+    """
+    rotation_radians = theta
+
+    if input_unit == 'deg':
+        rotation_radians = np.radians(theta)
+
+    rotation_axis = np.array(axis)  # type conversion... just in case
+    rotation_vector = rotation_radians * rotation_axis
+    rotation = R.from_rotvec(rotation_vector)
+    rotated_vec = rotation.apply(vec)
+    return rotated_vec
+
 
 
 class KinovaGripper_Env(gym.Env):
@@ -279,29 +313,53 @@ class KinovaGripper_Env(gym.Env):
 
     # Funtion to get 3D transformation matrix of the palm and get the wrist position and update both those varriables
     def _get_trans_mat_wrist_pose(self):  # WHY MUST YOU HATE ME WHEN I GIVE YOU NOTHING BUT LOVE?
-        center_pose = self._sim.data.get_site_xpos('palm')
-        xpos = self._sim.data.get_site_xpos('palm_3')
-        zpos = self._sim.data.get_site_xpos('palm_1')
-        xvec = xpos - center_pose
+        """
+        world coord => local coord, in the palm of the hand.
+
+        """
+        center_pose = self._sim.data.get_site_xpos('palm')  # this is the originof the local coord frame. this is the center red dot on the palm
+        xpos = self._sim.data.get_site_xpos('palm_3')  # these are red dots on the palm
+        zpos = self._sim.data.get_site_xpos('palm_1')  # these are red dots on the palm
+        xvec = xpos - center_pose  # differences are vectors / directions
         zvec = zpos - center_pose
-        yvec = np.cross(zvec, xvec)
+        yvec = np.cross(zvec, xvec)  # cross prod
+
+        # normalization
         xvec = xvec / np.linalg.norm(xvec)
         yvec = yvec / np.linalg.norm(yvec)
         zvec = zvec / np.linalg.norm(zvec)
+
+        # rotation matrix
         rotation_matrix = np.array([xvec, yvec, zvec])
         # print("rotation matrix from cindy's method", rotation_matrix)
+
+        # get world frame position of the palm
+        # should just use center pose of the wrist pose
         self.wrist_pose = np.copy(self._sim.data.get_geom_xpos('palm'))
-        Rfa = np.copy(self._sim.data.get_geom_xmat('palm'))
-        temp = np.matmul(Rfa, np.array([[0, 0, 1], [-1, 0, 0], [0, -1, 0]]))
-        temp = np.transpose(temp)
+
+        #lol nope
+        # Rfa = np.copy(self._sim.data.get_geom_xmat('palm'))
+        # temp = np.matmul(Rfa, np.array([[0, 0, 1], [-1, 0, 0], [0, -1, 0]]))
+        # temp = np.transpose(temp)
+
+        # set up rotation matrix
         Tfw = np.zeros([4, 4])
         Tfw[0:3, 0:3] = rotation_matrix
         Tfw[3, 3] = 1
         # self.wrist_pose=self.wrist_pose+np.matmul(np.transpose(Tfw[0:3,0:3]),[-0.009,0.048,0.0])
-        self.wrist_pose = self.wrist_pose + np.matmul(Tfw[0:3, 0:3], [-0.0062, 0.048, 0.0])
+
+        # this brings our wrist pose
+        # self.wrist_pose = self.wrist_pose + np.matmul(Tfw[0:3, 0:3], [-0.0062, 0.048, 0.0])
+        self.wrist_pose = center_pose
+
+
+
         Tfw[0:3, 3] = np.matmul(-(Tfw[0:3, 0:3]), np.transpose(self.wrist_pose))
         self.Tfw = Tfw
         self.Twf = np.linalg.inv(Tfw)
+
+        # print('TRANSFER LOCAL FROM WORLD')
+        # print(self.Tfw)
 
     def experimental_sensor(self,rangedata,finger_pose,gravity):
         #print('flimflam')
@@ -748,21 +806,35 @@ class KinovaGripper_Env(gym.Env):
 
     # Function to get the dimensions of the object
     def _get_obj_size(self):
+        """
+        self._sim.model.geom_size ==> array of arrays
+        mujoco is poopy, so for certain shapes we have to draw multiple geometries.
+        (otherwise draw convex)
+
+
+        """
+
         #TODO: fix this shit
         num_of_geoms=np.shape(self._sim.model.geom_size)
+        print(num_of_geoms)
         final_size=[0,0,0]
         #print(self._sim.model.geom_size)
         #print(num_of_geoms[0]-8)
         for i in range(num_of_geoms[0]-8):
+            print(self._sim.model.geom_size)
             size=np.copy(self._sim.model.geom_size[-1-i])
+            # print('size doesnt matter:', size)
+
+            # difference of shapes from different axes
             diffs=[0,0,0]
             if size[2]==0:
                 size[2]=size[1]
                 size[1]=size[0]
-            diffs[0]=abs(size[0]-size[1])
-            diffs[1]=abs(size[1]-size[2])
-            diffs[2]=abs(size[0]-size[2])
-            if ('lemon' in self.filename)|(np.argmin(diffs)!=0):
+            diffs[0]=abs(size[0]-size[1])  # x vs y
+            diffs[1]=abs(size[1]-size[2])  # y vs z
+            diffs[2]=abs(size[0]-size[2])  # x vs z
+            if ('lemon' in self.filename)|(np.argmin(diffs)!=0):  # check the
+                # handle the lemon case: switch the x and z, because a rotation has already been handled
                 temp=size[0]
                 size[0]=size[2]
                 size[2]=temp
@@ -783,6 +855,8 @@ class KinovaGripper_Env(gym.Env):
                     for j in range(3):
                         final_size[j]=final_size[j]*0.7
             else:
+                # assumes that the shape is symmetrical.
+                # in the z direction (height), we add the sizes together
                 final_size[0]=max(size[0],final_size[0])
                 final_size[1]=max(size[1],final_size[1])
                 final_size[2]+=size[2]
@@ -851,8 +925,16 @@ class KinovaGripper_Env(gym.Env):
     def experiment(self, shape_keys): #TODO: Talk to people thursday about adding the hourglass and bottles to this dataset.
         #self.objects = {}
 
+        print('EXPERIMENT FUNCTION before')
+        print(self.objects)
+        print(shape_keys)
+
         for key in shape_keys:
             self.objects[key] = self.all_objects[key]
+
+        print('EXPERIMENT FUNCTION')
+        print(self.objects)
+        print(shape_keys)
 
         if len(shape_keys) == 0:
             print("No shape keys")
@@ -895,37 +977,130 @@ class KinovaGripper_Env(gym.Env):
         z = size[-1]/2
         return rand_x, rand_y, z
 
-    def write_xml(self,new_wrist_pos,new_rotation):   #This function takes in a rotation vector [roll, pitch, yaw] and sets the hand rotation in the
-                                        #self.file_dir and self.filename to that rotation. It then sets up the simulator with the object
-                                        #incredibly far from the hand to prevent collisions and recalculates the rotation matrices of the hand
+    def write_xml(self, new_wrist_pos, new_rotation):
+        # step 0: parse the desired positions and euler angles
+        desired_pos = ' '.join([str(float_item) for float_item in new_wrist_pos])
+        desired_euler = ' '.join([str(float_item) for float_item in new_rotation])
+
+        # step 1: open the xml file
+        # xml_filepath = os.path.join(self.file_dir, self.filename)
+        xml_filepath = self.file_dir + self.filename
+        print('XML FILEPATH:', xml_filepath)
+        print(self.file_dir + self.filename)
+
+        # ASSUMPTIONS: ROOT IS FIRST BODY, THEN J2S7S300_LINK_7 IS THE NEXT FIRST NESTED BODY
+
+        tree = ET.parse(xml_filepath)
+        root = tree.getroot()
+
+        # according to assumptions, we find the wrist link.
+        # note: if you want to do more work, you can do loops through all nested body tags, and check the attribute, in order to confirm you have the right tag.
+        j2s7s300_link_7_tag = root.find('worldbody').find('body').find('body')
+
+        # we then get the position and euler orientation
+        wrist_link_pos = j2s7s300_link_7_tag.attrib['pos']
+        wrist_link_euler_rot = j2s7s300_link_7_tag.attrib['euler']
+
+        # # optional: access the current values.
+        # curr_wrist_link_pos_float_arr = [float(str_item) for str_item in wrist_link_pos.split()]
+        # curr_wrist_link_euler_rot_float_arr = [float(str_item) for str_item in wrist_link_euler_rot.split()]
+
+        # next, we modify them. we give an example here
+        j2s7s300_link_7_tag.set('pos', desired_pos)
+        j2s7s300_link_7_tag.set('euler', desired_euler)
+
+        # now, write to the xml file. and because we don't like keeping history, we'll just overwrite the existing file.
+        new_filepath = xml_filepath  # if you want to break the cycle, go ahead and change this variable
+
+        tree.write(new_filepath)
+
+        # load the mujoco model from this (new) path.
+        self._model = load_model_from_path(new_filepath)
+        self._sim = MjSim(self._model)
+        self._set_state(np.array([0, 0, 0, 0, 0, 0, 10, 10, 10]))
+        self._get_trans_mat_wrist_pose()  # TODO: trace this
+
+
+    def write_xml_old(self,new_wrist_pos,new_rotation):
+        #This function takes in a rotation vector [roll, pitch, yaw] and sets the hand rotation in the
+        #self.file_dir and self.filename to that rotation. It then sets up the simulator with the object
+        #incredibly far from the hand to prevent collisions and recalculates the rotation matrices of the hand
+
+        """
+        we don't actually use new_wrist_pos...
+        need to rotate it around something...
+        rotate it around -
+        """
+
+        print('IM WRITING AN XML')
+        print('name of the file:', os.path.join(self.file_dir, self.filename))
+        print(new_rotation)
+
+        # step 1: open the xml file, get the contents, close the xml file
         xml_file=open(self.file_dir+self.filename,"r")
         xml_contents=xml_file.read()
         xml_file.close()
+
+        # step 2: get the info of the last link (closest to wrist joint) in the urdf file.
+        # xyz position (euler),
         starting_point=xml_contents.find('<body name="j2s7s300_link_7"')
         euler_point=xml_contents.find('euler=',starting_point)
         contents=re.search("[^\s]+\s[^\s]+\s[^>]+",xml_contents[euler_point:])
         c_start=contents.start()
         c_end=contents.end()
+
+        print('STEP 3 ====================')
+        print('c_start:', c_start)
+        print('c_end:', c_end)
+
+        # step 3: find the joint 7, and uhh do stuff??
         starting_point=xml_contents.find('joint name="j2s7s300_joint_7" type')
         axis_point=xml_contents.find('axis=',starting_point)
         contents=re.search("[^\s]+\s[^\s]+\s[^>]+",xml_contents[axis_point:])
         starting_point=xml_contents.find('site name="local_origin_site" type="cylinder" size="0.0075 0.005" rgba="25 0.5 0.0 1"')
+
+        # get the position from the "local_origin_site". we don't do anything with it though?
         site_point=xml_contents.find('pos=',starting_point)
         contents=re.search("[^\s]+\s[^\s]+\s[^>]+",xml_contents[starting_point:])
-        wrist_pose= self.wrist_pose #[-0.00364792, 0.01415926, 0.25653749]
-        new_thing= str(wrist_pose[0]) + " " + str(wrist_pose[1]) + " " + str(wrist_pose[2])
+
+        print('site_point:', site_point)
+        print('contents:', contents)
+
+        # step 5: play around with the wrist?LOL??
+
+        # NONE OF THIS ACTUALLY GETS USED...
+        # # THIS IS HARD CODED.
+        # wrist_pose= self.wrist_pose #[-0.00364792, 0.01415926, 0.25653749]
+        # print('wrist_pose:', wrist_pose)
+        # new_thing= str(wrist_pose[0]) + " " + str(wrist_pose[1]) + " " + str(wrist_pose[2])
+
+
         p1=str(new_rotation[0])
         p2=str(new_rotation[1])
         p3=str(new_rotation[2])
+
+        # print('before:', xml_contents)
+
+        print('the position we are inserting:', p1[0:min(5,len(p1))]+ " "+p2[0:min(5,len(p2))] +" "+ p3[0:min(5,len(p3))])
+        print(xml_contents[euler_point:euler_point+c_start+7])  # euler="
+
+
+        # p1[0:min(5,len(p1))] => shitty way to truncate a float after it's already turned into a string
         xml_contents=xml_contents[:euler_point+c_start+7] + p1[0:min(5,len(p1))]+ " "+p2[0:min(5,len(p2))] +" "+ p3[0:min(5,len(p3))] \
         + xml_contents[euler_point+c_end-1:]# + new_thing #+ xml_contents[site_point+c2_end:]
+
+        # print('after:', xml_contents)
+
+        # write to the same exact file... oh yeahhhh
         xml_file=open(self.file_dir+self.filename,"w")
         xml_file.write(xml_contents)
         xml_file.close()
+
+        # load the mujoco model from this path.
         self._model = load_model_from_path(self.file_dir + self.filename)
         self._sim = MjSim(self._model)
         self._set_state(np.array([0, 0, 0, 0, 0, 0, 10, 10, 10]))
-        self._get_trans_mat_wrist_pose()
+        self._get_trans_mat_wrist_pose()  # TODO: trace this
 
     # Steph Added
     def check_obj_file_empty(self,filename):
@@ -941,7 +1116,12 @@ class KinovaGripper_Env(gym.Env):
 
     def Generate_Latin_Square(self,max_elements,filename,shape_keys, test = False):
         """ Generate uniform list of shapes """
+
+
         ### Choose an experiment ###
+        print('why the fuck am i entering self.experiment again')
+        print('SHAPE KEYS:', shape_keys)
+        print('object keys:', self.objects.keys())
         self.objects = self.experiment(shape_keys)
 
         # TEMPORARY - Only uncomment for quicker testing
@@ -1018,14 +1198,19 @@ class KinovaGripper_Env(gym.Env):
 
         my_file = Path(filename)
         print('the filepath is:', my_file)
-        if my_file.is_file() is True:
+        if False:  # my_file.is_file() is True  # Note: since we COMMIT our objects.csv, this accidentally gets stuck with whatever config you used previously! fuck that!
+            print('ALALLALALALALA')
             if os.stat(filename).st_size == 0:
                 print("Object file is empty!")
                 self.Generate_Latin_Square(num_objects,filename,shape_keys)
         else:
+            print('THE FILENAME DOESNT EXIST')
+            print("IM GENERATING LATIN SQUARES 1036")
             self.Generate_Latin_Square(num_objects, filename, shape_keys)
 
         print(filename)
+        # opens the file and writes the name. why the fuck are we storing csvs like this?
+        # e.g. C,u,b,e,M <=== wtf????
         with open(filename, newline='') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
@@ -1039,7 +1224,7 @@ class KinovaGripper_Env(gym.Env):
     def get_object(self,filename):
         # Get random shape
         print("OUR RANDOM SHAPES BEFOREHAND")
-        # print(self.obj_keys)
+        print(self.obj_keys)
         random_shape = self.obj_keys.pop()
 
         # remove current object file contents
@@ -1217,7 +1402,9 @@ class KinovaGripper_Env(gym.Env):
         # Based on environment, sets amount of objects and object file to store them in
         if env_name == "env":
             print('selecting object...')
-            obj_list_filename = "NONONOobjects.csv"
+
+            # it seems to be making an object
+            obj_list_filename = "NONOfNOobjects.csv"
             # num_objects = 20000
             num_objects = 9
         else:
@@ -1228,6 +1415,7 @@ class KinovaGripper_Env(gym.Env):
 
         # Replenish objects list if none left in list to grab
         if len(self.objects) == 0:
+            print('going into experiment function')
             self.objects = self.experiment(shape_keys)
         if len(self.obj_keys) == 0:
             print('hi, what could go wrong')
@@ -1235,7 +1423,7 @@ class KinovaGripper_Env(gym.Env):
 
         # Determine the current object from a set list of objects stored in obj_list_filename text file
         if obj_params==None:
-            print("get the object lol")
+            print("get the object lol ==========")
             random_shape, self.filename = self.get_object(obj_list_filename)
         else:
             # Determine the current object from set object parameters ([shape_name, shape_size])
@@ -1326,7 +1514,19 @@ class KinovaGripper_Env(gym.Env):
 
     def determine_wrist_pos_coords(self,orientation,shape):
         """Determine the initial coodinate position of the wrist center [x,y,z] to start with based on the current orientation and shape"""
+        print('well hello THERE! DETERMINE_WRIST_POS_COORDS')
+        print(orientation)
+        print(shape)
         size = shape[-1]
+
+
+        # TODO: dude.... it's all hardcoded.
+        # 1. deal with
+
+        """
+        The existence of the other two position: Manually changed the values 
+        Ask Anjali
+        """
 
         if orientation == 'top':
             # Small object
@@ -1348,7 +1548,8 @@ class KinovaGripper_Env(gym.Env):
                 pos = [0.00106814, 0.16522095, 0.21466633]
 
         else: # Orientation is normal by default
-            pos = [0.0, 0.18, 0.0654]
+            pos = [0.0, 0.18, 0.0654]  # this is hardcoded!!! => this is the joint difference towards the middle grasp of the end effector
+            # pos = [0.0, 0.0, 0.0]
 
         return pos
 
@@ -1376,6 +1577,7 @@ class KinovaGripper_Env(gym.Env):
         if self.check_obj_file_empty(coords_filename) == False:
             obj_x, obj_y, obj_z, hand_x, hand_y, hand_z, orient_idx = self.sample_initial_object_hand_pos(coords_filename, with_noise=with_noise, orient_idx=orient_idx, region=self.obj_coord_region)
         else:
+            print('i am randomly generating coords')
             # If coordinate file is empty or does not exist, randomly generate coordinates
             obj_x, obj_y, obj_z = self.randomize_initial_pos_data_collection(orientation=self.orientation)
             coords_filename = None
@@ -1419,6 +1621,7 @@ class KinovaGripper_Env(gym.Env):
         new_wrist_pos = self.determine_wrist_pos_coords(self.orientation, random_shape)
 
         # Writes the new hand orientation and wrist position to the xml file to be simulated in the environment
+        print('being called under determine_obj_hand_coords')
         self.write_xml(new_wrist_pos, new_rotation)
 
         return obj_x, obj_y, obj_z, hand_x, hand_y, hand_z, orient_idx, coords_filename
@@ -1455,6 +1658,19 @@ class KinovaGripper_Env(gym.Env):
                 new_path.mkdir(parents=True, exist_ok=True)
 
 
+    def get_wrist_pos_coord(self, euler_rotation, original_offset=[0.0, 0.18, 0.0654], original_rotation=np.array([-np.pi/2, 0.0, -np.pi/2])):
+        """
+        TODO: use tuples as an immutable array? better practice??
+        rotates the wrist position around the coordinate...
+        """
+        # delta_rotation = np.array(euler_rotation) + original_rotation
+        # print('delta rotation: ', delta_rotation)
+        # delta_rotation = np.array(euler_rotation)
+        new_point = rotate_around_origin(original_offset, euler_rotation)
+        new_point = rotate_around_origin(new_point, original_rotation)
+        return new_point
+
+
     def reset(self,shape_keys,hand_orientation,with_grasp=False,env_name="env",mode="train",start_pos=None,hand_rotation=None,obj_params=None, qpos=None, obj_coord_region=None, orient_idx=None, with_noise=False):
         """ Reset the environment; All parameters (hand and object coordinate postitions, rewards, parameters) are set to their initial values
         shape_keys: List of object shape names (CubeS, CylinderM, etc.) to be referenced
@@ -1476,25 +1692,30 @@ class KinovaGripper_Env(gym.Env):
         self.set_obj_coord_region(obj_coord_region) # Set the region from where the initial x,y object coordinate will be sampled from
 
         # Determine object to be used within current environment
+        # TODO: WHY IS THIS RANDOM...
         random_shape = self.select_object(env_name, shape_keys, obj_params)
         self.set_random_shape(random_shape)
 
         # Determine hand orientation to be used within current environment
         orientation = self.select_orienation(random_shape, hand_orientation)
+        print('oreintation:', orientation)
         self.set_orientation(orientation)
 
         # Determine location of x, y, z joint locations and proximal finger locations of the hand
         xloc, yloc, zloc, f1prox, f2prox, f3prox = self.determine_hand_location()
+        print()
 
         # STEPH Use pre-set qpos (joint velocities?) and pre-set initial object initial object position
         if qpos is None:
+            print('hihihihhihihihihihihio')
             if start_pos is None:
                 # Select object and hand orientation coordinates from file then write them to the xml file for simulation in the current environment
                 obj_x, obj_y, obj_z, hand_x, hand_y, hand_z, orient_idx, coords_filename = self.determine_obj_hand_coords(random_shape, mode, orient_idx=orient_idx, with_noise=with_noise)
                 self.set_orientation_idx(orient_idx)  # Set orientation index value for reference and recording purposes
                 self.set_coords_filename(coords_filename)
 
-            elif len(start_pos)==3 and hand_rotation is not None:
+            elif len(start_pos)==3 and hand_rotation is not None:  # when you have both the start position, and the hand rotation
+                print('what is wrong with you LOL')
                 # Use a pre-set object position and hand orientation rotation
                 obj_x = start_pos[0]
                 obj_y = start_pos[1]
@@ -1506,20 +1727,57 @@ class KinovaGripper_Env(gym.Env):
                 # Determine the initial position of the wrist based on the orientation and shape/size
                 new_wrist_pos = self.determine_wrist_pos_coords(self.orientation, random_shape)
 
-                # Writes the new hand orientation and wrist position to the xml file to be simulated in the environment
+                # no, this sucks. let's first rotate our hand around the axis, and then shift the object relative to the hand.
+                # e.g.
+
+
+                # # TODO: change og_rot...
+                #
+                # og_rot = np.array([-np.pi/2, 0.0, -np.pi/2])
+                # og_wrist_pos = np.array([0.0, 0.18, 0.0654])
+                #
+                # # base this off of the normal...
+                # adams_wrist_pos = self.get_wrist_pos_coord(hand_rotation, original_offset=[0.0, 0.18, 0.0654], original_rotation=og_rot)
+                #
+                # # adams_wrist_pos = rotate_around_axis([0.0, 0.18, 0.0654], )
+                #
+                # print(adams_wrist_pos)
+                #
+                # # adjusted_hand_rotation = hand_rotation + og_rot
+                #
+                #
+                # # world to link frame of ref
+                # rotation = R.from_euler('xyz', og_rot)
+                # wrist_pos_coord_system = rotation.apply(og_wrist_pos)
+                #
+                # # rotate in the link frame of ref
+                # new_rotation = R.from_euler('xyz', hand_rotation)
+                # intermediate_wrist_pos = new_rotation.apply(wrist_pos_coord_system)
+                #
+                # # go back to world
+                # adams_wrist_pos = rotation.apply(intermediate_wrist_pos, inverse=True)
+                #
+                #
+                # # Writes the new hand orientation and wrist position to the xml file to be simulated in the environment
+                # print('being called because a new hand rotation has been given...')
+                # self.write_xml(adams_wrist_pos, hand_rotation + og_rot)
+
                 self.write_xml(new_wrist_pos, hand_rotation)
 
+                # TODO: trace this shitty XML pathing
+
             elif len(start_pos)==3:
-                ######################################
-                ## TO Test Real world data Uncomment##
-                ######################################
-                #start_pos.append(1)
-                #self._get_trans_mat_wrist_pose()
-                #temp_start_pos = np.matmul(self.Twf, start_pos)
-                #obj_x, obj_y, obj_z = temp_start_pos[0], temp_start_pos[1], temp_start_pos[2]
+                print('lol')
+                #####################################
+                # TO Test Real world data Uncomment##
+                #####################################F
+                start_pos.append(1)
+                self._get_trans_mat_wrist_pose()
+                temp_start_pos = np.matmul(self.Twf, start_pos)
+                obj_x, obj_y, obj_z = temp_start_pos[0], temp_start_pos[1], temp_start_pos[2]
 
                 ##Comment this to Test real world data
-                obj_x, obj_y, obj_z = start_pos[0], start_pos[1], start_pos[2]
+                # obj_x, obj_y, obj_z = start_pos[0], start_pos[1], start_pos[2]
             elif len(start_pos)==2:
                 obj_x, obj_y = start_pos[0], start_pos[1]
                 obj_z = self._get_obj_size()[-1]
@@ -1583,10 +1841,23 @@ class KinovaGripper_Env(gym.Env):
         if setPause:
             self._viewer._paused=True
 
-
-    def render_img(self, episode_num, timestep_num, obj_coords, text_overlay, w=1000, h=1000, cam_name=None, mode='offscreen',saving_dir=None,final_episode_type=None):
+    def just_render_img(self, w=1000, h=1000):
         if self._viewer is None:
             self._viewer = MjViewer(self._sim)
+        a = self._sim.render(width=w, height=h, depth=True, mode='offscreen')
+
+        # Just keep rgb values, so image is shape (w,h), make to be numpy array
+        a_rgb = a[0]
+        a_rgb = np.asarray(a_rgb, dtype=np.uint8)
+        # img = Image.fromarray(a_rgb, 'RGB')
+
+        return a_rgb
+
+    def render_img(self, episode_num, timestep_num, obj_coords, text_overlay, w=1000, h=1000, cam_name=None, mode='offscreen',saving_dir=None,final_episode_type=None, return_img=False):
+        if self._viewer is None:
+            self._viewer = MjViewer(self._sim)
+
+
 
         if saving_dir is None:
             saving_dir = "./"
@@ -1647,6 +1918,7 @@ class KinovaGripper_Env(gym.Env):
     #Function to close the rendering window
     def close(self): #This doesn't work right now
         if self._viewer is not None:
+            glfw.destroy_window(self._viewer.window)
             self._viewer = None
 
         # glfw.terminate()  # TODO: nuclear option

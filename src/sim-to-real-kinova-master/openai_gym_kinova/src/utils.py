@@ -94,11 +94,14 @@ def state_dim_setup(state_dim_option):
         'all_real': np.concatenate((f1_prox_pos_idx, f2_prox_pos_idx, f1_dist_pos_idx, f2_dist_pos_idx, obj_pos_idx,
                                     last_6_joint_states_idx, obj_size_idx, finger_obj_dist_idx)),
         #  wrist 3 + finger pos 12 + obj size 3 + last joint states 6 + obj pos 3 + finger obj dist 4
+
+
         'adam_sim2real': np.concatenate((f1_dist_pos_idx, f1_prox_pos_idx, f2_dist_pos_idx, f2_prox_pos_idx,
                                          wrist_pos_idx, obj_pos_idx, last_6_joint_states_idx, obj_size_idx,
                                          finger_obj_dist_f1_dist_1, finger_obj_dist_f1_prox_1,
                                          finger_obj_dist_f2_dist_1, finger_obj_dist_f2_prox_1))
         # this one is based on sim2real
+        # finger positions (12), wrist pos (3), obj pos (3), last 6 joint states (6), obj size (3), finger obj dist (4)
     }
 
     assert state_dim_option in state_dim_idx_arr_dict.keys()

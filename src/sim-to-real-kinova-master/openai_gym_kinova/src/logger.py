@@ -94,7 +94,7 @@ class Logger(object):
             self.video_recorder.init(enabled=True)
             self.debug_video_recorder.init(enabled=True)
 
-    def record_starting_position(self, obs, info, noise_info=None):
+    def record_starting_position(self, obs, info, noise_info=None, simulator=False):
         """
         Record the starting position of the object. Feed in the variables from the first time step.
         TODO: incorporate this with log_single_step when it's the first step detected?? (auto)
@@ -116,50 +116,58 @@ class Logger(object):
         # Step 1.2: Get XYZ position of the end effector JK it's at 0 0 0 <=== whats the hard coding?
         end_effector_pos = np.array([0, 0, 0])
 
-        # Step 1.3: Get orientation of the end effector (and make sure the XYZ is 0 0 0?)
-        curr_pose_unformatted = info['curr_pose']
-        curr_pose = np.array(
-            [curr_pose_unformatted.position.x, curr_pose_unformatted.position.y, curr_pose_unformatted.position.z,
-             curr_pose_unformatted.orientation.x, curr_pose_unformatted.orientation.y,
-             curr_pose_unformatted.orientation.z, curr_pose_unformatted.orientation.w])
-        curr_orientation = curr_pose[-4:]
-        start_pose = info['start_pose']  # this is already an array
-        start_orientation = start_pose[-4:]
+        if not simulator:
 
-        # Step 2: Calculate translation error from optimal grasp (place on x axis).
-        # curr_pose_pos = np.array(curr_pose[:3])
-        # start_pose_pos = np.array(start_pose[:3])
-        # pos_delta = curr_pose_pos - start_pose_pos
-        # translation_error = np.sqrt(np.sum(pos_delta ** 2))
+            # Step 1.3: Get orientation of the end effector (and make sure the XYZ is 0 0 0?)
+            curr_pose_unformatted = info['curr_pose']
+            curr_pose = np.array(
+                [curr_pose_unformatted.position.x, curr_pose_unformatted.position.y, curr_pose_unformatted.position.z,
+                 curr_pose_unformatted.orientation.x, curr_pose_unformatted.orientation.y,
+                 curr_pose_unformatted.orientation.z, curr_pose_unformatted.orientation.w])
+            curr_orientation = curr_pose[-4:]
+            start_pose = info['start_pose']  # this is already an array
+            start_orientation = start_pose[-4:]
 
-        pos_delta = obj_pos - end_effector_pos
-        translation_error = np.sqrt(np.sum(pos_delta ** 2))
+            # Step 2: Calculate translation error from optimal grasp (place on x axis).
+            # curr_pose_pos = np.array(curr_pose[:3])
+            # start_pose_pos = np.array(start_pose[:3])
+            # pos_delta = curr_pose_pos - start_pose_pos
+            # translation_error = np.sqrt(np.sum(pos_delta ** 2))
 
-        # Step 2.1: Turn translation error negative if x is negative as well
-        x_delta = obj_pos[0] - end_effector_pos[0]
-        if x_delta < 0:
-            translation_error = -translation_error
+            pos_delta = obj_pos - end_effector_pos
+            translation_error = np.sqrt(np.sum(pos_delta ** 2))
 
-        # Step 3: Calculate quaternion distance (y axis) - between WHAT? base rotation? I guess base rotation is [pi/2, 0, 0] since we do 90deg roll on the x-axis of the base frame
-        # Step 4: Yeah what is the rotation?
-        quaternion_dot_prod = np.dot(start_orientation, curr_orientation)
-        angle_difference = np.arccos(quaternion_dot_prod)  # in degrees
-        quat_distance = np.rad2deg(angle_difference)  # in radians
+            # Step 2.1: Turn translation error negative if x is negative as well
+            x_delta = obj_pos[0] - end_effector_pos[0]
+            if x_delta < 0:
+                translation_error = -translation_error
 
-        # Last step: Place in a class wide variable, that can be used to generate a plot.
-        # Note: You'll want to keep track of successes over multiple episodes as well.
+            # Step 3: Calculate quaternion distance (y axis) - between WHAT? base rotation? I guess base rotation is [pi/2, 0, 0] since we do 90deg roll on the x-axis of the base frame
+            # Step 4: Yeah what is the rotation?
+            quaternion_dot_prod = np.dot(start_orientation, curr_orientation)
+            angle_difference = np.arccos(quaternion_dot_prod)  # in degrees
+            quat_distance = np.rad2deg(angle_difference)  # in radians
 
-        self.translation_errors.append(translation_error)
-        self.quaternion_distances.append(quat_distance)
+            # Last step: Place in a class wide variable, that can be used to generate a plot.
+            # Note: You'll want to keep track of successes over multiple episodes as well.
 
-        # add start pose and noise info
-        self.start_pose = start_pose
+            self.translation_errors.append(translation_error)
+            self.quaternion_distances.append(quat_distance)
+
+            # add start pose and noise info
+            self.start_pose = start_pose
+        else:
+            self.start_pose = info['start_pose']
+
         if noise_info is not None:
             # TODO: figure out if we need to store start position, noises, and if we want to store in a csv.
             curr_noise_arr = np.array(
                 [noise_info['x_noise'], noise_info['y_noise'], noise_info['z_noise'], noise_info['roll_noise'],
                  noise_info['pitch_noise'], noise_info['yaw_noise']])
             self.noise_arr = curr_noise_arr
+
+            # TODO: I just made the realization that your pose doesn't really matter. just your last 4 things for hand orientation. see th
+
 
     def log_single_step(self, action, obs, next_obs, reward, done, info):
         """
@@ -201,7 +209,7 @@ class Logger(object):
 
             text_overlay = 'Timestep: ' + str(self.buffer_size) + '\n' + 'Action: ' + str(
                 action.round(decimals=3)) + '\n' + 'Obs: ' + str(obs.round(decimals=3)) + '\n' + \
-                           'Reward: ' + str(reward) + '\n' + 'Done: ' + str(done)
+                           'Reward: ' + str(reward) + '\n' + 'Done: ' + str(done) + '\n' + 'Start Noise: ' + str(self.noise_arr)
 
             font_filepath = os.path.join(self.rel_dirname, 'fonts/arial.ttf')
             font = ImageFont.truetype(font_filepath, 26)
