@@ -816,12 +816,12 @@ class KinovaGripper_Env(gym.Env):
 
         #TODO: fix this shit
         num_of_geoms=np.shape(self._sim.model.geom_size)
-        print(num_of_geoms)
+        # print(num_of_geoms)
         final_size=[0,0,0]
         #print(self._sim.model.geom_size)
         #print(num_of_geoms[0]-8)
         for i in range(num_of_geoms[0]-8):
-            print(self._sim.model.geom_size)
+            # print(self._sim.model.geom_size)
             size=np.copy(self._sim.model.geom_size[-1-i])
             # print('size doesnt matter:', size)
 
@@ -1837,6 +1837,8 @@ class KinovaGripper_Env(gym.Env):
         if self._viewer is None:
             self._viewer = MjViewer(self._sim)
             self._viewer._paused = setPause
+            self._viewer.cam.fixedcamid = 0  # set to the camera provided by the simulator!!!
+            self._viewer.cam.type = 2  # constant for CAMERA_FIXED
         self._viewer.render()
         if setPause:
             self._viewer._paused=True
@@ -1844,7 +1846,9 @@ class KinovaGripper_Env(gym.Env):
     def just_render_img(self, w=1000, h=1000):
         if self._viewer is None:
             self._viewer = MjViewer(self._sim)
-        a = self._sim.render(width=w, height=h, depth=True, mode='offscreen')
+            self._viewer.cam.fixedcamid = 0  # set to the camera provided by the simulator!!!
+            self._viewer.cam.type = 2  # constant for CAMERA_FIXED
+        a = self._sim.render(width=w, height=h, depth=True, mode='offscreen', camera_name='camera')
 
         # Just keep rgb values, so image is shape (w,h), make to be numpy array
         a_rgb = a[0]
@@ -1856,6 +1860,8 @@ class KinovaGripper_Env(gym.Env):
     def render_img(self, episode_num, timestep_num, obj_coords, text_overlay, w=1000, h=1000, cam_name=None, mode='offscreen',saving_dir=None,final_episode_type=None, return_img=False):
         if self._viewer is None:
             self._viewer = MjViewer(self._sim)
+            self._viewer.cam.fixedcamid = 0  # set to the camera provided by the simulator!!!
+            self._viewer.cam.type = 2  # constant for CAMERA_FIXED
 
 
 
@@ -1895,7 +1901,7 @@ class KinovaGripper_Env(gym.Env):
             final_dir = output_dir
             self._viewer._record_video = True
             self._viewer._video_path = output_dir + "video_1.mp4"
-            a = self._sim.render(width=w, height=h, depth=True, mode='offscreen')
+            a = self._sim.render(width=w, height=h, depth=True, mode='offscreen', camera_name='camera')
 
             # Just keep rgb values, so image is shape (w,h), make to be numpy array
             a_rgb = a[0]
