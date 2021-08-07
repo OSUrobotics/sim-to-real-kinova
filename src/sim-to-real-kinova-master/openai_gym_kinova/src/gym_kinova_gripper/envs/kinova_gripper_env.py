@@ -1839,6 +1839,8 @@ class KinovaGripper_Env(gym.Env):
             self._viewer._paused = setPause
             self._viewer.cam.fixedcamid = 0  # set to the camera provided by the simulator!!!
             self._viewer.cam.type = 2  # constant for CAMERA_FIXED
+            # render_context = MjRenderContextOffscreen(self._sim)
+            # self._sim.add_render_context(render_context)
         self._viewer.render()
         if setPause:
             self._viewer._paused=True
@@ -1848,6 +1850,8 @@ class KinovaGripper_Env(gym.Env):
             self._viewer = MjViewer(self._sim)
             self._viewer.cam.fixedcamid = 0  # set to the camera provided by the simulator!!!
             self._viewer.cam.type = 2  # constant for CAMERA_FIXED
+            # render_context = MjRenderContextOffscreen(self._sim)
+            # self._sim.add_render_context(render_context)
         a = self._sim.render(width=w, height=h, depth=True, mode='offscreen', camera_name='camera')
 
         # Just keep rgb values, so image is shape (w,h), make to be numpy array
@@ -1862,7 +1866,8 @@ class KinovaGripper_Env(gym.Env):
             self._viewer = MjViewer(self._sim)
             self._viewer.cam.fixedcamid = 0  # set to the camera provided by the simulator!!!
             self._viewer.cam.type = 2  # constant for CAMERA_FIXED
-
+            # render_context = MjRenderContextOffscreen(self._sim)
+            # self._sim.add_render_context(render_context)
 
 
         if saving_dir is None:

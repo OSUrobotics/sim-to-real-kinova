@@ -37,6 +37,7 @@ if __name__ == '__main__':
     config_path = 'experiment_configs/'
     filename = 'sim_positional_noise_test.yaml'
     filename = 'sim_constant_speed_test.yaml'
+    filename = 'sim_combined_test.yaml'
     config_filepath = os.path.join(rel_dirname, config_path, filename)
 
     stream = open(config_filepath, 'r')
@@ -91,6 +92,9 @@ if __name__ == '__main__':
         if noiser.noise_range in ['fixed', 'fixed_list']:
             noise_arr, noise_counter, reset_counter = noiser.sample_noise()
             x_noise, y_noise, z_noise, roll_noise, pitch_noise, yaw_noise = noise_arr
+
+            # flip y noise
+            y_noise *= -1
 
         print('Noise parameters:\n', 'x_noise:', str(x_noise), '| y_noise:', str(y_noise), '| z_noise:',
               str(z_noise), '| roll_noise:', str(roll_noise), '| pitch_noise:', str(pitch_noise), '| yaw_noise:',

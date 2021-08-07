@@ -33,6 +33,8 @@ from kinova_gripper_env import KinovaGripper_Env
 # the DDPGfD thingy
 from DDPGfD import DDPGfD
 
+# import simpleaudio as sa
+
 if __name__ == '__main__':
     rospy.init_node('openai_gym_kinova')
 
@@ -77,7 +79,10 @@ if __name__ == '__main__':
         """
         config_path = 'experiment_configs/'
         filename = 'positional_noise_test.yaml'
+        filename = 'real_combined_test.yaml'
         config_filepath = os.path.join(rel_dirname, config_path, filename)
+
+        print('config filepath: ', config_filepath)
 
         stream = open(config_filepath, 'r')
 

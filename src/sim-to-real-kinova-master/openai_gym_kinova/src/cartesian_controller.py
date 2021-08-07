@@ -261,6 +261,9 @@ class CartesianController:
             self.group.execute(plan, wait=True)
 
         else:
+            # audio_filename = 'ode_to_joy.wav'
+            # wave_obj = sa.WaveObject.from_wave_file(os.path.join(rel_dirname, audio_filename))
+            # play_obj = wave_obj.play()
             self.group.go(wpose, wait=True)
 
         # Calling ``stop()`` ensures that there is no residual movement

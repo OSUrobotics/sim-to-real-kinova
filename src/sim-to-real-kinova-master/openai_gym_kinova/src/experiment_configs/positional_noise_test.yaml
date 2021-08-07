@@ -9,7 +9,7 @@ params:
   logger:
     use_logger: true
     use_video: true
-    log_dir: positional_noise_test
+    log_dir: LOL
   noise:
     noise_range: fixed_list  # choose from fixed (fixed list), random (should contain uniform vs normal)
     noise_distribution: uniform  # choose from uniform or normal. don't need to touch this if using fixed

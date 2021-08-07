@@ -2,7 +2,7 @@ experiment_name: constant_speed_test
 params:
   controller:
     type: constant  # constant, discrete_random, continuous_random, pid, rl
-    speed: 6800
+    speed: 3
     options: [ 0, 1700, 3400 ]  # for discrete random
     distribution: uniform  # for continuous random uniform, random
     policy_filepath: policies/state_dim_full_train_v01/_07_22_21_0544/policy/train_DDPGfD_kinovaGrip
