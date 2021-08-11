@@ -55,11 +55,14 @@ def state_dim_setup(state_dim_option):
     '''
 
     finger_pos_idx = np.arange(0, 18)
-    f1_prox_pos_idx = np.array([3, 4, 5])
-    f2_prox_pos_idx = np.array([6, 7, 8])
-    f1_dist_pos_idx = np.array([12, 13, 14])
-    f2_dist_pos_idx = np.array([15, 16, 17])
+    f1_prox_pos_idx = np.array([0, 1, 2])
+    f2_prox_pos_idx = np.array([3, 4, 5])
+    f1_dist_pos_idx = np.array([9, 10, 11])
+    f2_dist_pos_idx = np.array([12, 13, 14])
     last_6_joint_states_idx = np.arange(27, 33)
+    f1_f2_joint_angles_idx = np.array([27, 28, 30,
+                                       31])  # TODO: figure out the right angles here... => in order: f1 proximal angle joint, f2 proximal angle joint, f1 distal angle joint, f2 distal angle joint.
+    # note: these are also all in radians in simulator...
 
     wrist_pos_idx = np.arange(18, 21)
     obj_pos_idx = np.arange(21, 24)
@@ -94,14 +97,16 @@ def state_dim_setup(state_dim_option):
         'all_real': np.concatenate((f1_prox_pos_idx, f2_prox_pos_idx, f1_dist_pos_idx, f2_dist_pos_idx, obj_pos_idx,
                                     last_6_joint_states_idx, obj_size_idx, finger_obj_dist_idx)),
         #  wrist 3 + finger pos 12 + obj size 3 + last joint states 6 + obj pos 3 + finger obj dist 4
-
-
         'adam_sim2real': np.concatenate((f1_dist_pos_idx, f1_prox_pos_idx, f2_dist_pos_idx, f2_prox_pos_idx,
                                          wrist_pos_idx, obj_pos_idx, last_6_joint_states_idx, obj_size_idx,
                                          finger_obj_dist_f1_dist_1, finger_obj_dist_f1_prox_1,
-                                         finger_obj_dist_f2_dist_1, finger_obj_dist_f2_prox_1))
+                                         finger_obj_dist_f2_dist_1, finger_obj_dist_f2_prox_1)), # finger positions (12), wrist pos (3), obj pos (3), last 6 joint states (6), obj size (3), finger obj dist (4)
         # this one is based on sim2real
-        # finger positions (12), wrist pos (3), obj pos (3), last 6 joint states (6), obj size (3), finger obj dist (4)
+        'adam_sim2real_v02': np.concatenate((f1_prox_pos_idx, f1_dist_pos_idx, f2_prox_pos_idx, f2_dist_pos_idx,
+                                             obj_pos_idx, f1_f2_joint_angles_idx, obj_size_idx,
+                                             finger_obj_dist_f1_dist_1, finger_obj_dist_f1_prox_1,
+                                             finger_obj_dist_f2_dist_1, finger_obj_dist_f2_prox_1))
+        # this one removes wrist position and third finger joints.
     }
 
     assert state_dim_option in state_dim_idx_arr_dict.keys()

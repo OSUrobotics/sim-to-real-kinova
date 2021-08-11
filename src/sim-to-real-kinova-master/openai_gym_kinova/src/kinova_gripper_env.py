@@ -36,6 +36,11 @@ from cv_bridge import CvBridge, CvBridgeError
 from euler_quaternion_transforms import quaternion_from_euler, euler_from_quaternion
 from utils import confirm_prompt
 
+import simpleaudio as sa
+import os
+
+rel_dirname = os.path.dirname(__file__)
+
 class KinovaGripper_Env:
     MARKER_TO_OBJ = {
         509: 'CylinderB',
@@ -43,9 +48,9 @@ class KinovaGripper_Env:
     }
 
     OBJ_SIZE_MAP = {
-        'CylinderB': [42, 42, 110],
-        'CubeB': [48, 48, 115],
-        'CubeM': [40, 40, 105]
+        'CylinderB': [0.042, 0.042, 0.110],
+        'CubeB': [0.048, 0.048, 0.115],
+        'CubeM': [0.040, 0.040, 0.105]
     }
 
     def __init__(self):
@@ -87,6 +92,12 @@ class KinovaGripper_Env:
 
         self.pre_grasp_orientation_cartesian = [0.03544, -0.62044, 0.185, 0.7071, 0.0, 0.0,
                                                 0.7071]
+
+        # self.pre_grasp_orientation_cartesian_sim_mock = [0.04, -0.5854, 0.185, 0.7071, 0.0, 0.0,
+        #                                                  0.7071]  # try to be like simulator
+        self.pre_grasp_orientation_cartesian_sim_mock = [0.04, -0.60, 0.185, 0.7071, 0.0, 0.0,
+                                                         0.7071]  # try to be like simulator
+        self.pre_grasp_orientation_cartesian = self.pre_grasp_orientation_cartesian_sim_mock
         """
         python2
         import tf
@@ -183,7 +194,8 @@ class KinovaGripper_Env:
     def get_joint_states(self):
         temp = list(self.joint_states.position)
         # print(temp)
-        finger_joint_state_value = [0, 0, 0, 0, 0, 0]
+        # finger_joint_state_value = [0, 0, 0, 0, 0, 0]
+        finger_joint_state_value = [0, 0, 0, 0]
         if self.finger_angle != []:
             finger_joint_state_value[0] = self.finger_angle[0]
             finger_joint_state_value[1] = self.finger_angle[1]
@@ -191,8 +203,8 @@ class KinovaGripper_Env:
             finger_joint_state_value[3] = self.finger_angle[3]
 
             # the third finger's guessed angles. TODO: remove these
-            finger_joint_state_value[4] = self.finger_angle[2]
-            finger_joint_state_value[5] = self.finger_angle[3]
+            # finger_joint_state_value[4] = self.finger_angle[2]
+            # finger_joint_state_value[5] = self.finger_angle[3]
         return finger_joint_state_value
 
     def get_obj_pose(self):
@@ -273,14 +285,17 @@ class KinovaGripper_Env:
         obj_pose = self.get_obj_pose()  # TODO
         obj_pose = np.copy(obj_pose)
         x_angle, z_angle = self.get_angles()  # TODO - JK
-        joint_states = self.get_joint_states()  # TODO
+        joint_states = self.get_joint_states()  # TODO - reduced!
         obj_size = self.get_obj_size()  # TODO
         finger_obj_dist = self.get_finger_obj_dist()  # TODO
         # fingers_6D_pose = []
 
         fingers_6D_pose = self.get_finger_pos()  # TODO
-        res_obs = fingers_6D_pose + list(self.wrist_pose) + list(obj_pose) + joint_states + \
-                  [obj_size[0], obj_size[1], obj_size[2] * 2] + finger_obj_dist  # + [x_angle, z_angle]
+
+        # Most recent commit: we halve the object size along certain dimensions, we remove the wrist pose...
+
+        res_obs = fingers_6D_pose + list(obj_pose) + joint_states + \
+                  [obj_size[0], obj_size[1], obj_size[2]] + finger_obj_dist  # + [x_angle, z_angle]
         # print('this is the obs data',fingers_6D_pose)
 
         print('==================== start obs ===========================')
@@ -301,12 +316,12 @@ class KinovaGripper_Env:
         1. Finger poses. XYZ coords of finger 1 and finger 2 (the top fingers). size 12
         fing1 dist pos, fing1 tip pos, fing2 dist pos, fing2 tip pos
         
-        2. wrist pose. XYZ coord. size 3
+        2. wrist pose. XYZ coord. size 3 => NOPE NO LONGER!
         3. object pos. XYZ coord. size 3
-        4. joint states. 6 of them. TODO ADD MORE. size 6
+        4. joint states. 6 of them. TODO ADD MORE. size 6 => nope now 4!
         5. object size. XYZ dims. size 3
         6. finger to object distances. size 4
-        fing1 distal, fing1 tip, fing2 distal, fing2 tip
+        fing1 prpxoima, fing1 distal, fing2 proximal, fing2 distal
         """
 
         return res_obs
@@ -422,6 +437,11 @@ class KinovaGripper_Env:
         test_lift_pose = copy.deepcopy(self.pre_grasp_orientation_cartesian)
         test_lift_pose[2] += 0.1
 
+        # IMPORTANT!
+        audio_filename = 'ode_to_joy.wav'
+        wave_obj = sa.WaveObject.from_wave_file(os.path.join(rel_dirname, audio_filename))
+        play_obj = wave_obj.play()
+
         self.move_arm_orientation_cartesian_action(test_lift_pose, use_cartesian_path=False)
         # # rospy.sleep(7)  # wait a bit before taking more actions
 
@@ -456,6 +476,7 @@ class KinovaGripper_Env:
         # rospy.set_param('finish_reward_check', "true")
 
         rospy.loginfo('====================== ending reward check')
+        play_obj.stop()  # stop da music
 
         return total_reward
 
