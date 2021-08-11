@@ -38,13 +38,13 @@ class ImageProcessor():
             self.finger_pose_pub = rospy.Publisher("/finger_pose", Float32MultiArray, queue_size=10)
             self.validation_checker= rospy.Publisher("/total_errors",Float32MultiArray, queue_size=10)
             self.finger_angle_pub = rospy.Publisher("/finger_angle", Float32MultiArray, queue_size=10)
-            #self.finger2_dist_angle_pub = rospy.Publisher("/finger2_dist_angle", Float32, queue_size=10)
+            #self.finger2_proximal_angle_pub = rospy.Publisher("/finger2_proximal_angle", Float32, queue_size=10)
             self.obj_corners=[]
             self.ee_corners=[]
-            self.f1distcorners=[]
-            self.f1tipcorners=[]
-            self.f2distcorners=[]
-            self.f2tipcorners=[]
+            self.f1proximalcorners=[]
+            self.f1distalcorners=[]
+            self.f2proximalcorners=[]
+            self.f2distalcorners=[]
             #cv bridge class
             self.bridge = CvBridge()
             self.prev_ee_rvec=[]
@@ -55,10 +55,10 @@ class ImageProcessor():
         else:
             self.obj_corners=[]
             self.ee_corners=[]
-            self.f1distcorners=[]
-            self.f1tipcorners=[]
-            self.f2distcorners=[]
-            self.f2tipcorners=[]
+            self.f1proximalcorners=[]
+            self.f1distalcorners=[]
+            self.f2proximalcorners=[]
+            self.f2distalcorners=[]
             #cv bridge class
             self.bridge = CvBridge()
             self.prev_ee_rvec=[]
@@ -79,19 +79,19 @@ class ImageProcessor():
         # Marker IDs
         ee_marker_id = 608  # end-effector
         obj_marker_id = 509  # object  # TODO: change detection so it only fires for this specific marker?
-        finger1_dist_id = 189 # Finger 1 Dist
-        finger1_tip_id = 331# Finger 1 Tip
-        finger2_dist_id = 411 # Finger 2 Dist  
-        finger2_tip_id = 190  # Finger 1 Tip
+        finger1_proximal_id = 189 # Finger 1 proximal
+        finger1_distal_id = 331# Finger 1 distal
+        finger2_proximal_id = 411 # Finger 2 proximal
+        finger2_distal_id = 190  # Finger 1 distal
         #finger 1 is the thumb, finger 2 is the side with 2 fingers.
         #finger 1 should have -x,+y location and finger 2 should have +x,+y location
         '''
         ee_marker_id = 0  # end-effector
         obj_marker_id = 2  # object
-        finger1_dist_id = 1 # Finger 1 Dist
-        finger1_tip_id = 4  # Finger 1 Tip
-        finger2_dist_id = 5 # Finger 2 Dist  
-        finger2_tip_id = 3  # Finger 1 Tip
+        finger1_proximal_id = 1 # Finger 1 proximal
+        finger1_distal_id = 4  # Finger 1 distal
+        finger2_proximal_id = 5 # Finger 2 proximal 
+        finger2_distal_id = 3  # Finger 1 distal
         '''
         # Get the saved camera and distortion matrices from calibration
         #mtx = np.load('/home/nigel/kinova_ws/kinova_pkg/src/camera_mtx.npy') # camera matrix
@@ -114,16 +114,16 @@ class ImageProcessor():
         #Lists for storing marker positions
         ee_marker = []
         obj_marker = []
-        finger1_dist = []
-        finger1_tip = []
-        finger2_dist = []
-        finger2_tip = []
+        finger1_proximal = []
+        finger1_distal = []
+        finger2_proximal = []
+        finger2_distal = []
         finger_object_dist = []
         finger_pose = []
-        finger1_tip1 = []
-        finger1_dist1 = []
-        finger2_tip1 = []
-        finger2_dist1 = []
+        finger1_distal1 = []
+        finger1_proximal1 = []
+        finger2_distal1 = []
+        finger2_proximal1 = []
         im_num=0
         local_rotation=[]
         f1_rotation=[]
@@ -185,38 +185,39 @@ class ImageProcessor():
 
             flag1=True
             if np.all(ids != None):  # TODO: this is redundant, we already do a none check. also the none check didn't really work before LOL (you did a check on len(ids))
-                for i in range(ids.size):
-                    if ids[i] == ee_marker_id:
-                        if len(self.ee_corners)>5:
-                            self.ee_corners.pop(0)
-                        self.ee_corners.append(corners[i])
-                        corners[i]=np.average(self.ee_corners,axis=0)
-                    if ids[i].item() in self.MARKER_TO_OBJ.keys():  #ids[i]==obj_marker_id:  # bruh this is an array so need to use .item()
-                        flag1=False
-                        if len(self.obj_corners)>5:
-                            self.obj_corners.pop(0)
-                        self.obj_corners.append(corners[i])
-                        corners[i]=np.average(self.obj_corners,axis=0)
-                    if ids[i] == finger1_dist_id:
-                        if len(self.f1distcorners)>5:
-                            self.f1distcorners.pop(0)
-                        self.f1distcorners.append(corners[i])
-                        corners[i]=np.average(self.f1distcorners,axis=0)
-                    if ids[i]==finger1_tip_id:
-                        if len(self.f1tipcorners)>5:
-                            self.f1tipcorners.pop(0)
-                        self.f1tipcorners.append(corners[i])
-                        corners[i]=np.average(self.f1tipcorners,axis=0)
-                    if ids[i] == finger2_dist_id:
-                        if len(self.f2distcorners)>5:
-                            self.f2distcorners.pop(0)
-                        self.f2distcorners.append(corners[i])
-                        corners[i]=np.average(self.f2distcorners,axis=0)
-                    if ids[i]==finger2_tip_id:
-                        if len(self.f2tipcorners)>5:
-                            self.f2tipcorners.pop(0)
-                        self.f2tipcorners.append(corners[i])
-                        corners[i]=np.average(self.f2tipcorners,axis=0)
+                # for i in range(ids.size):
+                    # if ids[i] == ee_marker_id:
+                    #     if len(self.ee_corners)>5:
+                    #         self.ee_corners.pop(0)
+                    #     self.ee_corners.append(corners[i])
+                    #     corners[i]=np.average(self.ee_corners,axis=0)
+                    # if ids[i].item() in self.MARKER_TO_OBJ.keys():  #ids[i]==obj_marker_id:  # bruh this is an array so need to use .item()
+                    #     flag1=False
+                    #     if len(self.obj_corners)>5:
+                    #         self.obj_corners.pop(0)
+                    #     self.obj_corners.append(corners[i])
+                    #     corners[i]=np.average(self.obj_corners,axis=0)
+                    # if ids[i] == finger1_proximal_id:
+                    #     if len(self.f1proximalcorners)>5:
+                    #         self.f1proximalcorners.pop(0)
+                    #     self.f1proximalcorners.append(corners[i])
+                    #     corners[i]=np.average(self.f1proximalcorners,axis=0)
+                    # if ids[i]==finger1_distal_id:
+                    #     if len(self.f1distalcorners)>5:
+                    #         self.f1distalcorners.pop(0)
+                    #     self.f1distalcorners.append(corners[i])
+                    #     corners[i]=np.average(self.f1distalcorners,axis=0)
+                    # if ids[i] == finger2_proximal_id:
+                    #     if len(self.f2proximalcorners)>5:
+                    #         self.f2proximalcorners.pop(0)
+                    #     self.f2proximalcorners.append(corners[i])
+                    #     corners[i]=np.average(self.f2proximalcorners,axis=0)
+                    # if ids[i]==finger2_distal_id:
+                    #     if len(self.f2distalcorners)>5:
+                    #         self.f2distalcorners.pop(0)
+                    #     self.f2distalcorners.append(corners[i])
+                    #     corners[i]=np.average(self.f2distalcorners,axis=0)
+
 
                 rvec, tvec, __ = aruco.estimatePoseSingleMarkers(corners,marker_size, mtx, dist)
                 all_rotations=[0,0,0,0,0,0]
@@ -234,7 +235,7 @@ class ImageProcessor():
                         all_rotations[0]=rotation.inv()
                         ee_marker1 = tvec[i][0]
                         ee_marker = np.copy(tvec[i][0])
-                        shift=np.matmul(rotation.as_matrix(),[0,2.6,0])
+                        shift=np.matmul(rotation.as_matrix(),[1,5.8,0])
                         all_shifts[0]=shift
                         local_rotation=np.copy(rotation.inv().as_matrix())
                         ee_marker1[0] = ee_marker1[0] + shift[0]
@@ -255,53 +256,53 @@ class ImageProcessor():
                         obj_marker1[0] = obj_marker1[0] + shift[0]
                         obj_marker1[1] = obj_marker1[1] + shift[1]
                         obj_marker1[2] = obj_marker1[2] + shift[2]  ###Since Object height in z is 110 mm. Subtracting 55 mm brings center to object center
-                    # Save finger1 Dist marker pose
-                    if ids[i] == finger1_dist_id:
+                    # Save finger1 proximalmarker pose
+                    if ids[i] == finger1_proximal_id:
                         f1_rotation=np.copy(rotation.as_matrix())
-                        finger1_dist = np.copy(tvec[i][0])
-                        finger1_dist1 = tvec[i][0]
+                        finger1_proximal = np.copy(tvec[i][0])
+                        finger1_proximal1 = tvec[i][0]
                         shift=np.matmul(rotation.as_matrix(),[4.7,-0.1,0])
                         all_shifts[1]=shift
-                        finger1_dist1[0] = finger1_dist[0] + shift[0]
-                        finger1_dist1[1] = finger1_dist[1] + shift[1]
-                        finger1_dist1[2] = finger1_dist[2] + shift[2]
+                        finger1_proximal1[0] = finger1_proximal[0] + shift[0]
+                        finger1_proximal1[1] = finger1_proximal[1] + shift[1]
+                        finger1_proximal1[2] = finger1_proximal[2] + shift[2]
                         all_rotations[1]=rotation
                         #aruco.drawAxis(cv_image, mtx, dist, rvec[i], tvec[i], 2)
 
-                    # Save finger1 tip pose
-                    if ids[i] == finger1_tip_id:
+                    # Save finger1 distal pose
+                    if ids[i] == finger1_distal_id:
                         #aruco.drawAxis(cv_image, mtx, dist, rvec[i], tvec[i], 2)
                         shift=np.matmul(rotation.as_matrix(),[4.3,-2.7,0])
-                        finger1_tip = np.copy(tvec[i][0])
-                        finger1_tip1 = tvec[i][0]
+                        finger1_distal = np.copy(tvec[i][0])
+                        finger1_distal1 = tvec[i][0]
                         all_shifts[2]=shift
-                        #print('f1 z',finger1_tip[-1])
-                        finger1_tip1[0] = finger1_tip[0] + shift[0]
-                        finger1_tip1[1] = finger1_tip[1] + shift[1]
-                        finger1_tip1[2] = finger1_tip[2]+ shift[2]
+                        #print('f1 z',finger1_distal[-1])
+                        finger1_distal1[0] = finger1_distal[0] + shift[0]
+                        finger1_distal1[1] = finger1_distal[1] + shift[1]
+                        finger1_distal1[2] = finger1_distal[2]+ shift[2]
                         all_rotations[2]=rotation
-                    # Save finger2 Dist marker pose
-                    if ids[i] == finger2_dist_id:
+                    # Save finger2 proximalmarker pose
+                    if ids[i] == finger2_proximal_id:
                         f2_rotation=np.copy(rotation.as_matrix())
                         shift=np.matmul(rotation.as_matrix(),[4.4,-0.1,0])
                         all_shifts[3]=shift
-                        finger2_dist = np.copy(tvec[i][0])
-                        finger2_dist1 = tvec[i][0]
-                        finger2_dist1[0] = finger2_dist[0] + shift[0]
-                        finger2_dist1[1] = finger2_dist[1] + shift[1]
-                        finger2_dist1[2] = finger2_dist[2] + shift[2]
+                        finger2_proximal = np.copy(tvec[i][0])
+                        finger2_proximal1 = tvec[i][0]
+                        finger2_proximal1[0] = finger2_proximal[0] + shift[0]
+                        finger2_proximal1[1] = finger2_proximal[1] + shift[1]
+                        finger2_proximal1[2] = finger2_proximal[2] + shift[2]
                         all_rotations[3]=rotation
-                    # Save finger2 tip pose
-                    if ids[i] == finger2_tip_id:
+                    # Save finger2 distal pose
+                    if ids[i] == finger2_distal_id:
                         shift=np.matmul(rotation.as_matrix(),[4.3,2.7,0])
                         #aruco.drawAxis(cv_image, mtx, dist, rvec[i], tvec[i], 2)
                         all_shifts[4]=shift
-                        finger2_tip = np.copy(tvec[i][0])
-                        finger2_tip1 = tvec[i][0]
-                        #print('f2 z',finger2_tip[-1])
-                        finger2_tip1[0] = finger2_tip[0] + shift[0]
-                        finger2_tip1[1] = finger2_tip[1] + shift[1]
-                        finger2_tip1[2] = finger2_tip[2] + shift[2]
+                        finger2_distal = np.copy(tvec[i][0])
+                        finger2_distal1 = tvec[i][0]
+                        #print('f2 z',finger2_distal[-1])
+                        finger2_distal1[0] = finger2_distal[0] + shift[0]
+                        finger2_distal1[1] = finger2_distal[1] + shift[1]
+                        finger2_distal1[2] = finger2_distal[2] + shift[2]
                         all_rotations[4]=rotation
                     aruco.drawAxis(cv_image, mtx, dist, rvec[i], tvec[i], 2)
                 if (len(ee_marker)==0)&(len(self.prev_ee_rvec)>0):
@@ -315,38 +316,38 @@ class ImageProcessor():
                 if DEBUG_PRINTING:
                     print('markers!!!')
                     print('ee marker: ', ee_marker)
-                    print('finger 1 dist: ', finger1_dist)
-                    print('finger 2 dist: ', finger2_dist)
-                    print('finger 1 tip: ', finger1_tip)
-                    print('finger 2 tip: ', finger2_tip)
-                    # print(ee_marker,finger1_dist,finger2_dist,finger1_tip,finger2_tip)
+                    print('finger 1 proximal: ', finger1_proximal)
+                    print('finger 2 proximal: ', finger2_proximal)
+                    print('finger 1 distal: ', finger1_distal)
+                    print('finger 2 distal: ', finger2_distal)
+                    # print(ee_marker,finger1_proximal,finger2_proximal,finger1_distal,finger2_distal)
 
                 # this condition checks if all the aruco markers are present.
-                can_calculate_z = len(ee_marker) and len(finger1_dist) and len(finger2_dist) and len(finger1_tip) and len(finger2_tip)
+                can_calculate_z = len(ee_marker) and len(finger1_proximal) and len(finger2_proximal) and len(finger1_distal) and len(finger2_distal)
                 if can_calculate_z:
-                    avg_z=np.average([ee_marker[-1],finger1_dist[-1],finger2_dist[-1],finger1_tip[-1],finger2_tip[-1]])
+                    avg_z=np.average([ee_marker[-1],finger1_proximal[-1],finger2_proximal[-1],finger1_distal[-1],finger2_distal[-1]])
                     Z_dist=avg_z
                     #print('Z dist',Z_dist)
                     ee_marker=fix_z(ee_marker1,Z_dist)
-                    finger1_dist=fix_z(finger1_dist1,Z_dist)
-                    finger1_tip=fix_z(finger1_tip1,Z_dist)
-                    finger2_dist=fix_z(finger2_dist1,Z_dist)
-                    finger2_tip=fix_z(finger2_tip1,Z_dist)
+                    finger1_proximal=fix_z(finger1_proximal1,Z_dist)
+                    finger1_distal=fix_z(finger1_distal1,Z_dist)
+                    finger2_proximal=fix_z(finger2_proximal1,Z_dist)
+                    finger2_distal=fix_z(finger2_distal1,Z_dist)
 
                     #obj_marker=fix_z(obj_marker,Z_dist)
                     '''
-                    finger2_tip[0] = finger2_tip[0] + all_shifts[4][0]
-                    finger2_tip[1] = finger2_tip[1] + all_shifts[4][1]
-                    finger2_tip[2] = finger2_tip[2] + all_shifts[4][2]
-                    finger2_dist[0] = finger2_dist[0] + all_shifts[3][0]
-                    finger2_dist[1] = finger2_dist[1] + all_shifts[3][1]
-                    finger2_dist[2] = finger2_dist[2] + all_shifts[3][2]
-                    finger1_tip[0] = finger1_tip[0] + all_shifts[2][0]
-                    finger1_tip[1] = finger1_tip[1] + all_shifts[2][1]
-                    finger1_tip[2] = finger1_tip[2]+ all_shifts[2][2]
-                    finger1_dist[0] = finger1_dist[0] + all_shifts[1][0]
-                    finger1_dist[1] = finger1_dist[1] + all_shifts[1][1]
-                    finger1_dist[2] = finger1_dist[2] + all_shifts[1][2]
+                    finger2_distal[0] = finger2_distal[0] + all_shifts[4][0]
+                    finger2_distal[1] = finger2_distal[1] + all_shifts[4][1]
+                    finger2_distal[2] = finger2_distal[2] + all_shifts[4][2]
+                    finger2_proximal[0] = finger2_proximal[0] + all_shifts[3][0]
+                    finger2_proximal[1] = finger2_proximal[1] + all_shifts[3][1]
+                    finger2_proximal[2] = finger2_proximal[2] + all_shifts[3][2]
+                    finger1_distal[0] = finger1_distal[0] + all_shifts[2][0]
+                    finger1_distal[1] = finger1_distal[1] + all_shifts[2][1]
+                    finger1_distal[2] = finger1_distal[2]+ all_shifts[2][2]
+                    finger1_proximal[0] = finger1_proximal[0] + all_shifts[1][0]
+                    finger1_proximal[1] = finger1_proximal[1] + all_shifts[1][1]
+                    finger1_proximal[2] = finger1_proximal[2] + all_shifts[1][2]
                     obj_marker[0] = obj_marker[0] + all_shifts[-1][0]
                     obj_marker[1] = obj_marker[1] + all_shifts[-1][1]
                     obj_marker[2] = obj_marker[2] + all_shifts[-1][2]
@@ -377,19 +378,19 @@ class ImageProcessor():
                         #print('finger 1 proximal rot',new_rot.as_euler('xyz')[-1]*180/np.pi)
                         overall_angle=np.matmul(all_rotations[0].as_matrix(),all_rotations[2].as_matrix())
                         new_rot=R.from_matrix(overall_angle)
-                        #print('finger 1 distal rot',new_rot.as_euler('xyz')[-1]*180/np.pi)
+                        #print('finger 1 proximalal rot',new_rot.as_euler('xyz')[-1]*180/np.pi)
                         overall_angle=np.matmul(all_rotations[0].as_matrix(),all_rotations[3].as_matrix())
                         new_rot=R.from_matrix(overall_angle)
                         #print('finger 2 proximal rot',new_rot.as_euler('xyz')[-1]*180/np.pi)
                         overall_angle=np.matmul(all_rotations[0].as_matrix(),all_rotations[4].as_matrix())
                         new_rot=R.from_matrix(overall_angle)
-                        #print('finger 2 distal rot',new_rot.as_euler('xyz')[-1]*180/np.pi)
+                        #print('finger 2 proximalal rot',new_rot.as_euler('xyz')[-1]*180/np.pi)
                         #print('rotations',all_rotations[0].as_euler('xyz'), all_rotations[4].as_euler('xyz'))
                         #print("Object Distance: " +str(object_pose))
                         count += 1
 
-                    if len(finger1_dist) > 0 and len(ee_marker) > 0 and len(obj_marker) > 0:
-                        #print('pre rotation values',finger1_dist,ee_marker,finger2_dist)
+                    if len(finger1_proximal) > 0 and len(ee_marker) > 0 and len(obj_marker) > 0:
+                        #print('pre rotation values',finger1_proximal,ee_marker,finger2_proximal)
 
                         overall_angle=np.matmul(all_rotations[0].as_matrix(),all_rotations[1].as_matrix())
                         new_rot=R.from_matrix(overall_angle)
@@ -397,147 +398,147 @@ class ImageProcessor():
                         finger_angles.append(90+theta)
 
 
-                        finger_pose_local = [(x - y)/100 for x, y in zip(finger1_dist,ee_marker)]
+                        finger_pose_local = [(x - y)/100 for x, y in zip(finger1_proximal,ee_marker)]
                         finger_pose.append(list(np.matmul(local_rotation,finger_pose_local)))
 
                         # Get the distance between object and finger 1
 
-                        dist =np.linalg.norm([(x - y)/100 for x, y in zip(finger1_dist,obj_marker)])
+                        dist =np.linalg.norm([(x - y)/100 for x, y in zip(finger1_proximal,obj_marker)])
                         #dist = [math.sqrt(x)*10.0 for x in delta_pose]
                         finger_object_dist.append(dist)
-                        #print("Finger1 Dist to object: " +str(dist))
+                        #print("Finger1 proximal to object: " +str(dist))
                         count += 1
 
-                        # finger1_dist to object distance: finger_object_dist[0]
+                        # finger1_proximal to object distance: finger_object_dist[0]
 
-                    if len(finger1_tip) > 0 and len(ee_marker) > 0 and len(obj_marker) > 0:
+                    if len(finger1_distal) > 0 and len(ee_marker) > 0 and len(obj_marker) > 0:
 
                         overall_angle=np.matmul(all_rotations[1].inv().as_matrix(),all_rotations[2].as_matrix())
                         new_rot=R.from_matrix(overall_angle)
                         theta=new_rot.as_euler('xyz')[-1]*180/np.pi
                         finger_angles.append(180+abs(theta))
 
-                        finger_pose_local = [(x - y)/100 for x, y in zip(finger1_tip,ee_marker)]
+                        finger_pose_local = [(x - y)/100 for x, y in zip(finger1_distal,ee_marker)]
                         finger_pose.append(list(np.matmul(local_rotation,finger_pose_local)))
 
                         delta_pose = 0
                         # Get the distance between object and finger
-                        dist =np.linalg.norm([(x - y)/100 for x, y in zip(finger1_tip,obj_marker)])
+                        proximal=np.linalg.norm([(x - y)/100 for x, y in zip(finger1_distal,obj_marker)])
                         finger_object_dist.append(dist)
-                        #print("Finger1 tip to object: " +str(dist1))
+                        #print("Finger1 distal to object: " +str(dist1))
                         count += 1
 
-                        # finger1_tip to object distance: finger_object_dist[1]
+                        # finger1_distal to object distance: finger_object_dist[1]
 
-                    if len(finger2_dist) > 0 and len(ee_marker) > 0 and len(obj_marker) > 0:
+                    if len(finger2_proximal) > 0 and len(ee_marker) > 0 and len(obj_marker) > 0:
 
                         overall_angle=np.matmul(all_rotations[0].as_matrix(),all_rotations[3].as_matrix())
                         new_rot=R.from_matrix(overall_angle)
                         theta=new_rot.as_euler('xyz')[-1]*180/np.pi
                         finger_angles.append(270-theta)
 
-                        finger_pose_local = [(x - y)/100 for x, y in zip(finger2_dist,ee_marker)]
+                        finger_pose_local = [(x - y)/100 for x, y in zip(finger2_proximal,ee_marker)]
                         finger_pose.append(list(np.matmul(local_rotation,finger_pose_local)))
                         #finger_pose.append(finger_pose_local1[1])
                         #finger_pose.append(finger_pose_local1[2])
                         #print("Finger2 Proximal to Object relative pose: ", finger_pose[2][0:3])
 
-                        # finger2_dist to object pose: finger_pose[6:9]
+                        # finger2_proximal to object pose: finger_pose[6:9]
 
-                        dist =np.linalg.norm([(x - y)/100 for x, y in zip(finger2_dist,obj_marker)])
+                        dist =np.linalg.norm([(x - y)/100 for x, y in zip(finger2_proximal,obj_marker)])
 
-                        # finger2_dist to object distance: finger_object_dist[2]
+                        # finger2_proximal to object distance: finger_object_dist[2]
 
                         finger_object_dist.append(dist)
-                        #print("Finger2 Dist to object: " +str(dist2))
+                        #print("Finger2 proximalto object: " +str(dist2))
                         count += 1
 
-                    if len(finger2_tip) > 0 and len(ee_marker) > 0 and len(obj_marker) > 0:
+                    if len(finger2_distal) > 0 and len(ee_marker) > 0 and len(obj_marker) > 0:
 
                         overall_angle=np.matmul(all_rotations[3].inv().as_matrix(),all_rotations[4].as_matrix())
                         new_rot=R.from_matrix(overall_angle)
                         theta=new_rot.as_euler('xyz')[-1]*180/np.pi
                         finger_angles.append(180+abs(theta))
 
-                        finger_pose_local = [(x - y)/100 for x, y in zip(finger2_tip,ee_marker)]
+                        finger_pose_local = [(x - y)/100 for x, y in zip(finger2_distal,ee_marker)]
                         finger_pose.append(list(np.matmul(local_rotation,finger_pose_local)))
                         #finger_pose.append(finger_pose_local2[1])
                         #finger_pose.append(finger_pose_local2[2])
-                        #print("Finger2 tip to Object relative pose: ", finger_pose[3][0:3])
+                        #print("Finger2 distal to Object relative pose: ", finger_pose[3][0:3])
 
 
-                        # finger2_tip to object pose: finger_pose[6], finger_pose[7]
+                        # finger2_distal to object pose: finger_pose[6], finger_pose[7]
 
                         # Get the distance between object and finger
-                        dist =np.linalg.norm([(x - y)/100 for x, y in zip(finger2_tip,obj_marker)])
+                        dist =np.linalg.norm([(x - y)/100 for x, y in zip(finger2_distal,obj_marker)])
 
 
-                        # finger2_tip to object distance: finger_object_dist[3]
+                        # finger2_distal to object distance: finger_object_dist[3]
 
                         finger_object_dist.append(dist)
                         # finger_object_dist.append(dist1)
                         # finger_object_dist.append(dist2)
 
-                        #print("Finger2 tip to object: " +str(dist))
+                        #print("Finger2 distal to object: " +str(dist))
                         count += 1
                     #print('calculated finger angles',finger_angles)
                     #old method of finding finger angles
                     '''
                     old_finger_angles=[]
-                    if (len(f1_rotation) >0)&(len(f2_rotation)>0)&(len(local_rotation)>0)&(len(finger2_tip)>0)&(len(finger1_tip)>0):
+                    if (len(f1_rotation) >0)&(len(f2_rotation)>0)&(len(local_rotation)>0)&(len(finger2_distal)>0)&(len(finger1_distal)>0):
                         shift=np.matmul(f1_rotation,[0,-2.7,0])
                         a=np.copy(ee_marker)
-                        b=np.copy(finger1_dist)
+                        b=np.copy(finger1_proximal)
                         b=b+shift
-                        c=np.copy(finger1_dist)
+                        c=np.copy(finger1_proximal)
                         a1=np.array([b[0]-a[0],b[1]-a[1]])
                         a2=np.array([b[0]-c[0],b[1]-c[1]])
                         angle=np.arccos(np.dot(a1,a2)/(np.linalg.norm(a1)*np.linalg.norm(a2)))
                         
-                        #aruco.drawAxis(cv_image, mtx, dist, rvec[finger1_dist_id], b, 2)
+                        #aruco.drawAxis(cv_image, mtx, dist, rvec[finger1_proximal_id], b, 2)
                         old_finger_angles.append(angle*180/np.pi)
                         
                         shift=np.matmul(f1_rotation,[0,2.7,0])
-                        a=np.copy(finger1_dist)
-                        b=np.copy(finger1_dist)
+                        a=np.copy(finger1_proximal)
+                        b=np.copy(finger1_proximal)
                         b=b+shift
-                        c=np.copy(finger1_tip)
+                        c=np.copy(finger1_distal)
                         a1=np.array([b[0]-a[0],b[1]-a[1]])
                         a2=np.array([b[0]-c[0],b[1]-c[1]])
                         angle=np.arccos(np.dot(a1,a2)/(np.linalg.norm(a1)*np.linalg.norm(a2)))
-                        check=np.matmul(np.transpose(f1_rotation),finger1_tip)
-                        check=check-np.matmul(np.transpose(f1_rotation),finger1_dist)
+                        check=np.matmul(np.transpose(f1_rotation),finger1_distal)
+                        check=check-np.matmul(np.transpose(f1_rotation),finger1_proximal)
                         if check[0] <0:
                             angle=2*np.pi-angle
-                        #aruco.drawAxis(cv_image, mtx, dist, rvec[finger1_tip_id], b, 2)
+                        #aruco.drawAxis(cv_image, mtx, dist, rvec[finger1_distal_id], b, 2)
                         old_finger_angles.append(angle*180/np.pi)
                         
                         shift=np.matmul(f2_rotation,[0,2.7,0])
                         a=np.copy(ee_marker)
-                        b=np.copy(finger2_dist)
+                        b=np.copy(finger2_proximal)
                         b=b+shift
-                        c=np.copy(finger2_dist)
+                        c=np.copy(finger2_proximal)
                         a1=np.array([b[0]-a[0],b[1]-a[1]])
                         a2=np.array([b[0]-c[0],b[1]-c[1]])
                         angle=np.arccos(np.dot(a1,a2)/(np.linalg.norm(a1)*np.linalg.norm(a2)))
-                        #aruco.drawAxis(cv_image, mtx, dist, rvec[finger2_dist_id], b, 2)
+                        #aruco.drawAxis(cv_image, mtx, dist, rvec[finger2_proximal_id], b, 2)
                         old_finger_angles.append(angle*180/np.pi)
                         f2_rotation
                         shift=np.matmul(f2_rotation,[0,-2.7,0])
-                        a=np.copy(finger2_dist)
-                        b=np.copy(finger2_dist)
+                        a=np.copy(finger2_proximal)
+                        b=np.copy(finger2_proximal)
                         b=b+shift
-                        c=np.copy(finger2_tip)
+                        c=np.copy(finger2_distal)
                         a1=np.array([b[0]-a[0],b[1]-a[1]])
                         a2=np.array([b[0]-c[0],b[1]-c[1]])
                         angle=np.arccos(np.dot(a1,a2)/(np.linalg.norm(a1)*np.linalg.norm(a2)))
-                        check=np.matmul(np.transpose(f2_rotation),finger2_tip)
-                        check=check-np.matmul(np.transpose(f2_rotation),finger2_dist)
+                        check=np.matmul(np.transpose(f2_rotation),finger2_distal)
+                        check=check-np.matmul(np.transpose(f2_rotation),finger2_proximal)
                         if check[0] <0:
                             angle=2*np.pi-angle
                         #print('angle 1 and 2',a1,a2)
                         #print('final angle',angle)
-                        #aruco.drawAxis(cv_image, mtx, dist, rvec[finger2_tip_id], b, 2)
+                        #aruco.drawAxis(cv_image, mtx, dist, rvec[finger2_distal_id], b, 2)
                         old_finger_angles.append(angle*180/np.pi)
         
                     #print('finger angles',np.array(finger_angles)*180/np.pi)
@@ -545,21 +546,21 @@ class ImageProcessor():
                     #even older method to find finger angles
                     '''
                     if m1 > m2:
-                        #finger2_dist_angle = np.atan((m2- m1)/(1+ m1*m2))  ###  <  <-  this side angle of finger
-                        finger2_dist_angle = np.pi*2 - np.arctan((m2 - m1)/(1+ m1*m2))  ###  ->   <  this side angle of finger
+                        #finger2_proximal_angle = np.atan((m2- m1)/(1+ m1*m2))  ###  <  <-  this side angle of finger
+                        finger2_proximal_angle = np.pi*2 - np.arctan((m2 - m1)/(1+ m1*m2))  ###  ->   <  this side angle of finger
                     else:
-                          #finger2_dist_angle = np.atan((m1 - m2)/(1+ m1*m2))  ###  <  <-  this side angle of finger
-                        finger2_dist_angle = np.pi*2 - np.arctan((m1 - m2)/(1+ m1*m2))  ###  ->   <  this side angle of finger
+                          #finger2_proximal_angle = np.atan((m1 - m2)/(1+ m1*m2))  ###  <  <-  this side angle of finger
+                        finger2_proximal_angle = np.pi*2 - np.arctan((m1 - m2)/(1+ m1*m2))  ###  ->   <  this side angle of finger
                                      
-                    m3 = (finger1_dist1[1] - finger1_dist[1])/(finger1_dist1[0] - finger1_dist[0]) 
-                    m4 = (finger1_tip1[1] - finger1_tip[1])/(finger1_tip1[0] - finger1_tip[0]) 
+                    m3 = (finger1_proximal1[1] - finger1_proximal[1])/(finger1_proximal1[0] - finger1_proximal[0]) 
+                    m4 = (finger1_distal1[1] - finger1_distal[1])/(finger1_distal1[0] - finger1_distal[0]) 
                     
                     if m3 > m4:
-                        #finger1_dist_angle = np.atan((m3 - m4)/(1+ m3*m4))  ###  <  <-  this side angle of finger
-                        finger1_dist_angle = np.pi*2 - np.arctan((m3 - m4)/(1+ m3*m4))  ###  ->   <  this side angle of finger
+                        #finger1_proximal_angle = np.atan((m3 - m4)/(1+ m3*m4))  ###  <  <-  this side angle of finger
+                        finger1_proximal_angle = np.pi*2 - np.arctan((m3 - m4)/(1+ m3*m4))  ###  ->   <  this side angle of finger
                     else:
-                          #finger1_dist_angle = np.atan((m4 - m3)/(1+ m3*m4))  ###  <  <-  this side angle of finger
-                        finger1_dist_angle = np.pi*2 - np.arctan((m4 - m3)/(1+ m3*m4))  ###  ->   <  this side angle of finger  
+                          #finger1_proximal_angle = np.atan((m4 - m3)/(1+ m3*m4))  ###  <  <-  this side angle of finger
+                        finger1_proximal_angle = np.pi*2 - np.arctan((m4 - m3)/(1+ m3*m4))  ###  ->   <  this side angle of finger  
                     '''
 
                     # print('finger obj dist',finger_object_dist)
@@ -572,7 +573,7 @@ class ImageProcessor():
                     filename='image'+str(im_num)+'.png'
                         #print(filename)
                     cv2.imwrite(filename,gray)
-                    #self.finger2_dist_angle_pub.publish(finger2_dist_angle)
+                    #self.finger2_proximal_angle_pub.publish(finger2_proximal_angle)
 
                     # TODO: WTF IS THIS COUNT VARIABLE??
                     if count > 4:
@@ -654,7 +655,7 @@ class ImageProcessor():
 
         #Display
         # print('window size: ', cv_image.shape)
-        # cv2.imshow('object_pose_and_distance_estimation window', cv_image)
+        cv2.imshow('object_pose_and_distance_estimation.py window', cv_image)
         
         cv2.waitKey(3)
         
