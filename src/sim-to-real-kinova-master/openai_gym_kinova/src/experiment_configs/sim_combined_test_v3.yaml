@@ -1,28 +1,25 @@
-experiment_name: constant_speed_test
+experiment_name: sim_positional_test_v3_constant  # TODO: make this the log directory instead? idk
 params:
   controller:
     type: constant  # constant, discrete_random, continuous_random, pid, rl
-    speed: 3
+    speed: 6800  # steps per second. between 8000-10000
     options: [ 0, 1700, 3400 ]  # for discrete random
     distribution: uniform  # for continuous random uniform, random
     policy_filepath: policies/state_dim_full_train_v01/_07_22_21_0544/policy/train_DDPGfD_kinovaGrip
   logger:
     use_logger: true
     use_video: true
-    log_dir: sim_positional_test_v2_constant
+    log_dir: sim_positional_test_v3_constant
   noise:
     noise_range: fixed_list  # choose from fixed (fixed list), random (should contain uniform vs normal)
     noise_distribution: uniform  # choose from uniform or normal. don't need to touch this if using fixed
     fixed_list: [ [ 0,0,0,0,0,0 ], [ 0, 0.03, 0, 0, 0, 0 ], [ 0.03, 0.03, 0, 0, 0, 0 ],[ 0.02, 0.03, 0, 0, 0, 0 ],
-                  [ -0.03, 0.03, 0, 0, 0, 0 ],[ -0.02, 0.03, 0, 0, 0, 0 ], [ 0, 0.04, 0, 0, 0, 0 ],
-                  [ -0.04, 0.04, 0, 0, 0, 0 ], [ -0.03, 0.04, 0, 0, 0, 0 ], [ 0.03, 0.04, 0, 0, 0, 0 ],
-                  [ 0.04, 0.04, 0, 0, 0, 0 ], [ 0.02, 0.04, 0, 0, 0, 0 ], [ -0.02, 0.04, 0,0,0,0 ],
-                  [ 0.01, 0.04, 0,0,0,0 ], [ -0.01, 0.04, 0,0,0,0 ],
-                  [ 0, 0.035, 0,0,0,0 ], [ 0.01, 0.035,0,0,0,0 ], [ 0.02, 0.035, 0,0,0,0 ], [ 0.03, 0.035, 0,0,0,0 ], [ 0.04, 0.035, 0,0,0,0 ], [ -0.01, 0.035,0,0,0,0 ], [ -0.02, 0.035, 0,0,0,0 ], [ -0.03, 0.035, 0,0,0,0 ], [ -0.04, 0.035, 0,0,0,0 ],
-                  [ 0, 0.025, 0,0,0,0 ], [ 0.01, 0.025,0,0,0,0 ], [ 0.02, 0.025, 0,0,0,0 ], [ 0.03, 0.025, 0,0,0,0 ], [ 0.04, 0.025, 0,0,0,0 ], [ -0.01, 0.025,0,0,0,0 ], [ -0.02, 0.025, 0,0,0,0 ], [ -0.03, 0.025, 0,0,0,0 ], [ -0.04, 0.025, 0,0,0,0 ],
+                  [ -0.03, 0.03, 0, 0, 0, 0 ],[ -0.02, 0.03, 0, 0, 0, 0 ],
+                  [ 0, 0.035, 0,0,0,0 ], [ 0.03, 0.035, 0,0,0,0 ], [ -0.03, 0.035, 0,0,0,0 ],
+                  [ 0, 0.025, 0,0,0,0 ], [ 0.01, 0.025,0,0,0,0 ], [ 0.02, 0.025, 0,0,0,0 ], [ 0.03, 0.025, 0,0,0,0 ], [ -0.01, 0.025,0,0,0,0 ], [ -0.02, 0.025, 0,0,0,0 ], [ -0.03, 0.025, 0,0,0,0 ],
                   [ 0, 0.01, 0, 0, 0, 0 ], [ -0.01, 0.01, 0,0,0,0 ], [ 0.01, 0.01, 0, 0, 0, 0 ],
                   [ 0.02, 0.02, 0,0,0,0 ], [ -0.02, 0.02, 0,0,0,0 ], [ 0, 0.02, 0,0,0,0 ]
-    ]  # we turn the y axis negative in our script main_experiment_sim.py
+    ] # [ 0, 0.05, 0,0,0,0 ], [ 0.04, 0.05, 0,0,0,0 ], [ 0.03, 0.05, 0,0,0,0 ], [ 0.02, 0.05, 0,0,0,0 ], [ 0.01, 0.05, 0, 0, 0, 0 ], [ -0.04, 0.05, 0,0,0,0 ], [ -0.03, 0.05, 0,0,0,0 ], [ -0.02, 0.05, 0,0,0,0 ], [ -0.01, 0.05, 0, 0, 0, 0 ],
     x_noise: [ 0, 0.01, -0.01, 0.02, -0.02 ]
     y_noise: [ 0, 0.01, -0.01, 0.02, -0.02 ]
     z_noise: [ 0.00 ]
