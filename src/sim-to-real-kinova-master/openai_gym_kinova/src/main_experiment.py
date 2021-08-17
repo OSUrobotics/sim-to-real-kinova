@@ -78,8 +78,7 @@ if __name__ == '__main__':
         Loading parameters from YAML file
         """
         config_path = 'experiment_configs/'
-        filename = 'positional_noise_test.yaml'
-        filename = 'real_combined_test.yaml'
+        filename = 'real_rl_v1.yaml'
         config_filepath = os.path.join(rel_dirname, config_path, filename)
 
         print('config filepath: ', config_filepath)
@@ -102,7 +101,9 @@ if __name__ == '__main__':
         elif controller_type == 'discrete_random':
             agent = RandomAgent(options=controller_params)
         elif controller_type == 'rl':
-            agent = RLAgent(trained_policy_path=controller_params['policy_filepath'])
+            live_training = controller_params['live_training']
+            assert type(live_training) == bool, 'make sure your live_training parameter is a boolean (true or false)'
+            agent = RLAgent(trained_policy_path=os.path.join(rel_dirname, controller_params['policy_filepath']))
         else:
             # NOOOOOOOOOOOOOO
             rospy.error('YOU DIDNT GIVE A VALID CONTROLLER TYPE (TURN THIS INTO AN ASSERTION)')
@@ -125,7 +126,8 @@ if __name__ == '__main__':
         rate = rospy.Rate(30)  # TODO: hz param?
 
         # TODO: num of episodes based on num of permutations
-        for trial_idx in range(noise_params['start_index'], len(noiser.noise_permutation_arr)):  # TODO: num of trials param?
+        for trial_idx in range(noise_params['start_index'],
+                               len(noiser.noise_permutation_arr)):  # TODO: num of trials param?
 
             input('Trial ' + str(trial_idx) + ' | ' + 'Press enter to move to noisy position...')
 
@@ -182,13 +184,16 @@ if __name__ == '__main__':
 
             for timestep_idx in range(max_timesteps):  # or turn this into for loop
                 print('timestep:', timestep_idx)
-                action = agent.act(obs)
+                action = np.array([0, 0, 0]) if done else agent.act(obs)
                 print('THE ACTION IS:', action)
                 next_obs, reward, done, info = env.step(action)
 
-                if done or timestep_idx == max_timesteps - 1:
+                if done:
                     rospy.loginfo('=== stopping the closing of fingers...')
                     finish_velocity_controller_pub.publish(True)
+
+                if timestep_idx == max_timesteps - 1:
+                    rospy.loginfo('=== burned 30 timesteps...')
                     break
 
                 # grab the image from subscriber
