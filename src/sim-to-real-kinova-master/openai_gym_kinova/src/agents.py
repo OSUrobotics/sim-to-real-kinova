@@ -78,18 +78,21 @@ class RLAgent(Agent):
     action class based on trained RL agent
     """
 
-    def __init__(self, trained_policy_path, state_dim_config='adam_sim2real'):
+    def __init__(self, trained_policy_path, state_dim_config='adam_sim2real_v02', real_world=True):
         super(Agent, self).__init__()
 
-        state_idx_arr = state_dim_setup(state_dim_config)
-        self.modified_state_dim = len(state_idx_arr)
+        self.state_idx_arr = state_dim_setup(state_dim_config)
+        # print('length of state idx arr: ', self.state_idx_arr.shape)
+        self.modified_state_dim = len(self.state_idx_arr)
 
         # Set dimensions for state and action spaces - policy initialization
         # state_dim = 82  # State dimension dependent on the length of the state space
         self.action_dim = 3  # env.action_space.shape[0]
-        self.max_action = 3.0  # this is hardcoded from our simulation environment
+        self.max_action = 1.5  # this is hardcoded from our simulation environment
 
-        self.max_action_real_world = 6800  # this is hardcoded from real life
+        self.max_action_real_world = 3400  # this is hardcoded from real life
+
+        self.real_world = real_world
 
         kwargs = {
             "state_dim": self.modified_state_dim,
@@ -105,12 +108,20 @@ class RLAgent(Agent):
         """
         lmao pick some random shit
         """
-        rl_action = self.policy.select_action(obs)
-        scaled_action = lerp(rl_action, old_min=-self.max_action, old_max=self.max_action,
+
+        mod_obs = obs
+        # print('lol', obs.shape)
+        if not self.real_world:
+            mod_obs = obs[self.state_idx_arr]
+
+        rl_action = self.policy.select_action(mod_obs)
+
+        print('observation shape:', mod_obs.shape)
+        print('original action:', rl_action)
+
+        if self.real_world:
+            rl_action = lerp(rl_action, old_min=-self.max_action, old_max=self.max_action,
                              new_min=-self.max_action_real_world,
                              new_max=self.max_action_real_world)
 
-        print('observation shape:', obs.shape)
-        print('original action:', rl_action)
-
-        return scaled_action
+        return rl_action

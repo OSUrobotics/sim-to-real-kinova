@@ -24,9 +24,6 @@ from utils import Noiser
 # the actual openai gym
 import gym
 
-# the DDPGfD thingy
-from DDPGfD import DDPGfD
-
 if __name__ == '__main__':
     rel_dirname = os.path.dirname(__file__)
     print('relative path:', rel_dirname)
@@ -35,9 +32,9 @@ if __name__ == '__main__':
     Loading parameters from YAML file
     """
     config_path = 'experiment_configs/'
-    filename = 'sim_positional_noise_test.yaml'
-    filename = 'sim_constant_speed_test.yaml'
-    filename = 'sim_combined_test.yaml'
+    filename = 'sim_combined_test_v6.yaml'
+    filename = 'sim_playground_test.yaml'
+    filename = 'sim_rl_v1.yaml'
     config_filepath = os.path.join(rel_dirname, config_path, filename)
 
     stream = open(config_filepath, 'r')
@@ -58,7 +55,7 @@ if __name__ == '__main__':
     elif controller_type == 'discrete_random':
         agent = RandomAgent(options=controller_params)
     elif controller_type == 'rl':
-        agent = RLAgent(trained_policy_path=controller_params['policy_filepath'])
+        agent = RLAgent(trained_policy_path=os.path.join(rel_dirname, controller_params['policy_filepath']), real_world=False)
     else:
         # NOOOOOOOOOOOOOO
         raise AssertionError('YOU DIDNT GIVE A VALID CONTROLLER TYPE (TURN THIS INTO AN ASSERTION)')
@@ -96,6 +93,9 @@ if __name__ == '__main__':
             # flip y noise
             y_noise *= -1
 
+            # flip x noise
+            x_noise *= -1
+
         print('Noise parameters:\n', 'x_noise:', str(x_noise), '| y_noise:', str(y_noise), '| z_noise:',
               str(z_noise), '| roll_noise:', str(roll_noise), '| pitch_noise:', str(pitch_noise), '| yaw_noise:',
               str(yaw_noise))
@@ -132,8 +132,8 @@ if __name__ == '__main__':
         info['curr_image'] = env.just_render_img()
 
         noise_info = {
-            'x_noise': x_noise,
-            'y_noise': y_noise,
+            'x_noise': -x_noise,  # flip x noise back
+            'y_noise': -y_noise,  # flip y noise back
             'z_noise': z_noise,
             'roll_noise': roll_noise,
             'pitch_noise': pitch_noise,
@@ -144,8 +144,10 @@ if __name__ == '__main__':
 
         for timestep_idx in range(max_timesteps):  # or turn this into for loop
             # print('timestep:', timestep_idx)
+            # print('observation size: ', obs.shape)
             action = agent.act(obs)
             print('THE ACTION IS:', action)
+            # action = np.array([3400, 0, 0])
             next_obs, reward, done, info = env.step(np.concatenate(([0], action)))
 
             # grab the image from subscriber
