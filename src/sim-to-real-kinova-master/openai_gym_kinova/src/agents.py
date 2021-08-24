@@ -97,7 +97,8 @@ class RLAgent(Agent):
         kwargs = {
             "state_dim": self.modified_state_dim,
             "action_dim": self.action_dim,
-            "max_action": self.max_action
+            "max_action": self.max_action,
+            "batch_size": 1  # use a batch size of 1 for the updates...
         }
 
         self.policy = DDPGfD(**kwargs)
