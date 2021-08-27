@@ -14,7 +14,10 @@ import sys
 class ImageProcessor():
     MARKER_TO_OBJ = {
         509: 'CylinderB',
-        201: 'CubeM'
+        201: 'CubeM',
+        202: 'CylinderM',
+        203: 'Vase1M',
+        204: 'Cone1M'
     }
     def __init__(self):
         # see openai_gym_kinova for more info on MARKER_TO_OBJ
@@ -121,7 +124,7 @@ class ImageProcessor():
 
         #Display
         # cv2.imshow('reward_detection.py window', cv_image)
-        cv2.waitKey(3)
+        cv2.waitKey(3)  # waits 3 milliseconds
             
     
 def main(args):

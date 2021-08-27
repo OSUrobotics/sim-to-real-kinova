@@ -11,6 +11,7 @@ import cv2.aruco as aruco
 import sys
 import math
 from scipy.spatial.transform import Rotation as R
+import time
 
 DEBUG_PRINTING=False
 
@@ -24,7 +25,10 @@ def fix_z(vector,zval):
 class ImageProcessor():
     MARKER_TO_OBJ = {
         509: 'CylinderB',
-        201: 'CubeM'
+        201: 'CubeM',
+        202: 'CylinderM',
+        203: 'Vase1M',
+        204: 'Cone1M'
     }
     def __init__(self,real=True):
         # see openai_gym_kinova for more info on MARKER_TO_OBJ
@@ -66,6 +70,8 @@ class ImageProcessor():
 
     # Callback for image processing
     def get_object_pose(self, img_msg):
+        # start = time.time()
+
         # Aruko Marker Info
 
         ##Box Pixel values in the Image## < WHY WE CROPPIN THE IMAGE THO
@@ -185,6 +191,9 @@ class ImageProcessor():
 
             flag1=True
             if np.all(ids != None):  # TODO: this is redundant, we already do a none check. also the none check didn't really work before LOL (you did a check on len(ids))
+                '''
+                this is an averaging function. averages the observation over the past 5 observations seen
+                '''
                 # for i in range(ids.size):
                     # if ids[i] == ee_marker_id:
                     #     if len(self.ee_corners)>5:
@@ -657,7 +666,11 @@ class ImageProcessor():
         # print('window size: ', cv_image.shape)
         cv2.imshow('object_pose_and_distance_estimation.py window', cv_image)
         
-        cv2.waitKey(3)
+        cv2.waitKey(1)
+
+        # end = time.time()
+        #
+        # rospy.loginfo(end - start)
         
     
 def main(args):
