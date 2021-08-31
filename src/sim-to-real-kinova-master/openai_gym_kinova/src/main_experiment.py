@@ -39,20 +39,20 @@ if __name__ == '__main__':
     rospy.init_node('openai_gym_kinova')
 
     try:
-        # TODO: instead of sleeping, listen to a "ready" channel or service.
-        rospy.sleep(5.0)
-
-        # TODO Note: if some shit breaks, add stuff here
-        print('Starting file: main_experiment.py')
-
-        # load OpenAI Gym env
-        env = KinovaGripper_Env()
-
-        # this parameter keeps the kinova_gripper_env running in ROS wrapper code
-        rospy.set_param('exec_done', 'false')
-
-        # this controller lets us manually set off the joint velocity controller
-        finish_velocity_controller_pub = rospy.Publisher('/finish_velocity_controller', Bool, queue_size=1)
+        # # TODO: instead of sleeping, listen to a "ready" channel or service.
+        # rospy.sleep(5.0)
+        #
+        # # TODO Note: if some shit breaks, add stuff here
+        # print('Starting file: main_experiment.py')
+        #
+        # # load OpenAI Gym env
+        # env = KinovaGripper_Env(shape='CubeM')
+        #
+        # # this parameter keeps the kinova_gripper_env running in ROS wrapper code
+        # rospy.set_param('exec_done', 'false')
+        #
+        # # this controller lets us manually set off the joint velocity controller
+        # finish_velocity_controller_pub = rospy.Publisher('/finish_velocity_controller', Bool, queue_size=1)
 
         # # load agent
         # trained_policy_path = 'policies/state_dim_full_train_v01/_07_22_21_0544/policy/train_DDPGfD_kinovaGrip'
@@ -78,7 +78,7 @@ if __name__ == '__main__':
         Loading parameters from YAML file
         """
         config_path = 'experiment_configs/'
-        filename = 'real_rl_v1.yaml'
+        filename = 'real_constant_v1_cube_observation.yaml'
         config_filepath = os.path.join(rel_dirname, config_path, filename)
 
         print('config filepath: ', config_filepath)
@@ -94,10 +94,15 @@ if __name__ == '__main__':
         logger_params = experiment_params['logger']
         noise_params = experiment_params['noise']
         max_timesteps = experiment_params['max_timesteps']
+        shape = experiment_params['shape']
+
+        assert shape in ['CubeM', 'CylinderM', 'Vase1M',
+                         'Cone1M'], 'make sure you are using a shape name that actually exists...'
 
         controller_type = controller_params['type']
         if controller_type == 'constant':
             agent = ConstantAgent(speed=controller_params['speed'])
+            # agent = None
         elif controller_type == 'discrete_random':
             agent = RandomAgent(options=controller_params)
         elif controller_type == 'rl':
@@ -110,7 +115,7 @@ if __name__ == '__main__':
 
         logger = None
         if logger_params['use_logger']:
-            log_dir = os.path.join(rel_dirname, logger_params['log_dir'])
+            log_dir = os.path.join(rel_dirname, experiment_name)
             logger = Logger(log_dir=log_dir, use_video=logger_params['use_video'],
                             start_episode_num=noise_params['start_index'] + 1)
 
@@ -118,6 +123,21 @@ if __name__ == '__main__':
                         noise_params['roll_noise'], noise_params['pitch_noise'], noise_params['yaw_noise'],
                         noise_range=noise_params['noise_range'], noise_distribution=noise_params['noise_distribution'],
                         start_index=noise_params['start_index'], fixed_list=noise_params['fixed_list'])
+
+        # TODO: instead of sleeping, listen to a "ready" channel or service.
+        rospy.sleep(5.0)
+
+        # TODO Note: if some shit breaks, add stuff here
+        print('Starting file: main_experiment.py')
+
+        # load OpenAI Gym env
+        env = KinovaGripper_Env(shape=shape)
+
+        # this parameter keeps the kinova_gripper_env running in ROS wrapper code
+        rospy.set_param('exec_done', 'false')
+
+        # this controller lets us manually set off the joint velocity controller
+        finish_velocity_controller_pub = rospy.Publisher('/finish_velocity_controller', Bool, queue_size=1)
 
         rospy.loginfo('There are ' + str(len(noiser.noise_permutation_arr)) + ' trials to be conducted')
         rospy.loginfo('Starting at trial: ' + str(noise_params['start_index']))
@@ -188,12 +208,17 @@ if __name__ == '__main__':
                 print('THE ACTION IS:', action)
                 next_obs, reward, done, info = env.step(action)
 
+
+                '''
+                welp the two processes combined
+                '''
                 if done:
                     rospy.loginfo('=== stopping the closing of fingers...')
                     finish_velocity_controller_pub.publish(True)
 
                 if timestep_idx == max_timesteps - 1:
                     rospy.loginfo('=== burned 30 timesteps...')
+                    finish_velocity_controller_pub.publish(True)  # do it anyways
                     break
 
                 # grab the image from subscriber

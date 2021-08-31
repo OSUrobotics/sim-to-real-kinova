@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 ###############
-# Author: Paresh
+# Author: Adam
 # Purpose: Simulation to Real Implementation on Kinova
-# Summer 2020
+# Summer 2021
 ###############
 import copy
 
@@ -44,16 +44,23 @@ rel_dirname = os.path.dirname(__file__)
 class KinovaGripper_Env:
     MARKER_TO_OBJ = {
         509: 'CylinderB',
-        201: 'CubeM'
+        201: 'CubeM',
+        202: 'CylinderM',
+        203: 'Vase1M',
+        204: 'Cone1M'
     }
 
     OBJ_SIZE_MAP = {
         'CylinderB': [0.042, 0.042, 0.110],
         'CubeB': [0.048, 0.048, 0.115],
-        'CubeM': [0.040, 0.040, 0.105]
+        'CubeM': [0.040, 0.040, 0.105],
+        # 'CylinderM': [0.042, 0.042, 0.110],
+        'CylinderM': [0.03180836 * 2, 0.03187125 * 2, 0.13553753],  # taken directly from mujoco sim. this has no fucking correlation to how I measured it in real life.
+        'Cone1M': [0.03180836 * 2, 0.03187125 * 2, 0.13553753],  # same as above
+        'Vase1M': [0.02128863 * 2, 0.02125081 * 2, 0.11000255]  # same as above
     }
 
-    def __init__(self):
+    def __init__(self, shape='CubeM'):
         self.joint_states = JointState()
         self.finger_pos = FingerPosition()
         self.reward = 0
@@ -90,14 +97,20 @@ class KinovaGripper_Env:
         #                                         0.7071]  # manually set the quaternions lol
         # # 0.0329 -0.4842 0.3109 0.7778 -0.0420 0.0475 0.6252
 
-        self.pre_grasp_orientation_cartesian = [0.03544, -0.62044, 0.185, 0.7071, 0.0, 0.0,
-                                                0.7071]
+        # self.pre_grasp_orientation_cartesian = [0.03544, -0.62044, 0.185, 0.7071, 0.0, 0.0,
+        #                                         0.7071]
 
         # self.pre_grasp_orientation_cartesian_sim_mock = [0.04, -0.5854, 0.185, 0.7071, 0.0, 0.0,
         #                                                  0.7071]  # try to be like simulator
-        self.pre_grasp_orientation_cartesian_sim_mock = [0.04, -0.60, 0.185, 0.7071, 0.0, 0.0,
+
+        # NOTE: THIS IS OUR DEFAULT GRASPING POSE!
+        self.pre_grasp_orientation_cartesian = [0.04, -0.60, 0.185, 0.7071, 0.0, 0.0,
                                                          0.7071]  # try to be like simulator
-        self.pre_grasp_orientation_cartesian = self.pre_grasp_orientation_cartesian_sim_mock
+
+        # NOTE: WE ADDED IN THIS SHIFT MANUALLY BECAUSE IRL ROBOT WAS GLITCHING!
+        self.pre_grasp_orientation_cartesian = [0.065, -0.60, 0.185, 0.7071, 0.0, 0.0,
+                                                         0.7071]  # try to be like simulator
+        # self.pre_grasp_orientation_cartesian = self.pre_grasp_orientation_cartesian_sim_mock
         """
         python2
         import tf
@@ -172,7 +185,7 @@ class KinovaGripper_Env:
         self.image_sub = rospy.Subscriber('/usb_cam/image_raw', Image, self.update_most_recent_image)
 
         # TODO: this is hardcoded
-        self.obj_size = self.OBJ_SIZE_MAP['CubeM']
+        self.obj_size = self.OBJ_SIZE_MAP[shape]
 
     def update_most_recent_image(self, img_msg):
         """
@@ -197,10 +210,11 @@ class KinovaGripper_Env:
         # finger_joint_state_value = [0, 0, 0, 0, 0, 0]
         finger_joint_state_value = [0, 0, 0, 0]
         if self.finger_angle != []:
-            finger_joint_state_value[0] = self.finger_angle[0]
-            finger_joint_state_value[1] = self.finger_angle[1]
-            finger_joint_state_value[2] = self.finger_angle[2]
-            finger_joint_state_value[3] = self.finger_angle[3]
+            ### NOTE: WE CHANGE EVERYTHING TO RADIANS!
+            finger_joint_state_value[0] = np.deg2rad(self.finger_angle[0]) % (2 * np.pi)  # first finger: f1 prox angle
+            finger_joint_state_value[1] = np.deg2rad(self.finger_angle[1]) % (2 * np.pi)  # f1 dist angle
+            finger_joint_state_value[2] = np.deg2rad(self.finger_angle[2]) % (2 * np.pi)  # f2 prox angle
+            finger_joint_state_value[3] = np.deg2rad(self.finger_angle[3]) % (2 * np.pi)  # f2 dist angle
 
             # the third finger's guessed angles. TODO: remove these
             # finger_joint_state_value[4] = self.finger_angle[2]
@@ -295,7 +309,7 @@ class KinovaGripper_Env:
         # Most recent commit: we halve the object size along certain dimensions, we remove the wrist pose...
 
         res_obs = fingers_6D_pose + list(obj_pose) + joint_states + \
-                  [obj_size[0], obj_size[1], obj_size[2]] + finger_obj_dist  # + [x_angle, z_angle]
+                  [obj_size[0] * 0.5, obj_size[1] * 0.5, obj_size[2]] + finger_obj_dist  # + [x_angle, z_angle]
         # print('this is the obs data',fingers_6D_pose)
 
         print('==================== start obs ===========================')
@@ -670,6 +684,9 @@ class KinovaGripper_Env:
         action_goal = GoToPoseOrientationCartesianGoal()
         action_goal.goal_pose = goal_pose
         action_goal.cartesian_path = Bool(use_cartesian_path)
+
+        # print('our pregoal position (move_arm_orientation_cartesian_action):')
+        # print(action_goal.goal_pose)
 
         client = actionlib.SimpleActionClient('go_to_pose_orientation_cartesian_as', GoToPoseOrientationCartesianAction)
         client.wait_for_server()
