@@ -16,6 +16,12 @@ import pandas as pd
 import seaborn as sns
 
 
+"""
+Example usage:
+
+python visualize_irl.py --log_dir sim_rl_v2_cone && python visualize_irl.py --log_dir sim_rl_v2_vase && python visualize_irl.py --log_dir sim_rl_v2
+"""
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--log_dir", type=str, required=True)  # log directory
