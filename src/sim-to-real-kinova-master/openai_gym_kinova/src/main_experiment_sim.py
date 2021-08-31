@@ -9,6 +9,8 @@ Author: Adam Lee (or... run git blame to find the latest edits)
 """
 
 # standard packages
+import argparse
+from pathlib import Path
 import time
 import os
 import yaml
@@ -27,7 +29,18 @@ import gym
 
 # os.environ.get("LD_LIBRARY_PATH", "")
 
+"""
+Example usage:
+python main_experiment_sim.py --config_name sim_rl_v2_cone.yaml && python main_experiment_sim.py --config_name sim_rl_v2_vase.yaml && python main_experiment_sim.py --config_name sim_rl_v2_cylinder.yaml
+"""
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config_name", type=str, required=True)  # real directory
+    parser.add_argument("--config_folder", type=str, default='experiment_configs/')
+
+    args = parser.parse_args()
+
     # print(os.environ['MUJOCO_GL'])
     rel_dirname = os.path.dirname(__file__)
     print('relative path:', rel_dirname)
@@ -36,9 +49,13 @@ if __name__ == '__main__':
     Loading parameters from YAML file
     """
     config_path = 'experiment_configs/'
+    config_path = args.config_folder
+    assert Path(config_path).exists(), 'Check that the config folder ' + config_path + ' exists.'
+
     filename = 'sim_combined_test_v6.yaml'
     filename = 'sim_playground_test.yaml'
-    # filename = 'sim_rl_v1.yaml'
+    filename = 'sim_rl_v2.yaml'
+    filename = args.config_name
     config_filepath = os.path.join(rel_dirname, config_path, filename)
 
     stream = open(config_filepath, 'r')
@@ -52,6 +69,9 @@ if __name__ == '__main__':
     logger_params = experiment_params['logger']
     noise_params = experiment_params['noise']
     max_timesteps = experiment_params['max_timesteps']
+    shape = experiment_params['shape']
+
+    assert shape in ['CubeM', 'CylinderM', 'Vase1M', 'Cone1M'], 'make sure you are using a shape name that actually exists...'
 
     controller_type = controller_params['type']
     live_training = False
@@ -127,7 +147,7 @@ if __name__ == '__main__':
 
         start_hand_rotation = [-1.57 + roll_noise, 0 + pitch_noise, -1.57 + yaw_noise]
 
-        obs = env.reset(shape_keys=['CubeM'], hand_orientation='normal',
+        obs = env.reset(shape_keys=[shape], hand_orientation='normal',
                         start_pos=[x_noise, y_noise, z_noise],
                         hand_rotation=start_hand_rotation)  # TODO: make sure this is NO OBJECT
 
