@@ -282,12 +282,12 @@ class Logger(object):
         if self._use_video:
             print('SAVING!!!')
             # save the video
-            self.video_recorder.save('video_' + str(self.episode_num))
+            self.video_recorder.save('video_' + str(self.episode_num).zfill(3))
             # this is bad practice, but just make a new video recorder lol
             self.video_recorder = VideoRecorder(dir_name=self.video_path_name, height=1080, width=1920, camera_id=0,
                                                 fps=30)
 
-            self.debug_video_recorder.save('debug_video_' + str(self.episode_num))
+            self.debug_video_recorder.save('debug_video_' + str(self.episode_num).zfill(3))
             # this is bad practice, but just make a new video recorder lol
             self.debug_video_recorder = VideoRecorder(dir_name=self.video_path_name, height=1080, width=1920, camera_id=0,
                                                 fps=30)
