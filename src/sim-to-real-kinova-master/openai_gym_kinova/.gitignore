@@ -27,3 +27,5 @@ src/__pycache__/
 # log stuff:
 *.log
 
+*MUJOCO_LOG.TXT
+*.zip
