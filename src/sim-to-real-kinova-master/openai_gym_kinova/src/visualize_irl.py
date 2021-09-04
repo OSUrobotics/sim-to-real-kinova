@@ -62,6 +62,10 @@ if __name__ == "__main__":
     x_noise_arr = noise_arr[:, 0]
     y_noise_arr = noise_arr[:, 1]
     z_noise_arr = noise_arr[:, 2]
+    roll_noise_arr = noise_arr[:, 3]
+    pitch_noise_arr = noise_arr[:, 4]
+    yaw_noise_arr = noise_arr[:, 5]
+
 
     start_pose_arr = np.array([np.load(filepath) for filepath in start_pose_filepaths])
     hand_orientation_quat_arr = start_pose_arr[:, -4:]  # last 4 elems are x,y,z,w quaternion...
@@ -71,13 +75,15 @@ if __name__ == "__main__":
     # quat_dist_arr = np.array([np.load(filepath) for filepath in quat_dist_filepaths])
 
     df = pd.DataFrame(
-        {'x_noise': x_noise_arr, 'y_noise': y_noise_arr, 'z_noise': z_noise_arr, 'Success': success_arr == True})
+        {'x_noise': x_noise_arr, 'y_noise': y_noise_arr, 'z_noise': z_noise_arr, 'roll_noise': roll_noise_arr,
+         'pitch_noise': pitch_noise_arr, 'yaw_noise': yaw_noise_arr, 'Success': success_arr == True})
 
     # calculation stuff: do this after defining dataframe
 
     # step 1: get translation_err. flips to neg value if x is negative
+    # note: we add 0.00001 cuz otherwise, np.sign(0) is just 0.
     df['trans_err'] = df[['x_noise', 'y_noise', 'z_noise']].apply(
-        lambda x: np.sign(x[0]) * np.sqrt(np.sum((x.to_numpy() - base_location) ** 2)), axis=1)
+        lambda x: np.sign(x[0] + 0.00001) * np.sqrt(np.sum((x.to_numpy() - base_location) ** 2)), axis=1)
 
     # step 2: get quat distance
     quaternion_dot_prod = np.dot(hand_orientation_quat_arr, ideal_grasp_quat)

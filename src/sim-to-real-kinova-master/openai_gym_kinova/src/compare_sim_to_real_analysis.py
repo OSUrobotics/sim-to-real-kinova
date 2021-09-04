@@ -30,6 +30,10 @@ def cropND(img, bounding):  # taken from https://stackoverflow.com/a/50322574
 
 
 class ExperimentAnalysis:
+    """
+    TODO: eventually replace visualize_irl.py with this object!
+    """
+
     def __init__(self, log_dir, base_location=np.array([0, 0, 0]),
                  ideal_grasp_quat=np.array([np.pi / 2, 0, 0, np.pi / 2])):
         # make results directory first...
@@ -55,19 +59,24 @@ class ExperimentAnalysis:
         x_noise_arr = noise_arr[:, 0]
         y_noise_arr = noise_arr[:, 1]
         z_noise_arr = noise_arr[:, 2]
+        roll_noise_arr = noise_arr[:, 3]
+        pitch_noise_arr = noise_arr[:, 4]
+        yaw_noise_arr = noise_arr[:, 5]
 
         start_pose_arr = np.array([np.load(filepath) for filepath in start_pose_filepaths])
         hand_orientation_quat_arr = start_pose_arr[:, -4:]  # last 4 elems are x,y,z,w quaternion...
 
         # the dataframe
         self.df = pd.DataFrame(
-            {'x_noise': x_noise_arr, 'y_noise': y_noise_arr, 'z_noise': z_noise_arr, 'Success': success_arr == True})
+            {'x_noise': x_noise_arr, 'y_noise': y_noise_arr, 'z_noise': z_noise_arr, 'roll_noise': roll_noise_arr,
+             'pitch_noise': pitch_noise_arr, 'yaw_noise': yaw_noise_arr, 'Success': success_arr == True})
 
         # calculation stuff: do this after defining dataframe
 
         # step 1: get translation_err. flips to neg value if x is negative
+        # note: we add 0.00001 cuz otherwise, np.sign(0) is just 0.
         self.df['trans_err'] = self.df[['x_noise', 'y_noise', 'z_noise']].apply(
-            lambda x: np.sign(x[0]) * np.sqrt(np.sum((x.to_numpy() - base_location) ** 2)), axis=1)
+            lambda x: np.sign(x[0] + 0.00001) * np.sqrt(np.sum((x.to_numpy() - base_location) ** 2)), axis=1)
 
         # step 2: get quat distance
         quaternion_dot_prod = np.dot(hand_orientation_quat_arr, ideal_grasp_quat)
@@ -301,11 +310,12 @@ if __name__ == "__main__":
             print('figure: ', 'Obs variable with index: ' + str(obs_var_idx))
             axs[obs_var_idx].set_title('Obs variable with index: ' + str(obs_var_idx))
             axs[obs_var_idx].plot(np.arange(real_obs.shape[0]), real_obs[:, obs_var_idx], label='real', marker='o')
-            axs[obs_var_idx].plot(np.arange(30), reduced_sim_obs[:30, obs_var_idx], marker='x',
+            axs[obs_var_idx].plot(np.arange(45), reduced_sim_obs[:45, obs_var_idx], marker='x',
                                   label='sim')  # we truncate at 30, the max timesteps for the grasping stage in simulation. this is HARDCODED
             axs[obs_var_idx].legend()
 
-        obs_compare_filename = 'obs_compare_' + 'x_' + "{:05d}".format(int(x_noise * 1000)) + '_y_' + "{:05d}".format(
+        obs_compare_filename = 'obs_compare_' + str(episode_idx).zfill(3) + '_x_' + "{:05d}".format(
+            int(x_noise * 1000)) + '_y_' + "{:05d}".format(
             int(y_noise * 1000)) + '.png'
 
         fig.savefig(os.path.join(results_obs_dir, obs_compare_filename))
@@ -330,7 +340,8 @@ if __name__ == "__main__":
 
         print(np.diff(x_path_sim))
 
-        plt.quiver(x_path_real[:-1], y_path_real[:-1], np.diff(x_path_real), np.diff(y_path_real), angles='xy', scale_units='xy', scale=1,
+        plt.quiver(x_path_real[:-1], y_path_real[:-1], np.diff(x_path_real), np.diff(y_path_real), angles='xy',
+                   scale_units='xy', scale=1,
                    label='real', color='C1')  # C1: matplotlib orange
         plt.quiver(x_path_sim[:-1], y_path_sim[:-1], np.diff(x_path_sim), np.diff(y_path_sim), angles='xy',
                    scale_units='xy', scale=1, label='sim', color='C0')  # C0: matplotlib blue
@@ -340,10 +351,10 @@ if __name__ == "__main__":
         plt.ylabel('y / parallel distance from palm (m)')
         plt.xlim(-0.1, 0.1)
         plt.ylim(0, 0.1)
-        plt.savefig(os.path.join(results_obs_dir, 'object_path_' + 'x_' + "{:05d}".format(int(x_noise * 1000)) + '_y_' + "{:05d}".format(
+        plt.savefig(os.path.join(results_obs_dir, 'object_path_' + str(episode_idx).zfill(3) + '_x_' + "{:05d}".format(
+            int(x_noise * 1000)) + '_y_' + "{:05d}".format(
             int(y_noise * 1000)) + '.png'))
         plt.clf()
-
 
     reward_df = pd.DataFrame({
         'x_noise': x_noise_arr,

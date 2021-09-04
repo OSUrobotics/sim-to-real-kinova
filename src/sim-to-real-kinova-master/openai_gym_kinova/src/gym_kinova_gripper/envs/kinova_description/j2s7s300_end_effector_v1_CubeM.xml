@@ -39,9 +39,12 @@
 
     <worldbody>
         <body name="root" pos="0 0 0">
-
+            <geom type="sphere" size="0.19151281941 0.19151281941 0.19151281941" pos="0 0 0" rgba="0.5 0.5 0.5 0.2" />
             <camera euler="0 0 3.14" mode="fixed" name="camera" pos="0 0 1" />
-            <body euler="-1.57 0 -1.57" name="j2s7s300_link_7" pos="0.0 0.18 0.0654">
+<!--            <body euler="-1.57 0 -1.57" name="j2s7s300_link_7" pos="0.0 0.18 0.0654">-->
+<!--            <body euler="-1.5696701508795226 -0.3213123 -1.5692036734575932" name="j2s7s300_link_7" pos="-0.8343860018001261 0.834386001800126 0.0654">-->
+<!--            <body euler="0 0 0" name="j2s7s300_link_7" pos="0.0 0 0.1915">-->
+<!--            <body euler="0 0 0" name="j2s7s300_link_7" pos="0 0.18 0">-->
                 <inertial diaginertia="0.00034532 0.00034532 0.00058160" mass="0.727" pos="0 0 -0.06" />
 
                 <joint axis="0 1 0" limited="true" name="j2s7s300_slide_x" pos="0 0 0" range="-0.5 0.5" type="slide" />
@@ -55,8 +58,7 @@
                 <site name="palm_4" pos="0.0 0.015 -0.11" quat="0 1 0 0" rgba="25 0.5 0.7 1" size="0.005 0.005 0.005" type="cylinder" />
 
 
-
-                <body euler="1.57079924 -1.35961082 -2.23052837" name="j2s7s300_link_finger_1" pos="0.00279 0.03126 -0.11467">
+                <body name="j2s7s300_link_finger_1" pos="0.00279 0.03126 -0.11467" quat="0.379408 -0.662973 -0.245899 0.596699">
                     <inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
                     <joint axis="0 0 1" limited="true" name="j2s7s300_joint_finger_1" pos="0 0 0" range="0 2" />
                     <geom mesh="finger_proximal" name="f1_prox" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
@@ -64,13 +66,12 @@
                     <site euler="1.57 3.14 1.57" name="f1_prox_1" pos="0.02 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
 
 
-
-						<body name="j2s7s300_link_finger_tip_1" pos="0.044 -0.003 0">
-							<inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
-							<joint axis="0 0 1" name="j2s7s300_joint_fingertip_1" pos="0 0 0" range="0 2" />
-							<geom mesh="finger_distal" name="f1_dist" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
-							<site euler="1.57 3.14 1.57" name="f1_dist" pos="0.03 0.0 0.0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
-							<site euler="1.57 3.14 1.57" name="f1_dist_1" pos="0.02 0.0 0.0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                    <body name="j2s7s300_link_finger_tip_1" pos="0.044 -0.003 0">
+                        <inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
+                        <joint axis="0 0 1" name="j2s7s300_joint_fingertip_1" pos="0 0 0" range="0 2" />
+                        <geom mesh="finger_distal" name="f1_dist" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
+                        <site euler="1.57 3.14 1.57" name="f1_dist" pos="0.03 0.0 0.0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                        <site euler="1.57 3.14 1.57" name="f1_dist_1" pos="0.02 0.0 0.0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
 
 
                     </body>
@@ -79,20 +80,20 @@
                 </body>
 
 
-					<body name="j2s7s300_link_finger_2" pos="0.02226 -0.02707 -0.11482" quat="0.659653 -0.37146 0.601679 -0.254671">
-						<inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
-						<joint axis="0 0 1" limited="true" name="j2s7s300_joint_finger_2" pos="0 0 0" range="0 2" />
-						<geom mesh="finger_proximal" name="f2_prox" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
-						<site euler="1.57 3.14 1.57" name="f2_prox" pos="0.03 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
-						<site euler="1.57 3.14 1.57" name="f2_prox_1" pos="0.02 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                <body name="j2s7s300_link_finger_2" pos="0.02226 -0.02707 -0.11482" quat="0.659653 -0.37146 0.601679 -0.254671">
+                    <inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
+                    <joint axis="0 0 1" limited="true" name="j2s7s300_joint_finger_2" pos="0 0 0" range="0 2" />
+                    <geom mesh="finger_proximal" name="f2_prox" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
+                    <site euler="1.57 3.14 1.57" name="f2_prox" pos="0.03 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                    <site euler="1.57 3.14 1.57" name="f2_prox_1" pos="0.02 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
 
 
-						<body name="j2s7s300_link_finger_tip_2" pos="0.044 -0.003 0">
-							<inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
-							<joint axis="0 0 1" name="j2s7s300_joint_fingertip_2" pos="0 0 0" range="0 2" />
-							<geom mesh="finger_distal" name="f2_dist" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
-							<site euler="1.57 3.14 1.57" name="f2_dist" pos="0.03 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
-							<site euler="1.57 3.14 1.57" name="f2_dist_1" pos="0.02 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                    <body name="j2s7s300_link_finger_tip_2" pos="0.044 -0.003 0">
+                        <inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
+                        <joint axis="0 0 1" name="j2s7s300_joint_fingertip_2" pos="0 0 0" range="0 2" />
+                        <geom mesh="finger_distal" name="f2_dist" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
+                        <site euler="1.57 3.14 1.57" name="f2_dist" pos="0.03 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                        <site euler="1.57 3.14 1.57" name="f2_dist_1" pos="0.02 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
 
                     </body>
 
@@ -100,20 +101,20 @@
                 </body>
 
 
-					<body name="j2s7s300_link_finger_3" pos="-0.02226 -0.02707 -0.11482" quat="0.601679 -0.254671 0.659653 -0.37146">
-						<inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
-						<joint axis="0 0 1" limited="true" name="j2s7s300_joint_finger_3" pos="0 0 0" range="0 2" />
-						<geom mesh="finger_proximal" name="f3_prox" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
-						<site euler="1.57 3.14 1.57" name="f3_prox" pos="0.03 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
-						<site euler="1.57 3.14 1.57" name="f3_prox_1" pos="0.02 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                <body name="j2s7s300_link_finger_3" pos="-0.02226 -0.02707 -0.11482" quat="0.601679 -0.254671 0.659653 -0.37146">
+                    <inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
+                    <joint axis="0 0 1" limited="true" name="j2s7s300_joint_finger_3" pos="0 0 0" range="0 2" />
+                    <geom mesh="finger_proximal" name="f3_prox" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
+                    <site euler="1.57 3.14 1.57" name="f3_prox" pos="0.03 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                    <site euler="1.57 3.14 1.57" name="f3_prox_1" pos="0.02 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
 
 
-						<body name="j2s7s300_link_finger_tip_3" pos="0.044 -0.003 0">
-							<inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
-							<joint axis="0 0 1" name="j2s7s300_joint_fingertip_3" pos="0 0 0" range="0 2" />
-							<geom mesh="finger_distal" name="f3_dist" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
-							<site euler="1.57 3.14 1.57" name="f3_dist" pos="0.03 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
-							<site euler="1.57 3.14 1.57" name="f3_dist_1" pos="0.02 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                    <body name="j2s7s300_link_finger_tip_3" pos="0.044 -0.003 0">
+                        <inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
+                        <joint axis="0 0 1" name="j2s7s300_joint_fingertip_3" pos="0 0 0" range="0 2" />
+                        <geom mesh="finger_distal" name="f3_dist" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
+                        <site euler="1.57 3.14 1.57" name="f3_dist" pos="0.03 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
+                        <site euler="1.57 3.14 1.57" name="f3_dist_1" pos="0.02 0 0" rgba="25 0.5 0.7 1" size="0.002 0.002 0.002" type="cylinder" />
 
                     </body>
 

@@ -42,7 +42,7 @@
         <body name="root" pos="0 0 0">
 
             <camera euler="0 0 3.14" mode="fixed" name="camera" pos="0 0 1" />
-            <body euler="-1.57 0 -1.57" name="j2s7s300_link_7" pos="0.0 0.18 0.0654">
+            <body euler="-1.57 0.0 -1.57" name="j2s7s300_link_7" pos="0.0 0.18 0.0654">
                 <inertial diaginertia="0.00034532 0.00034532 0.00058160" mass="0.727" pos="0 0 -0.06" />
 
                 <joint axis="0 1 0" limited="true" name="j2s7s300_slide_x" pos="0 0 0" range="-0.5 0.5" type="slide" />
@@ -57,7 +57,7 @@
 
 
                 
-                <body euler="1.57079924 -1.35961082 -2.23052837" name="j2s7s300_link_finger_1" pos="0.00279 0.03126 -0.11467">
+                <body name="j2s7s300_link_finger_1" pos="0.00279 0.03126 -0.11467" quat="0.379408 -0.662973 -0.245899 0.596699">
                     <inertial diaginertia="7.89997e-07 7.89997e-07 8e-08" mass="0.01" pos="0.022 0 0" />
                     <joint axis="0 0 1" limited="true" name="j2s7s300_joint_finger_1" pos="0 0 0" range="0 2" />
                     <geom mesh="finger_proximal" name="f1_prox" rgba="0.792157 0.819608 0.933333 1" type="mesh" />
