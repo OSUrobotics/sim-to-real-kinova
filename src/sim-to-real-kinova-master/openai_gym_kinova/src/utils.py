@@ -104,8 +104,8 @@ def state_dim_setup(state_dim_option):
         # this one is based on sim2real
         'adam_sim2real_v02': np.concatenate((f1_prox_pos_idx, f1_dist_pos_idx, f2_prox_pos_idx, f2_dist_pos_idx,
                                              obj_pos_idx, f1_f2_joint_angles_idx, obj_size_idx,
-                                             finger_obj_dist_f1_dist_1, finger_obj_dist_f1_prox_1,
-                                             finger_obj_dist_f2_dist_1, finger_obj_dist_f2_prox_1))
+                                             finger_obj_dist_f1_prox_1, finger_obj_dist_f1_dist_1,
+                                             finger_obj_dist_f2_prox_1, finger_obj_dist_f2_dist_1))
         # this one removes wrist position and third finger joints.
     }
 
