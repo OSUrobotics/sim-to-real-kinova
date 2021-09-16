@@ -14,7 +14,7 @@ Assumes that you know how to run Jupyter Notebooks
 `real_world_replay_buffer.ipynb` - some proto code I wrote while developing the live learning code to learn from IRL episodes. should be scriptified already
 `rotation_noise_hell.ipynb` - some proto code I wrote while developing the live learning code. see https://gist.github.com/jimzers/fa997c034c53b59fd3121877a9dfaaa5
 `testing_aruco.ipynb` - code for testing if we can read images of aruco markers. can ignore
-`testing_generated_coordinate_information.ipynb` - 
+`testing_generated_coordinate_information.ipynb` - code that generates coordinates and takes pictures of the first frame seen.
 `testing_policy_notebook.ipynb` - testing code for sanity checking RL policy actions under recorded states from real world vs sim
 `testing_simulator.ipynb` - some sandbox code to play around the with reset fn in the simulator openai gym stuff
 `test_pid_controller.ipynb` - unfinished PID testing code
