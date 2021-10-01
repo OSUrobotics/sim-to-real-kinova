@@ -145,7 +145,7 @@ Logging directory can be either simulation or real world logs. This generates:
 
 
 
-For comparing two folders to another:
+For comparing two folders to another (needs to be run after `visualize_irl.py` is run on both folders:
 
 `python3 compare_sim_to_real_analysis.py --real_dir <name of real world log dir> --sim_dir <name of simulation log dir> --results_dir <desired logging directory> --compare_gifs`
 

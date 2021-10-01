@@ -3,7 +3,7 @@
 import numpy as np
 import cv2 
 import glob
-import cv2.aruco as aruco
+#import cv2.aruco as aruco
 import math
 
 """
@@ -25,7 +25,7 @@ img_points = [] # 2D points in image plane
 # size = 0.025 #m or 25 cm 
 
 # images = glob.glob('/home/mechagodzilla/sim-to-real-kinova/kinova_pkg/camera_calibration/*.png')
-images = glob.glob('/home/mechagodzilla/sim-to-real-kinova/calibration_photos/*.png')
+images = glob.glob('/home/mechagodzilla/sim-to-real-kinova/calibration_photos/*.jpg')
 
 for fname in images:
     img = cv2.imread(fname)
@@ -40,7 +40,7 @@ for fname in images:
 
         corners2 = cv2.cornerSubPix(gray,corners,(11,11),(-1,-1),criteria)
         img_points.append(corners2)
-
+        print('corners',corners2)
         #Draw and display the corners
         img = cv2.drawChessboardCorners(img, (9,6), corners2, ret)
         cv2.imshow('img',img)

@@ -108,8 +108,11 @@ class KinovaGripper_Env:
                                                          0.7071]  # try to be like simulator
 
         # NOTE: WE ADDED IN THIS SHIFT MANUALLY BECAUSE IRL ROBOT WAS GLITCHING!
-        self.pre_grasp_orientation_cartesian = [0.065, -0.60, 0.185, 0.7071, 0.0, 0.0,
-                                                         0.7071]  # try to be like simulator
+        """
+        UNCOMMNENT OR RECOMMENT ME IF POSITIONING AT ORIGIN IS OFF!
+        """
+        # self.pre_grasp_orientation_cartesian = [0.065, -0.60, 0.185, 0.7071, 0.0, 0.0,
+        #                                                  0.7071]  # try to be like simulator
         # self.pre_grasp_orientation_cartesian = self.pre_grasp_orientation_cartesian_sim_mock
         """
         python2
@@ -154,8 +157,9 @@ class KinovaGripper_Env:
                                                 queue_size=10)
         self.finger_angle_sub = rospy.Subscriber('/finger_angle', Float32MultiArray, self.finger_angle_callback,
                                                  queue_size=10)
-        # self.finger2_dist_angle_sub = rospy.Subscriber('/finger2_dist_angle', Float32, self.finger2_dist_angle_callback, queue_size=10)
-
+        #self.finger2_dist_angle_sub = rospy.Subscriber('/finger_dot_prod', Float32, self.finger2_dist_angle_callback, queue_size=10)
+        self.finger_dot_prod_sub = rospy.Subscriber('/finger_dot_prod', Float32, self.finger_dot_prod_callback, queue_size=10)
+        self.dot_prod = []
         ###Publisher###
         self.finger_command_pub = rospy.Publisher('/sim2real/finger_command', FingerPosition, queue_size=10)
         self.joint_angle_command_pub = rospy.Publisher('/sim2real/joint_angle_command', JointState, queue_size=10)
@@ -303,13 +307,13 @@ class KinovaGripper_Env:
         obj_size = self.get_obj_size()  # TODO
         finger_obj_dist = self.get_finger_obj_dist()  # TODO
         # fingers_6D_pose = []
-
+        dot_prods = self.dot_prod
         fingers_6D_pose = self.get_finger_pos()  # TODO
 
         # Most recent commit: we halve the object size along certain dimensions, we remove the wrist pose...
 
         res_obs = fingers_6D_pose + list(obj_pose) + joint_states + \
-                  [obj_size[0] * 0.5, obj_size[1] * 0.5, obj_size[2]] + finger_obj_dist  # + [x_angle, z_angle]
+                  [obj_size[0] * 0.5, obj_size[1] * 0.5, obj_size[2]] + finger_obj_dist + dot_prods # + [x_angle, z_angle]
         # print('this is the obs data',fingers_6D_pose)
 
         print('==================== start obs ===========================')
@@ -508,6 +512,7 @@ class KinovaGripper_Env:
         is_done = total_pos >= threshold
 
         return is_done
+
 
     def move_arm_cartesian(self, cartesian_goal):
         """
@@ -821,6 +826,9 @@ class KinovaGripper_Env:
 
     def finger_dist_callback(self, msg):
         self.finger_dist_list = list(msg.data)
+
+    def finger_dot_prod_callback(self, msg):
+        self.dot_prod = list(msg.data)
 
     # TODO: ARE WE EVEN USING THIS???
     def reset_check_callback(self, msg):

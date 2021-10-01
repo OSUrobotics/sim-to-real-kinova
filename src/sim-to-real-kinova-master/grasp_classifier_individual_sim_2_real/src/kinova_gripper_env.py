@@ -216,6 +216,8 @@ class KinovaGripper_Env:
         self.finger_pos_goal.finger2 = action.finger2
         self.finger_pos_goal.finger3 = action.finger3
         self.finger_command_pub.publish(self.finger_pos_goal)
+
+        # control by position here.
         
         while not rospy.get_param('exec_done'):
             rospy.sleep(0.1)

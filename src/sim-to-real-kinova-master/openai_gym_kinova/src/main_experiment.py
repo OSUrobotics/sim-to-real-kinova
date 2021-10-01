@@ -29,15 +29,17 @@ from utils import Noiser
 
 # the actual openai gym
 from kinova_gripper_env import KinovaGripper_Env
-
+from expert_controller import ExpertPIDController, get_action
 # the DDPGfD thingy
 from DDPGfD import DDPGfD
 
 # import simpleaudio as sa
 
+class Eclass:
+    pass
+
 if __name__ == '__main__':
     rospy.init_node('openai_gym_kinova')
-
     try:
         # # TODO: instead of sleeping, listen to a "ready" channel or service.
         # rospy.sleep(5.0)
@@ -78,7 +80,16 @@ if __name__ == '__main__':
         Loading parameters from YAML file
         """
         config_path = 'experiment_configs/'
-        filename = 'real_constant_v1_cube_observation.yaml'
+
+        """
+        TOUCH THIS
+        """
+        filename = 'icra/icra_real_cylinder_variable_speed_pt1.yaml'  # HEY YOU! CHANGE THIS TO CHANGE THE CONFIG FILE
+        """
+        SDFKLJASDFJKLSDFJKLSDFJKLSDF
+        """
+
+
         config_filepath = os.path.join(rel_dirname, config_path, filename)
 
         print('config filepath: ', config_filepath)
@@ -109,6 +120,10 @@ if __name__ == '__main__':
             live_training = controller_params['live_training']
             assert type(live_training) == bool, 'make sure your live_training parameter is a boolean (true or false)'
             agent = RLAgent(trained_policy_path=os.path.join(rel_dirname, controller_params['policy_filepath']))
+        elif controller_type == 'PID':
+            print('using a PID controller')
+            agent = Eclass()
+            agent.act = get_action
         else:
             # NOOOOOOOOOOOOOO
             rospy.error('YOU DIDNT GIVE A VALID CONTROLLER TYPE (TURN THIS INTO AN ASSERTION)')
@@ -189,6 +204,7 @@ if __name__ == '__main__':
             logger.record_current_episode(True)  # set recording on
 
             obs = env.get_obs()  # get the most recent observation
+
             info = env.get_info()
 
             noise_info = {
@@ -201,10 +217,13 @@ if __name__ == '__main__':
             }
 
             logger.record_starting_position(obs, info, noise_info=noise_info)
-
+            expert_PID_controller = ExpertPIDController(obs)
             for timestep_idx in range(max_timesteps):  # or turn this into for loop
                 print('timestep:', timestep_idx)
-                action = np.array([0, 0, 0]) if done else agent.act(obs)
+                if controller_type == "PID":
+                    action = np.array([0, 0, 0]) if done else agent.act(obs,expert_PID_controller)
+                else:
+                    action = np.array([0, 0, 0]) if done else agent.act(obs)
                 print('THE ACTION IS:', action)
                 next_obs, reward, done, info = env.step(action)
 
@@ -228,6 +247,7 @@ if __name__ == '__main__':
 
                 rate.sleep()
 
+                # IF WE COMMENT THIS AND IT STILL ACTS THE SAME THEN SOMETHINGS FISHY
                 obs = next_obs
 
             # once set as done, check reward

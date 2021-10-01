@@ -1,5 +1,19 @@
 build/
 devel/
+ros_lib/
+old_photos/
+src/
+.ipynb_checkpoints/
+
+
+!src/sim-to-real-kinova-master
+
+src/sim-to-real-kinova-master/openai_gym_kinova/src
+!src/sim-to-real-kinova-master/openai_gym_kinova/src*.py
+!src/sim-to-real-kinova-master/openai_gym_kinova/src/experiment_configs
+!src/sim-to-real-kinova-master/openai_gym_kinova/src/shape_orientations
+!src/sim-to-real-kinova-master/openai_gym_kinova/src/policies
+!src/sim-to-real-kinova-master/openai_gym_kinova/src/gym_kinova_gripper
 
 *.pyc
 

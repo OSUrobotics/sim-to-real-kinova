@@ -98,7 +98,7 @@ if __name__ == '__main__':
 
     logger = None
     if logger_params['use_logger']:
-        log_dir = os.path.join(rel_dirname, logger_params['log_dir'])
+        log_dir = os.path.join(rel_dirname, experiment_name)
         logger = Logger(log_dir=log_dir, use_video=logger_params['use_video'],
                         start_episode_num=noise_params['start_index'] + 1)
 
