@@ -7,9 +7,19 @@ project(object_detection_pkg)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+#SET(opencv_DIR "/home/nigel/opencv/build")
+#set(opencv_DIR /usr/share/OpenCV/)
+
+# use this directory if you already have opencv installed.
+set(OpenCV_DIR /usr/share/OpenCV/)
+
+# use this directory if you don't already have opencv installed. and followed the instructions on building cmake properly
+#set(OpenCV_DIR ~/ihateopencv/build/)
+#set(OpenCV_DIR ~/adam-research/opencv_build_hell/build/)
+
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
-  opencv2
+  OpenCV
   roscpp
   rospy
   sensor_msgs

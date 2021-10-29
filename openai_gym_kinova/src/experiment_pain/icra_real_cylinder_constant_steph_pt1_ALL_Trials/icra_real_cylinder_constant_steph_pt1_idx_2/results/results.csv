@@ -1,0 +1,3 @@
+,x_noise,y_noise,z_noise,Success,trans_err,quat_dist
+0,0.01,0.01,0.0,True,0.01414213562373095,0.0
+1,0.02,0.02,0.0,False,0.0282842712474619,0.0

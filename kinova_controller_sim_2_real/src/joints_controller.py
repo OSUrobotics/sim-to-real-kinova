@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python2
 """A helper program to test cartesian goals for the JACO and MICO arms."""
 
 ###############

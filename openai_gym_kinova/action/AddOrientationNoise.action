@@ -1,0 +1,10 @@
+# Define the goal
+float32 pitch
+float32 roll
+float32 yaw
+---
+# Define the result
+std_msgs/Bool end_state
+---
+# Define a feedback message
+std_msgs/Bool is_finished

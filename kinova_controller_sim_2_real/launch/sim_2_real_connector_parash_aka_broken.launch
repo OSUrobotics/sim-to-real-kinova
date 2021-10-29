@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+
+  <rosparam command="load" file="$(find kinova_controller_sim_2_real)/config/params.yaml"/>
+  
+  <node pkg="kinova_controller_sim_2_real" name="fingers_controller" type="fingers_controller.py" output="screen"/>
+  
+  <node pkg="kinova_controller_sim_2_real" name="joints_controller" type="joints_controller.py" output="screen"/>
+  
+</launch>

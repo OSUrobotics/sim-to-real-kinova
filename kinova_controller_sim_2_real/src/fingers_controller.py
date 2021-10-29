@@ -31,13 +31,18 @@ def gripper_client(msg):
     client = actionlib.SimpleActionClient(action_address,
                                           kinova_msgs.msg.SetFingersPositionAction)
     client.wait_for_server()
-    finger_positions = list(msg.finger1, msg.finger2, msg.finger3)
+    finger_positions = [msg.finger1, msg.finger2, msg.finger3]
+    # print('DAMN IT HERE ARE THE POSITIONS')
+    # print(finger_positions)
+    # print(action_address)
+    print("Calling on fingers_controller.py - Going to position:", finger_positions)
+
     goal = kinova_msgs.msg.SetFingersPositionGoal()
     goal.fingers.finger1 = float(finger_positions[0])
     goal.fingers.finger2 = float(finger_positions[1])
     goal.fingers.finger3 = float(finger_positions[2])
     client.send_goal(goal)
-    if client.wait_for_result(rospy.Duration(1.0)):
+    if client.wait_for_result(rospy.Duration(3.0)):
         rospy.set_param('exec_done', "true")
         return client.get_result()
     else:
