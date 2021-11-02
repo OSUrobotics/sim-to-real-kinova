@@ -1,6 +1,0 @@
-Heatmap Coords 
-Saved at: ./experiments/train/state_dim_full_train_v01/_07_22_21_0544/output/heatmap//normal/CubeM/local
-Shape: CubeM
-Normal Orientation
-# Success: 80
-# Fail: 20

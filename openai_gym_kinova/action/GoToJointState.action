@@ -1,8 +1,0 @@
-# Define the goal
-sensor_msgs/JointState goal_joint_state
----
-# Define the result
-std_msgs/Bool end_state
----
-# Define a feedback message
-std_msgs/Bool is_finished

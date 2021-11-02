@@ -1,0 +1,5 @@
+[default]
+entity = jimzers
+project = kinova_grasping
+base_url = https://api.wandb.ai
+

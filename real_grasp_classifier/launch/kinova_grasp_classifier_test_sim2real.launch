@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="use_hardware" default="false"/>
+  <arg name="collect_data" default="false"/>
+  <node pkg="rosbag" type="record" name="rosbag_record_sensors"
+            args="record -o /home/nigel/physical_data/ /data_to_save /j2s7s300_driver/out/joint_state /usb_cam/image_raw" if="$(arg collect_data)"/> 
+            <!-- INCLUDE THIS IN THE PREVIOUS RECORDING THING TO SAVE CAMERA DATA /usb_cam/image_raw -->
+  <rosparam command="load" file="$(find grasp_classifier_individual_sim_2_real)/config/params.yaml"/>
+  
+  <!-- <include file="$(find kinova_bringup)/launch/kinova_robot.launch">
+    <arg name="kinova_robotType" value="j2s7s300"/>
+  </include> 
+  
+  <include file="$(find j2s7s300_moveit_config)/launch/j2s7s300_demo.launch"/> -->
+  <include file="$(find grasp_classifier_individual_sim_2_real)/launch/cam_launch.launch"/>
+  
+  <include file="$(find kinova_controller_sim_2_real)/launch/sim_2_real_connector.launch"/>
+  
+  <include file="$(find object_detection_pkg)/launch/object_detection.launch"/>
+  
+  <node pkg="grasp_classifier_individual_sim_2_real" name="grasp_classifier_test" type="grasp_classifier_test.py" output="screen"/>
+  
+  <node
+   name="serial_node"
+   pkg="rosserial_python"
+   type="serial_node.py"
+   if="$(arg use_hardware)"
+   >
+   <param name="port" type="string" value="/dev/ttyACM0"/>   <param name="baud" type="int" value="57600"/></node>
+  
+</launch>

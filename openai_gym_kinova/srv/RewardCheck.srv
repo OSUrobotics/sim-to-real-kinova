@@ -1,4 +1,0 @@
-sensor_msgs/Image Image
----
-bool success
-# other intermediate shit goes here
