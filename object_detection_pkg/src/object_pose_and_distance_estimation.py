@@ -1,5 +1,11 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
+
+import sys
+print("Python version")
+print (sys.version)
+print("Version info.")
+print (sys.version_info)
 import rospy
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
