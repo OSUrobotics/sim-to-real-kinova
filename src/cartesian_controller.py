@@ -15,13 +15,13 @@ from tf.transformations import quaternion_from_euler
 from tf.transformations import euler_from_quaternion
 
 import actionlib
-from openai_gym_kinova.msg import GoToPoseOrientationCartesianAction, GoToPoseOrientationCartesianFeedback, \
+from sim_to_real_kinova.msg import GoToPoseOrientationCartesianAction, GoToPoseOrientationCartesianFeedback, \
     GoToPoseOrientationCartesianResult
-from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, \
+from sim_to_real_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, \
     GoToJointStateResult  # go to joint state
-from openai_gym_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, \
+from sim_to_real_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, \
     AddOrientationNoiseResult  # add orientation noise
-from openai_gym_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, \
+from sim_to_real_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, \
     AddPositionalNoiseResult  # add positional noise
 
 

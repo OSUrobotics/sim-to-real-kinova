@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 ###############
 # Author: Adam
@@ -20,12 +20,12 @@ from std_msgs.msg import Bool
 from geometry_msgs.msg import Point, Pose
 
 import actionlib
-from openai_gym_kinova.msg import GoToPoseOrientationCartesianAction, GoToPoseOrientationCartesianFeedback, \
+from sim_to_real_kinova.msg import GoToPoseOrientationCartesianAction, GoToPoseOrientationCartesianFeedback, \
     GoToPoseOrientationCartesianResult, GoToPoseOrientationCartesianGoal
-from openai_gym_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, GoToJointStateResult, GoToJointStateGoal
-from openai_gym_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, AddPositionalNoiseResult, \
+from sim_to_real_kinova.msg import GoToJointStateAction, GoToJointStateFeedback, GoToJointStateResult, GoToJointStateGoal
+from sim_to_real_kinova.msg import AddPositionalNoiseAction, AddPositionalNoiseFeedback, AddPositionalNoiseResult, \
     AddPositionalNoiseGoal
-from openai_gym_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, AddOrientationNoiseResult, \
+from sim_to_real_kinova.msg import AddOrientationNoiseAction, AddOrientationNoiseFeedback, AddOrientationNoiseResult, \
     AddOrientationNoiseGoal
 
 from sensor_msgs.msg import Image
@@ -38,7 +38,11 @@ from utils import confirm_prompt
 
 import simpleaudio as sa
 import os
-
+import sys
+print("Python version in the file")
+print (sys.version)
+print("Version info that we care about.")
+print (sys.version_info)
 rel_dirname = os.path.dirname(__file__)
 
 class KinovaGripper_Env:

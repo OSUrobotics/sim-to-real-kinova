@@ -6,7 +6,7 @@
           args="record -o ~/physical_data/ /data_to_save /j2s7s300_driver/out/joint_state /usb_cam/image_raw"
           if="$(arg collect_data)"/>
     <!-- INCLUDE THIS IN THE PREVIOUS RECORDING THING TO SAVE CAMERA DATA /usb_cam/image_raw -->
-    <rosparam command="load" file="$(find openai_gym_kinova)/config/params.yaml"/>
+    <rosparam command="load" file="$(find sim_to_real_kinova)/config/params.yaml"/>
 
 
     <!--    Uncomment the stuff below, if you want to -->
@@ -18,17 +18,17 @@
     <param name="move_group/trajectory_execution/allowed_execution_duration_scaling" value="4.0"/>
     <param name="move_group/trajectory_execution/execution_duration_monitoring" value="false"/>
 
-    <include file="$(find openai_gym_kinova)/launch/cam_launch.launch"/>
+    <include file="$(find sim_to_real_kinova)/launch/cam_launch.launch"/>
 
-    <!--  <include file="$(find kinova_controller_sim_2_real)/launch/sim_2_real_connector.launch"/>-->
-    <include file="$(find kinova_controller_sim_2_real)/launch/sim_2_real_connector_parash_aka_broken.launch"/>
+    <!--  <include file="$(find kinova_controller)/launch/sim_2_real_connector.launch"/>-->
+    <include file="$(find kinova_controller)/launch/sim_2_real_connector_parash_aka_broken.launch"/>
 
-    <include file="$(find object_detection_pkg)/launch/object_detection.launch"/>
+    <include file="$(find kinova_object_detection)/launch/object_detection.launch"/>
 
-    <node pkg="openai_gym_kinova" name="velocity_controller" type="velocity_controller.py"/>
-    <node pkg="openai_gym_kinova" name="cartesian_controller" type="cartesian_controller.py" output="screen"/>
+    <node pkg="sim_to_real_kinova" name="velocity_controller" type="velocity_controller.py"/>
+    <node pkg="sim_to_real_kinova" name="cartesian_controller" type="cartesian_controller.py" output="screen"/>
 
-    <node pkg="openai_gym_kinova" name="sim_and_real_compare" type="sim_and_real_compare.py" output="screen"/>
+    <node pkg="sim_to_real_kinova" name="sim_and_real_compare" type="sim_and_real_compare.py" output="screen"/>
 
     <node
             name="serial_node"
